@@ -8,7 +8,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ParkourDataManager {
+public class CourseDataManager {
 
     private static final String FILE_PATH = "speedrun_data.txt";
 
