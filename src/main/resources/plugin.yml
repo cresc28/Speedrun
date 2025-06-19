@@ -1,0 +1,5 @@
+name: Speedrun
+version: '${project.version}'
+main: com.github.cresc28.speedrun.Speedrun
+authors: [cresc28]
+description: SpeedrunPlugin
