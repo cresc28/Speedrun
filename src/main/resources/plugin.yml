@@ -5,6 +5,6 @@ authors: [cresc28]
 description: SpeedrunPlugin
 
 commands:
-  parkour:
+  course:
     description: Make Speedrun cource
-    usage: /parkour [add/remove] [start/end] [name] or /parkour list
+    usage: /course [add/remove] [start/end] [name] or /course list
