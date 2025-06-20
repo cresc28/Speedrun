@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 
 public class Utils {
-
     //tickを現実時間に変換
     public static String formatTime(int ticks){
         int commas = (ticks % 20) * 5;

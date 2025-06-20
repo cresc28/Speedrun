@@ -2,14 +2,14 @@ package com.github.cresc28.speedrun.data;
 
 import org.bukkit.Location;
 
-public class PlayerState {
+public class RunState {
     private int startTime; //スタート時のtick
     private boolean isRunning; //スタートを踏んだ後か
     private boolean isOnEnd; //ゴール地点の上にいるか(ゴールの連発防止用)
     private String currentCourse; //現在走行中のコース
     private Location lastStartLocation; //最後に踏んだスタートの位置
 
-    public PlayerState() {
+    public RunState() {
         this.isRunning = false;
         this.isOnEnd = false;
         this.startTime = 0;
