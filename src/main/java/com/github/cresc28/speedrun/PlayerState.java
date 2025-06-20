@@ -17,28 +17,12 @@ public class PlayerState {
         this.lastStartLocation = null;
     }
 
-    public int getStartTime() {
-        return startTime;
-    }
-
-    public boolean isRunning() {
-        return isRunning;
-    }
-
     public boolean isOnEnd() {
         return isOnEnd;
     }
 
-    public String getCurrentCourse() {
-        return currentCourse;
-    }
-
-    public Location getLastStartLocation() {
-        return lastStartLocation;
-    }
-
     //計測開始
-    public boolean start(String courseName, int tick, Location currentLoc) {
+    public boolean startCourse(String courseName, int tick, Location currentLoc) {
         //直前に同じスタート地点を踏んでいなければ処理を開始。
         if (lastStartLocation == null || !lastStartLocation.equals(currentLoc)) {
             this.currentCourse = courseName;
@@ -51,8 +35,13 @@ public class PlayerState {
     }
 
     //計測終了
-    public void stop() {
-        this.isRunning = false;
+    public int endCourse(int tick, String courseName) {
+        //TAを開始していないまたはゴールしたコースが走行中のコースと不一致なら-1を返す。
+        if (!isRunning || !courseName.equals(currentCourse)) {
+            return -1;
+        }
+        isRunning = false;
+        return tick - startTime;
     }
 
     public void setOnEnd(boolean onEnd) {

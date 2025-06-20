@@ -24,42 +24,9 @@ public final class Speedrun extends JavaPlugin implements Listener {
         // Plugin startup logic
         Bukkit.getPluginManager().registerEvents(this,this);
         Bukkit.getLogger().info("Speedrunプラグインが起動しました。");
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                tick++;
-            }
-        }.runTaskTimer(this, 0, 1);
+        startTickCounter();
         getCommand("course").setExecutor(new SpeedrunCommand());
         CourseDataManager.load();
-    }
-
-    //計測開始
-    private void startTimer(Player player, UUID uuid, Location loc, String courseName){
-        PlayerState state = playerStates.computeIfAbsent(uuid, k -> new PlayerState());
-
-        boolean started = state.start(courseName, tick, loc);
-        if (started) {
-            player.sendMessage("計測開始！");
-        }
-    }
-
-    //計測終了
-    private void endTimer(Player player, UUID uuid, Location loc, String courseName){
-        PlayerState state = playerStates.computeIfAbsent(uuid, k -> new PlayerState());
-        //TAを開始していることスタートの時のパルクール名との一致が条件
-        if (state.isRunning() && courseName.equals(state.getCurrentCourse())) {
-            state.stop();
-            int record = tick - state.getStartTime();
-            String timeString = Utils.formatTime(record);
-            Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "を" + timeString + " (" + record + "tick)でクリア！");
-        }
-
-        //TAを開始したパルクール以外のパルクールのゴールを踏むとクリア表示のみを出す。
-        // isOnEndはゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
-        else if(!state.isOnEnd()) {
-            Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "をクリア！");
-        }
     }
 
     @EventHandler
@@ -79,10 +46,44 @@ public final class Speedrun extends JavaPlugin implements Listener {
             state.setOnEnd(true);
         }
 
-        else{
-            state.setOnEnd(false);
-        }
+        else state.setOnEnd(false);
 
         state.updateLastStartLocation(loc);
+    }
+
+    private void startTickCounter() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                tick++;
+            }
+        }.runTaskTimer(this, 0, 1);
+    }
+
+    //計測開始
+    private void startTimer(Player player, UUID uuid, Location loc, String courseName){
+        PlayerState state = playerStates.computeIfAbsent(uuid, k -> new PlayerState());
+
+        boolean started = state.startCourse(courseName, tick, loc);
+        if (started) {
+            player.sendMessage("計測開始！");
+        }
+    }
+
+    //計測終了
+    private void endTimer(Player player, UUID uuid, Location loc, String courseName){
+        PlayerState state = playerStates.computeIfAbsent(uuid, k -> new PlayerState());
+        int record = state.endCourse(tick, courseName);
+        //TAを開始していることスタートの時のパルクール名との一致が条件
+        if (record > 0) {
+            String timeString = Utils.formatTime(record);
+            Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "を" + timeString + " (" + record + "tick)でクリア！");
+        }
+
+        //TAを開始したパルクール以外のパルクールのゴールを踏むとクリア表示のみを出す。
+        // isOnEndはゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
+        else if(!state.isOnEnd()) {
+            Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "をクリア！");
+        }
     }
 }
