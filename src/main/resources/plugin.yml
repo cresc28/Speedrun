@@ -8,3 +8,10 @@ commands:
   course:
     description: Make Speedrun cource
     usage: /course [add/remove] [start/end] [name] or /course list
+    permission: speedrun.course
+    permission-message: "このコマンドを使用する権限がありません。"
+
+permissions:
+  speedrun.course:
+    description: コースコマンドの使用制限
+    default: op
