@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun;
+package com.github.cresc28.speedrun.data;
 
 import org.bukkit.Location;
 

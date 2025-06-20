@@ -112,6 +112,7 @@ public class CourseDataManager {
             }
         }
 
+        if(keysToRemove.isEmpty()) return false;
         keysToRemove.forEach(map::remove);
         save();
         return true;

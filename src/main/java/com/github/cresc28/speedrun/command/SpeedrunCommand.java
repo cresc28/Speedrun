@@ -89,7 +89,9 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
         else if (args.length == 2 && args[0].equals("remove")) {
             boolean removedStart = CourseDataManager.removeCourse(CourseDataManager.getStartMap(), args[1]);
             boolean removedEnd = CourseDataManager.removeCourse(CourseDataManager.getEndMap(), args[1]);
-            sendRemoveMessage(sender, (removedStart || removedEnd), args[1]);
+            boolean removed = removedStart || removedEnd;
+            if(removed) sendRemoveMessage(sender, removed, args[1]);
+            else sender.sendMessage(ChatColor.RED + "その名前のコースは登録されていません。");
             return true;
         }
 
@@ -100,11 +102,13 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
 
                 if (args[1].equals("start")) {
                     CourseDataManager.registarCourse(loc,args[2],"start");
+                    sender.sendMessage(String.format("スタート地点(%s) : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                     return true;
                 }
 
                 else if (args[1].equals("end")) {
                     CourseDataManager.registarCourse(loc,args[2],"end");
+                    sender.sendMessage(String.format("ゴール地点(%s) : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                     return true;
                 }
 
@@ -113,13 +117,15 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
             else if (args[0].equals("remove")) {
                 if (args[1].equals("start")) {
                     boolean removed = CourseDataManager.removeCourse(CourseDataManager.getStartMap(), args[2]);
-                    sendRemoveMessage(sender, removed, args[2]);
+                    if(removed) sendRemoveMessage(sender, removed, args[2]);
+                    else sender.sendMessage(ChatColor.RED + "その名前のコースは登録されていません。");
                     return true;
                 }
 
                 else if (args[1].equals("end")) {
                     boolean removed = CourseDataManager.removeCourse(CourseDataManager.getStartMap(), args[2]);
-                    sendRemoveMessage(sender, removed, args[2]);
+                    if(removed) sendRemoveMessage(sender, removed, args[2]);
+                    else sender.sendMessage(ChatColor.RED + "その名前のコースは登録されていません。");
                     return true;
                 }
             }

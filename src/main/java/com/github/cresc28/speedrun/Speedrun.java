@@ -2,6 +2,7 @@ package com.github.cresc28.speedrun;
 
 import com.github.cresc28.speedrun.command.SpeedrunCommand;
 import com.github.cresc28.speedrun.data.CourseDataManager;
+import com.github.cresc28.speedrun.data.PlayerState;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
