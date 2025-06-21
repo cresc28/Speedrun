@@ -1,5 +1,7 @@
 package com.github.cresc28.speedrun.utils;
 
+import org.bukkit.Location;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -22,5 +24,10 @@ public class Utils {
                 completions.add(value);
             }
         }
+    }
+
+    //プレイヤーの立っている座標(int)を取得
+    public static Location getBlockLocation(Location loc) {
+        return new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
 }

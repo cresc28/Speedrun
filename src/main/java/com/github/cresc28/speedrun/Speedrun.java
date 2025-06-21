@@ -1,7 +1,8 @@
 package com.github.cresc28.speedrun;
 
+import com.github.cresc28.speedrun.command.CheckpointCommand;
 import com.github.cresc28.speedrun.command.SpeedrunCommand;
-import com.github.cresc28.speedrun.data.CourseDataManager;
+import com.github.cresc28.speedrun.manager.CourseDataManager;
 import com.github.cresc28.speedrun.listener.PlayerInteractListener;
 import com.github.cresc28.speedrun.listener.PlayerMoveListener;
 import com.github.cresc28.speedrun.manager.TimerManager;
@@ -21,6 +22,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
 
         timerManager.startTimer(this);
         getCommand("course").setExecutor(new SpeedrunCommand());
+        getCommand("cp").setExecutor(new CheckpointCommand());
         CourseDataManager.load();
     }
 }

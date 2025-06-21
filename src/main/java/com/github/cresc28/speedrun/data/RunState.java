@@ -36,7 +36,7 @@ public class RunState {
 
     //計測終了
     public int endCourse(int tick, String courseName) {
-        //TAを開始していないまたはゴールしたコースが走行中のコースと不一致なら-1を返す。
+        //speedrunを開始していないまたはゴールしたコースが走行中のコースと不一致なら-1を返す。
         if (!isRunning || !courseName.equals(currentCourse)) {
             return -1;
         }

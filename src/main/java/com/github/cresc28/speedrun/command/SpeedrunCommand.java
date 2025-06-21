@@ -1,6 +1,7 @@
 package com.github.cresc28.speedrun.command;
 
-import com.github.cresc28.speedrun.data.CourseDataManager;
+import com.github.cresc28.speedrun.manager.CourseDataManager;
+import com.github.cresc28.speedrun.utils.MessageUtils;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -13,27 +14,6 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public class SpeedrunCommand implements CommandExecutor, TabCompleter {
-
-    private Location getBlockLocation(Location loc) {
-        return new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-    }
-
-    private void sendRemoveMessage(CommandSender sender, boolean removed, String courseName) {
-        if (removed) sender.sendMessage(courseName + "を削除しました。");
-        else sender.sendMessage(ChatColor.RED + "その名前のコースは登録されていません。");
-    }
-
-    //登録されているコースの一覧表示
-    private void displayCourse(Map<Location, String> map, CommandSender sender) {
-        if (map.isEmpty()) {
-            sender.sendMessage(ChatColor.RED + "登録済みのコースが存在しません。");
-            return;
-        }
-
-        Set<String> names = new HashSet<>(map.values());
-        sender.sendMessage(names.toString());
-    }
-
     //TAB補完
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
@@ -74,15 +54,13 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
         return completions;
     }
 
-
-
     //コマンドの受け取り
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!command.getName().equalsIgnoreCase("course")) return false;
 
         if(args.length == 1 && args[0].equals("list")) {
-            displayCourse(CourseDataManager.getStartMap(), sender);
+            MessageUtils.displayMap(CourseDataManager.getStartMap().values(), sender, "コース");
             return true;
         }
 
@@ -90,15 +68,14 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
             boolean removedStart = CourseDataManager.removeCourse(args[1], "start");
             boolean removedEnd = CourseDataManager.removeCourse(args[1], "end");
             boolean removed = removedStart || removedEnd;
-            if(removed) sendRemoveMessage(sender, removed, args[1]);
-            else sender.sendMessage(ChatColor.RED + "その名前のコースは登録されていません。");
+            MessageUtils.sendRemoveMessage(sender, removed, args[1], "コース");
             return true;
         }
 
         if (args.length == 3) {
             if (args[0].equals("add")) {
                 Player player = (Player) sender;
-                Location loc = getBlockLocation(player.getLocation());
+                Location loc = Utils.getBlockLocation(player.getLocation());
 
                 if (args[1].equals("start")) {
                     CourseDataManager.registerCourse(loc,args[2], "start");
@@ -117,15 +94,13 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
             else if (args[0].equals("remove")) {
                 if (args[1].equals("start")) {
                     boolean removed = CourseDataManager.removeCourse(args[2], "start");
-                    if(removed) sendRemoveMessage(sender, removed, args[2]);
-                    else sender.sendMessage(ChatColor.RED + "その名前のコースは登録されていません。");
+                    MessageUtils.sendRemoveMessage(sender, removed, args[2], "コース");
                     return true;
                 }
 
                 else if (args[1].equals("end")) {
                     boolean removed = CourseDataManager.removeCourse(args[2], "end");
-                    if(removed) sendRemoveMessage(sender, removed, args[2]);
-                    else sender.sendMessage(ChatColor.RED + "その名前のコースは登録されていません。");
+                    MessageUtils.sendRemoveMessage(sender, removed, args[2], "コース");
                     return true;
                 }
             }
