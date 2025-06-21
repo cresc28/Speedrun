@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun.data;
+package com.github.cresc28.speedrun.manager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,11 +25,11 @@ public class CourseDataManager {
         startMap.clear();
         endMap.clear();
 
-        loadPointMap(startMap,"start");
-        loadPointMap(endMap,"end");
+        loadToMap(startMap,"start");
+        loadToMap(endMap,"end");
     }
 
-    private static void loadPointMap(Map<Location, String> map, String type) {
+    private static void loadToMap(Map<Location, String> map, String type) {
         if (!config.isConfigurationSection(type)) return;
 
         for (String key : config.getConfigurationSection(type).getKeys(false)) {
@@ -63,8 +63,8 @@ public class CourseDataManager {
             }
         }
 
-        savePointMap(tempConfig, startMap,"start");
-        savePointMap(tempConfig, endMap,"end");
+        saveMap(tempConfig, startMap,"start");
+        saveMap(tempConfig, endMap,"end");
 
         try {
             // 一時ファイルに保存
@@ -76,7 +76,7 @@ public class CourseDataManager {
         }
     }
 
-    private static void savePointMap(FileConfiguration config, Map<Location, String> map, String type) {
+    private static void saveMap(FileConfiguration config, Map<Location, String> map, String type) {
         for (Map.Entry<Location, String> entry : map.entrySet()) {
             Location loc = entry.getKey();
             String key = String.format("%s,%d,%d,%d", loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
@@ -100,7 +100,7 @@ public class CourseDataManager {
         save();
     }
 
-    //登録されているコースの削除。typeはSTARTまたはENDを指定する。
+    //登録されているコースの削除。typeは"start"または"end"を指定する。
     public static boolean removeCourse(String CourseName, String type) {
         Map<Location, String> map;
 
@@ -112,22 +112,16 @@ public class CourseDataManager {
         }
         else return false;
 
-        List<Location> keysToRemove = new ArrayList<>();
-        for (Map.Entry<Location, String> entry : map.entrySet()) {
-            if (entry.getValue().equals(CourseName)) {
-                keysToRemove.add(entry.getKey());
-            }
-        }
+        int size = map.size();
+        map.keySet().removeIf(key -> CourseName.equals(map.get(key))); //指定された名前のコースを削除。
+        if(size == map.size()) return false; //mapのsizeが変わっていないなら削除されていない。
 
-        if(keysToRemove.isEmpty()) return false;
-        keysToRemove.forEach(map::remove);
         save();
         return true;
     }
 
-    //locをキーとする値を返す。typeはSTARTまたはENDを指定する。
+    //locをキーとする値を返す。typeは"start"または"end"を指定する。
     public static String getCourseName(Location loc, String type){
-
         if (type.equalsIgnoreCase("start")) {
             return startMap.get(loc);
         }

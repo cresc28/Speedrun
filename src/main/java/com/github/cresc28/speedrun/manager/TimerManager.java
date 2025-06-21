@@ -1,6 +1,5 @@
 package com.github.cresc28.speedrun.manager;
 
-import com.github.cresc28.speedrun.data.CourseDataManager;
 import com.github.cresc28.speedrun.data.RunState;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Bukkit;
