@@ -13,8 +13,13 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
+/**
+ * /course コマンドの実装クラス。
+ */
 public class SpeedrunCommand implements CommandExecutor, TabCompleter {
-    //TAB補完
+    /**
+     * Tab補完の処理を行う。
+     */
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
@@ -54,7 +59,9 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
         return completions;
     }
 
-    //コマンドの受け取り
+    /**
+     * コマンドの実行処理を行う。
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!command.getName().equalsIgnoreCase("course")) return false;

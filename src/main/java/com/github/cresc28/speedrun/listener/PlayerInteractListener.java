@@ -11,6 +11,15 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+
+/**
+ * プレイヤーのアイテムクリック時の処理を行う。
+ * <p>
+ * ネザースターの右クリックを検知するとチェックポイントへTPさせ、
+ * 左クリックを検知するとメニューを開く。
+ * </p>
+ */
+
 public class PlayerInteractListener implements Listener {
 
     @EventHandler
@@ -19,7 +28,7 @@ public class PlayerInteractListener implements Listener {
 
         if(item != null && item.getType() == Material.NETHER_STAR) {
             if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
-                Location loc = CheckpointManager.getCurrentCpLocation(event.getPlayer().getUniqueId());
+                Location loc = CheckpointManager.getCurrentGlobalCpLocation(event.getPlayer().getUniqueId());
                 if (loc != null) {
                     event.getPlayer().teleport(loc);
                 }

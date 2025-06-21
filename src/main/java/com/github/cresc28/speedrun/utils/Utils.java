@@ -6,8 +6,16 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+/**
+ * 汎用ユーティリティクラス。
+ */
 public class Utils {
-    //tickを現実時間に変換
+    /**
+     * tick数を現実時間に変更する
+     *
+     * @param ticks tick数
+     * @return 現実時間表示
+     */
     public static String formatTime(int ticks){
         int commas = (ticks % 20) * 5;
         int seconds = (ticks / 20) % 60;
@@ -17,7 +25,13 @@ public class Utils {
         return String.format("%02d:%02d:%02d.%02d0", hours, minutes, seconds, commas);
     }
 
-    //Collection内の全ての要素をTAB補完として表示する。
+    /**
+     * 指定されたcollectionの要素を全てTAB補完リストに追加する。
+     *
+     * @param source 補完対象のコレクション
+     * @param prefix 補完する文字列の頭文字
+     * @param completions 補完候補の追加先
+     */
     public static void completionFromMap(Collection<String> source, String prefix, List<String> completions) {
         for (String value : new HashSet<>(source)) {
             if (value.toLowerCase().startsWith(prefix)) {
@@ -26,7 +40,12 @@ public class Utils {
         }
     }
 
-    //プレイヤーの立っている座標(int)を取得
+    /**
+     * プレイヤーの真下のブロックのLocationをintで返す。
+     *
+     * @param loc 座標
+     * @return 整数化座標
+     */
     public static Location getBlockLocation(Location loc) {
         return new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
