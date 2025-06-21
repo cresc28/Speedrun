@@ -13,8 +13,13 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
+/**
+ * /cp コマンドの実装クラス。
+ */
 public class CheckpointCommand implements CommandExecutor, TabCompleter {
-    //TAB補完
+    /**
+    * Tab補完の処理を行う。
+    */
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
@@ -23,22 +28,31 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
         if (!command.getName().equalsIgnoreCase("cp")) return null;
 
         if (args.length == 1) {
-            List<String> options = Arrays.asList("remove", "list");
+            List<String> options = Arrays.asList("remove", "list", "arrowCrossWorldTp");
             for (String option : options) {
                 if (option.startsWith(args[0].toLowerCase())) completions.add(option);
             }
         }
 
         else if(args.length == 2) {
-            if ("remove".equalsIgnoreCase(args[0])) {
-                Utils.completionFromMap(CheckpointManager.getCheckpointNames(senderUuid), args[1].toLowerCase(), completions);
+            if (args[0].equalsIgnoreCase("remove")) {
+                Utils.completionFromMap(CheckpointManager.getCheckpointNames((Player) sender), args[1].toLowerCase(), completions);
+            }
+
+            else if(args[0].equalsIgnoreCase("arrowCrossWorldTp")){
+                List<String> options = Arrays.asList("true", "false");
+                for (String option : options) {
+                    if (option.startsWith(args[0].toLowerCase())) completions.add(option);
+                }
             }
         }
 
         return completions;
     }
 
-    //コマンドの受け取り
+    /**
+    * コマンドの実行処理を行う。
+    */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
@@ -48,37 +62,50 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
         if (!command.getName().equalsIgnoreCase("cp")) return false;
 
         if(args.length == 0){
-            CheckpointManager.registerCheckpoint(senderUuid, loc);
+            CheckpointManager.registerCheckpoint(player);
             return true;
         }
 
         else if(args.length == 1){
-            if(args[0].equals("list")){
-                MessageUtils.displayMap(CheckpointManager.getCheckpointNames(senderUuid), sender, "チェックポイント");
+            if(args[0].equalsIgnoreCase("list")){
+                MessageUtils.displayMap(CheckpointManager.getCheckpointNames(player), sender, "チェックポイント");
             }
 
             else{
-                CheckpointManager.registerCheckpoint(senderUuid, loc, args[0]);
+                CheckpointManager.registerCheckpoint(player, args[0]);
             }
 
             return true;
         }
 
         if(args.length == 2){
-            if(args[0].equals("remove")){
-                boolean removed = CheckpointManager.removeCheckpoint(senderUuid, args[1]);
+            if(args[0].equalsIgnoreCase("remove")){
+                boolean removed = CheckpointManager.removeCheckpoint(player, args[1]);
                 MessageUtils.sendRemoveMessage(sender, removed, args[1], "チェックポイント");
                 return true;
             }
-            else if(args[0].equals("tp")){
-                if(CheckpointManager.selectCp(senderUuid, args[1]) != null) {
-                    player.teleport(CheckpointManager.getCurrentCpLocation(senderUuid));
+            else if(args[0].equalsIgnoreCase("tp")){
+                if(!CheckpointManager.selectCheckpoint(player, args[1])) {
+                    player.teleport(CheckpointManager.getCurrentGlobalCpLocation(senderUuid));
                 }
 
                 else{
                     sender.sendMessage(ChatColor.RED + "指定された名前のチェックポイントは存在しません。");
                 }
 
+                return true;
+            }
+
+            else if(args[0].equalsIgnoreCase("arrowCrossWorldTp")){
+                if(args[1].equalsIgnoreCase("true")){
+
+                }
+
+                else if(args[1].equalsIgnoreCase("false")){
+
+                }
+
+                else sender.sendMessage("/cp arrowCrossWorldTp true/false");
                 return true;
             }
         }

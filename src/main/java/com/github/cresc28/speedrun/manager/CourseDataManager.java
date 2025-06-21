@@ -12,6 +12,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.logging.*;
 
+/**
+ * コースのロード・セーブ・登録・削除・取得を行うクラス。
+ */
+
 public class CourseDataManager {
     private static final Map<Location, String> startMap = new HashMap<>();
     private static final Map<Location, String> endMap = new HashMap<>();
@@ -20,7 +24,9 @@ public class CourseDataManager {
     private static final File TMP_FILE = new File("plugins/Speedrun/course.yml.tmp");
     private static final FileConfiguration config = YamlConfiguration.loadConfiguration(FILE);
 
-    //スタート/ゴール地点データのロード
+    /**
+     * Yamlファイルからスタート地点・ゴール地点の情報をロードする。
+     */
     public static void load() {
         startMap.clear();
         endMap.clear();
@@ -50,15 +56,16 @@ public class CourseDataManager {
         }
     }
 
-    //スタート/ゴール地点のロード
+    /**
+     * スタート地点・ゴール地点の情報をYamlファイルに保存する。
+     */
     public static void save() {
         File parentDir = FILE.getParentFile();
         FileConfiguration tempConfig = new YamlConfiguration();
 
-        //ディレクトリが存在しないなら作成
         if (!parentDir.exists()) {
             if (!parentDir.mkdirs()) {
-                LOGGER.log(Level.SEVERE, "speedrunディレクトリの作成に失敗しました。");
+                LOGGER.log(Level.SEVERE, "Speedrunディレクトリの作成に失敗しました。");
                 return;
             }
         }
@@ -67,10 +74,8 @@ public class CourseDataManager {
         saveMap(tempConfig, endMap,"end");
 
         try {
-            // 一時ファイルに保存
             tempConfig.save(TMP_FILE);
-            //一時ファイルから本ファイルにコピー
-            Files.move(TMP_FILE.toPath(), FILE.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            Files.move(TMP_FILE.toPath(), FILE.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE); //一時ファイルから本ファイルにコピー
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "本ファイルへのコピーに失敗しました。");
         }
@@ -84,7 +89,13 @@ public class CourseDataManager {
         }
     }
 
-    //コースの登録
+    /**
+     * 指定した座標にコース名を登録する。既に同じ座標に登録があれば上書きされる。
+     *
+     * @param loc        登録する座標
+     * @param courseName コース名
+     * @param type       "start" または "end"
+     */
     public static void registerCourse(Location loc, String courseName, String type){
         //重複が起きないよう現在座標をキーとする値を一旦削除
         startMap.remove(loc);
@@ -100,8 +111,14 @@ public class CourseDataManager {
         save();
     }
 
-    //登録されているコースの削除。typeは"start"または"end"を指定する。
-    public static boolean removeCourse(String CourseName, String type) {
+    /**
+     * 指定されたコース名の登録を削除する。
+     *
+     * @param courseName 削除対象のコース名
+     * @param type       "start" または "end"
+     * @return 削除に成功したか
+     */
+    public static boolean removeCourse(String courseName, String type) {
         Map<Location, String> map;
 
         if (type.equalsIgnoreCase("start")) {
@@ -113,14 +130,20 @@ public class CourseDataManager {
         else return false;
 
         int size = map.size();
-        map.keySet().removeIf(key -> CourseName.equals(map.get(key))); //指定された名前のコースを削除。
+        map.keySet().removeIf(key -> courseName.equals(map.get(key))); //指定された名前のコースを削除。
         if(size == map.size()) return false; //mapのsizeが変わっていないなら削除されていない。
 
         save();
         return true;
     }
 
-    //locをキーとする値を返す。typeは"start"または"end"を指定する。
+    /**
+     * 指定された座標のコース名を取得する。
+     *
+     * @param loc  座標
+     * @param type "start" または "end"
+     * @return コース名、存在しない場合はnull
+     */
     public static String getCourseName(Location loc, String type){
         if (type.equalsIgnoreCase("start")) {
             return startMap.get(loc);

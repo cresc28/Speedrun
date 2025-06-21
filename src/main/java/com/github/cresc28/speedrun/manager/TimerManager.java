@@ -12,10 +12,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * タイマーの管理と、計測開始・終了判定を行うクラス。
+ */
 public class TimerManager {
     private int tick = 0;
     private final Map<UUID, RunState> playerStates = new HashMap<>();
 
+    /**
+     * タイマーを開始する。
+     */
     public void startTimer(JavaPlugin plugin) {
         new BukkitRunnable() {
             @Override
@@ -25,6 +31,11 @@ public class TimerManager {
         }.runTaskTimer(plugin, 0, 1);
     }
 
+    /**
+     * プレイヤーの現在位置をチェックし、スタート地点またはゴール地点にいるなら計測開始・終了を行う。
+     *
+     * @param player プレイヤー
+     */
     public void detectStartOrEnd(Player player) {
         UUID uuid = player.getUniqueId();
         Location loc = player.getLocation().getBlock().getLocation();
