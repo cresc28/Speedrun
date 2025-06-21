@@ -15,10 +15,15 @@ public class CheckpointManager {
     private static final Map<UUID, Map<World, Map<String, Location>>> checkpoints = new HashMap<>(); //uuid->ワールド->CP名->座標と辿れる構成
     private static final Map<UUID, Location> globalCurrentCp = new HashMap<>(); //最後に設定されたCP
     private static final Map<UUID, Map<World, Location>> localCurrentCp = new HashMap<>(); //現在のワールドで最後に設定されたCP
+    private static boolean isCrossWorldTpAllowed; //異なるワールドへのTPを許可するか
 
-    //名前を自動で設定しCPを設定する。
+    /**
+     * 一時的なチェックポイントを登録。
+     *
+     * @param player プレイヤー
+     */
     public static void registerCheckpoint(Player player){
-        registerCheckpoint(player, generateName());
+        registerCheckpoint(player, "tmp");
     }
 
     /**
@@ -32,9 +37,11 @@ public class CheckpointManager {
         Location loc = player.getLocation();
         World world = loc.getWorld();
         Map<String, Location> map = checkpoints.computeIfAbsent(uuid, k -> new HashMap<>()).computeIfAbsent(world, w -> new HashMap<>());
+
         map.put(cpName, loc);
         globalCurrentCp.put(uuid, loc);
         localCurrentCp.computeIfAbsent(uuid, k -> new HashMap<>()).put(world, loc);
+        player.sendMessage("CPを設定しました。");
     }
 
     /**
@@ -106,6 +113,14 @@ public class CheckpointManager {
         return new ArrayList<>(cpMap.keySet());
     }
 
+    public static void setCrossWorldTpAllowed(boolean allowed){
+        isCrossWorldTpAllowed = allowed;
+    }
+
+    public static boolean isCrossWorldTpAllowed(){
+        return isCrossWorldTpAllowed;
+    }
+
     public static Location getCurrentGlobalCpLocation(UUID uuid){
         return globalCurrentCp.get(uuid);
     }
@@ -117,10 +132,5 @@ public class CheckpointManager {
         if (worldMap == null) return null;
 
         return worldMap.get(world);
-    }
-
-    //自動的に名前を割り当てる
-    private static String generateName(){
-        return "test";
     }
 }
