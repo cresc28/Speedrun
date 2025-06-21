@@ -28,18 +28,18 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
         if (!command.getName().equalsIgnoreCase("cp")) return null;
 
         if (args.length == 1) {
-            List<String> options = Arrays.asList("remove", "list", "arrowCrossWorldTp");
+            List<String> options = Arrays.asList("tp", "remove", "list", "allowCrossWorldTp");
             for (String option : options) {
                 if (option.startsWith(args[0].toLowerCase())) completions.add(option);
             }
         }
 
         else if(args.length == 2) {
-            if (args[0].equalsIgnoreCase("remove")) {
+            if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("tp")) {
                 Utils.completionFromMap(CheckpointManager.getCheckpointNames((Player) sender), args[1].toLowerCase(), completions);
             }
 
-            else if(args[0].equalsIgnoreCase("arrowCrossWorldTp")){
+            else if(args[0].equalsIgnoreCase("allowCrossWorldTp")){
                 List<String> options = Arrays.asList("true", "false");
                 for (String option : options) {
                     if (option.startsWith(args[0].toLowerCase())) completions.add(option);
@@ -86,23 +86,19 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
             }
             else if(args[0].equalsIgnoreCase("tp")){
                 if(!CheckpointManager.selectCheckpoint(player, args[1])) {
-                    player.teleport(CheckpointManager.getCurrentGlobalCpLocation(senderUuid));
+                    sender.sendMessage(ChatColor.RED + "指定された名前のチェックポイントは存在しません。");
                 }
 
                 else{
-                    sender.sendMessage(ChatColor.RED + "指定された名前のチェックポイントは存在しません。");
+                    player.teleport(CheckpointManager.getCurrentGlobalCpLocation(senderUuid));
                 }
 
                 return true;
             }
 
-            else if(args[0].equalsIgnoreCase("arrowCrossWorldTp")){
-                if(args[1].equalsIgnoreCase("true")){
-
-                }
-
-                else if(args[1].equalsIgnoreCase("false")){
-
+            else if(args[0].equalsIgnoreCase("allowCrossWorldTp")){
+                if(args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("false")){
+                    CheckpointManager.setCrossWorldTpAllowed(Boolean.parseBoolean(args[1]));
                 }
 
                 else sender.sendMessage("/cp arrowCrossWorldTp true/false");
