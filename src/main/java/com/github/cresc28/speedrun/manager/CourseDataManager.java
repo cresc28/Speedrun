@@ -19,7 +19,7 @@ import java.util.logging.*;
 public class CourseDataManager {
     private static final Map<Location, String> startMap = new HashMap<>();
     private static final Map<Location, String> endMap = new HashMap<>();
-    private static final Logger LOGGER = Logger.getLogger("Speedrun");
+    private static final Logger LOGGER = Logger.getLogger("CourseDataManager");
     private static final File FILE = new File("plugins/Speedrun/course.yml");
     private static final File TMP_FILE = new File("plugins/Speedrun/course.yml.tmp");
     private static final FileConfiguration config = YamlConfiguration.loadConfiguration(FILE);

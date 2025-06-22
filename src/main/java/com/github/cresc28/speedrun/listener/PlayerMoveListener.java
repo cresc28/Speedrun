@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 
 /**
- * プレイヤーの移動イベントを検知し処理を行う。
+ * プレイヤーの移動イベントを検知し処理を行うクラス。
  */
 public class PlayerMoveListener implements Listener {
     private final TimerManager timerManager;

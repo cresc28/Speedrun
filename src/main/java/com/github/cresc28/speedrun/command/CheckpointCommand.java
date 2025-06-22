@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 /**
- * /cp コマンドの実装クラス。
+ * /cpコマンドの実装クラス。
  */
 public class CheckpointCommand implements CommandExecutor, TabCompleter {
     /**
@@ -23,7 +23,7 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
-        UUID senderUuid = ((Player) sender).getUniqueId();
+        Player player = (Player) sender;
 
         if (!command.getName().equalsIgnoreCase("cp")) return null;
 
@@ -36,7 +36,7 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
         else if(args.length == 2) {
             if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("tp")) {
-                Utils.completionFromMap(CheckpointManager.getCheckpointNames((Player) sender), args[1].toLowerCase(), completions);
+                Utils.completionFromMap(CheckpointManager.getCheckpointNames(player.getUniqueId(), player.getLocation()), args[1].toLowerCase(), completions);
             }
 
             else if(args[0].equalsIgnoreCase("allowCrossWorldTp")){
@@ -56,23 +56,25 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
-        UUID senderUuid = player.getUniqueId();
+        UUID uuid = player.getUniqueId();
         Location loc = player.getLocation();
 
         if (!command.getName().equalsIgnoreCase("cp")) return false;
 
         if(args.length == 0){
-            CheckpointManager.registerCheckpoint(player);
+            CheckpointManager.registerCheckpoint(uuid, loc);
+            sender.sendMessage("チェックポイントを設定しました。");
             return true;
         }
 
         else if(args.length == 1){
             if(args[0].equalsIgnoreCase("list")){
-                MessageUtils.displayMap(CheckpointManager.getCheckpointNames(player), sender, "チェックポイント");
+                MessageUtils.displayMap(CheckpointManager.getCheckpointNames(uuid, loc), sender, "チェックポイント");
             }
 
             else{
-                CheckpointManager.registerCheckpoint(player, args[0]);
+                CheckpointManager.registerCheckpoint(uuid, loc, args[0]);
+                sender.sendMessage("チェックポイントを設定しました。");
             }
 
             return true;
@@ -80,25 +82,31 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
         if(args.length == 2){
             if(args[0].equalsIgnoreCase("remove")){
-                boolean removed = CheckpointManager.removeCheckpoint(player, args[1]);
+                boolean removed = CheckpointManager.removeCheckpoint(uuid, loc, args[1]);
                 MessageUtils.sendRemoveMessage(sender, removed, args[1], "チェックポイント");
                 return true;
             }
             else if(args[0].equalsIgnoreCase("tp")){
-                if(!CheckpointManager.selectCheckpoint(player, args[1])) {
+                if(!CheckpointManager.selectCheckpoint(uuid, loc, args[1])) {
                     sender.sendMessage(ChatColor.RED + "指定された名前のチェックポイントは存在しません。");
                 }
 
                 else{
-                    player.teleport(CheckpointManager.getCurrentGlobalCpLocation(senderUuid));
+                    player.teleport(CheckpointManager.getGlobalRecentCpLocation(uuid));
                 }
 
                 return true;
             }
 
             else if(args[0].equalsIgnoreCase("allowCrossWorldTp")){
-                if(args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("false")){
+                if(args[1].equalsIgnoreCase("true")){
                     CheckpointManager.setCrossWorldTpAllowed(Boolean.parseBoolean(args[1]));
+                    sender.sendMessage("他ワールドへのCPでの移動を許可しました。");
+                }
+
+                else if(args[1].equalsIgnoreCase("false")){
+                    CheckpointManager.setCrossWorldTpAllowed(Boolean.parseBoolean(args[1]));
+                    sender.sendMessage("他ワールドへのCPでの移動を禁止しました。");
                 }
 
                 else sender.sendMessage("/cp arrowCrossWorldTp true/false");
