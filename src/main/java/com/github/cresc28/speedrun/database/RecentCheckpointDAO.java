@@ -107,6 +107,14 @@ public class RecentCheckpointDAO {
         return null;
     }
 
+    /**
+     * ワールド全体で最後に設定されたチェックポイントを更新する。
+     * 指定UUIDの全CPに対してisGlobal=0を設定し、
+     * 指定されたワールドのチェックポイントをグローバルチェックポイント(isGlobal = 1)とする。。
+     *
+     * @param uuid uuid
+     * @param world この操作の時点でプレイヤーが最後にいたワールドを渡せばよい。
+     */
     public void updateGlobal(UUID uuid, World world){
         String sql1 = "UPDATE recentCheckpoints SET isGlobal = 0 WHERE uuid = ? AND isGlobal = 1";
         String sql2 = "UPDATE recentCheckpoints SET isGlobal = 1 WHERE uuid = ? AND world = ?";
