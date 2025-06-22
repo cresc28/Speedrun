@@ -1,8 +1,9 @@
 package com.github.cresc28.speedrun.manager;
 
+import com.github.cresc28.speedrun.database.CheckpointDAO;
+import com.github.cresc28.speedrun.database.RecentCheckpointDAO;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -12,105 +13,131 @@ import java.util.*;
  * 現在位置や最後に踏んだチェックポイントの情報も保持する。
  */
 public class CheckpointManager {
-    private static final Map<UUID, Map<World, Map<String, Location>>> checkpoints = new HashMap<>(); //uuid->ワールド->CP名->座標と辿れる構成
-    private static final Map<UUID, Location> globalCurrentCp = new HashMap<>(); //最後に設定されたCP
-    private static final Map<UUID, Map<World, Location>> localCurrentCp = new HashMap<>(); //現在のワールドで最後に設定されたCP
+    private static final Map<UUID, Location> globalRecentCp = new HashMap<>(); //最後に設定されたCP
+    private static final Map<UUID, Location> localRecentCp = new HashMap<>(); //現在のワールドで最後に設定されたCP
     private static boolean isCrossWorldTpAllowed; //異なるワールドへのTPを許可するか
+    private static final CheckpointDAO cpDao = new CheckpointDAO();
+    private static final RecentCheckpointDAO recentCpDao = new RecentCheckpointDAO();
 
     /**
      * 一時的なチェックポイントを登録。
      *
-     * @param player プレイヤー
+     * @param uuid UUID
+     * @param loc プレイヤーのいる座標
      */
-    public static void registerCheckpoint(Player player){
-        registerCheckpoint(player, "tmp");
+    public static void registerCheckpoint(UUID uuid, Location loc){
+        registerCheckpoint(uuid, loc, "tmp");
     }
 
     /**
      * プレイヤーの現在位置を指定された名前でチェックポイントとして登録する。
      *
-     * @param player プレイヤー
+     * @param uuid UUID
+     * @param loc プレイヤーのいる座標
      * @param cpName チェックポイント名
      */
-    public static void registerCheckpoint(Player player, String cpName){
-        UUID uuid = player.getUniqueId();
-        Location loc = player.getLocation();
+    public static void registerCheckpoint(UUID uuid, Location loc, String cpName){
         World world = loc.getWorld();
-        Map<String, Location> map = checkpoints.computeIfAbsent(uuid, k -> new HashMap<>()).computeIfAbsent(world, w -> new HashMap<>());
+        cpDao.insert(uuid, world, cpName, loc);
 
-        map.put(cpName, loc);
-        globalCurrentCp.put(uuid, loc);
-        localCurrentCp.computeIfAbsent(uuid, k -> new HashMap<>()).put(world, loc);
-        player.sendMessage("CPを設定しました。");
+        globalRecentCp.put(uuid, loc);
+        localRecentCp.put(uuid, loc);
     }
 
     /**
      * 指定された名前のチェックポイントを削除する。
+     * そのCPがcurrentCpに設定されている場合はcurrentCpをnullにする。
      *
-     * @param player プレイヤー
+     * @param uuid UUID
+     * @param loc プレイヤーのいる座標
      * @param cpName 削除したいチェックポイント名
      * @return 削除に成功したか
      */
-    public static boolean removeCheckpoint(Player player, String cpName){
-        UUID uuid = player.getUniqueId();
-        World world = player.getWorld();
-        Map<World, Map<String, Location>> worldMap = checkpoints.get(uuid);
-        Map<World, Location> localCpMap = localCurrentCp.get(uuid);
-        if(worldMap == null) return false;
+    public static boolean removeCheckpoint(UUID uuid, Location loc, String cpName){
+        World world = loc.getWorld();
 
-        Map<String, Location> cpMap = worldMap.get(world);
-        if(cpMap == null) return false;
+        Location toDelete = cpDao.getLocation(uuid, world, cpName);
+        if(toDelete == null) return false;
 
-        if (cpMap.containsKey(cpName)) {
-            if(cpMap.get(cpName).equals(globalCurrentCp.get(uuid))) globalCurrentCp.put(uuid, null); //削除したCPがcurrentCpならcurrentCpにnullを代入
-            if(localCpMap != null && cpMap.get(cpName).equals(localCpMap.get(world))) localCpMap.put(world, null);
-            cpMap.remove(cpName);
-            return true;
+        cpDao.delete(uuid, world, cpName);
+
+        if(toDelete.equals(globalRecentCp.get(uuid))) {
+            globalRecentCp.put(uuid, null); //削除したCPがcurrentCpならcurrentCpにnullを代入
         }
-        return false;
+        if(toDelete.equals(localRecentCp.get(uuid))) {
+            localRecentCp.put(uuid, null);
+        }
+
+        return true;
     }
 
     /**
      * 指定された名前のチェックポイントを今のチェックポイントに設定し、その位置を返す。
      *
-     * @param player プレイヤー
+     * @param uuid UUID
+     * @param loc プレイヤーのいる座標
      * @param cpName チェックポイント名
      * @return 選択に成功したか
      */
-    public static boolean selectCheckpoint(Player player, String cpName){
-        UUID uuid = player.getUniqueId();
-        World world = player.getWorld();
-        Map<World, Map<String, Location>> worldMap = checkpoints.get(uuid);
-        if(worldMap == null) return false;
+    public static boolean selectCheckpoint(UUID uuid, Location loc, String cpName){
+        World world = loc.getWorld();
+        Location selectedLoc = cpDao.getLocation(uuid, world, cpName);
 
-        Map<String, Location> cpMap = worldMap.get(world);
-        if (cpMap == null) return false;
+        if(selectedLoc == null) return false;
 
-        if (cpMap.containsKey(cpName)) {
-            globalCurrentCp.put(uuid, cpMap.get(cpName));
-            localCurrentCp.computeIfAbsent(uuid, k -> new HashMap<>()).put(world, cpMap.get(cpName));
-            return true;
-        }
-        return false;
+        globalRecentCp.put(uuid, selectedLoc);
+        localRecentCp.put(uuid, selectedLoc);
+        return true;
     }
 
     /**
      * 現在のワールドにおいてプレイヤーが登録しているチェックポイント名の一覧を返す。
      *
-     * @param player プレイヤー
+     * @param uuid UUID
+     * @param loc プレイヤーのいる座標
      * @return チェックポイント名の一覧
      */
-    public static Collection<String> getCheckpointNames(Player player){
-        UUID uuid = player.getUniqueId();
-        World world = player.getWorld();
+    public static Collection<String> getCheckpointNames(UUID uuid, Location loc){
+        World world = loc.getWorld();
 
-        Map<World, Map<String, Location>> worldMap = checkpoints.get(uuid);
-        if (worldMap == null) return Collections.emptyList();
+        return cpDao.getCheckpointNames(uuid, world);
+    }
 
-        Map<String, Location> cpMap = worldMap.get(world);
-        if (cpMap == null) return Collections.emptyList();
+    /**
+     * 最後に設定したチェックポイントの位置を更新する。
+     *
+     * @param uuid UUID
+     * @param world ワールド
+     * @param loc 位置
+     */
+    public static void saveRecentCp(UUID uuid, Boolean isGlobal, World world, Location loc){
+        if(!isGlobal) recentCpDao.insert(uuid, false, world, loc);
+        else {
+            World recentCpWorld = globalRecentCp.get(uuid).getWorld();
+            if(recentCpWorld == null) return;
+            recentCpDao.updateGlobal(uuid, recentCpWorld);
+        }
+    }
 
-        return new ArrayList<>(cpMap.keySet());
+    /**
+     * そのワールドで最後に設定したチェックポイントの位置を読み込む。
+     *
+     * @param uuid UUID
+     * @param world ワールド
+     */
+    public static void loadRecentLocalCp(UUID uuid, World world){
+        Location loc = recentCpDao.getLocalLocation(uuid, world);
+        localRecentCp.put(uuid, loc);
+    }
+
+    /**
+     * 全ワールドで最後に設定したチェックポイントの位置を読み込む。
+     *
+     * @param uuid UUID
+     */
+    public static void loadRecentGlobalCp(UUID uuid){
+        Location loc = recentCpDao.getGlobalLocation(uuid);
+        globalRecentCp.put(uuid, loc);
     }
 
     public static void setCrossWorldTpAllowed(boolean allowed){
@@ -121,16 +148,11 @@ public class CheckpointManager {
         return isCrossWorldTpAllowed;
     }
 
-    public static Location getCurrentGlobalCpLocation(UUID uuid){
-        return globalCurrentCp.get(uuid);
+    public static Location getGlobalRecentCpLocation(UUID uuid){
+        return globalRecentCp.get(uuid);
     }
 
-    public static Location getCurrentLocalCpLocation(Player player){
-        UUID uuid = player.getUniqueId();
-        World world = player.getWorld();
-        Map<World, Location> worldMap = localCurrentCp.get(uuid);
-        if (worldMap == null) return null;
-
-        return worldMap.get(world);
+    public static Location getLocalRecentCpLocation(UUID uuid){
+        return localRecentCp.get(uuid);
     }
 }

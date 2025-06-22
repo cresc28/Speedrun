@@ -3,7 +3,6 @@ package com.github.cresc28.speedrun.command;
 import com.github.cresc28.speedrun.manager.CourseDataManager;
 import com.github.cresc28.speedrun.utils.MessageUtils;
 import com.github.cresc28.speedrun.utils.Utils;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,7 +13,7 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 /**
- * /course コマンドの実装クラス。
+ * /courseコマンドの実装クラス。
  */
 public class SpeedrunCommand implements CommandExecutor, TabCompleter {
     /**
