@@ -22,9 +22,9 @@ public class CheckpointsDatabase {
             try(Statement stmt = con.createStatement()) {
                 stmt.executeUpdate(
                         "CREATE TABLE IF NOT EXISTS checkpoints (" +
-                                "uuid TEXT NOT NULL, world TEXT NOT NULL, cp_name TEXT NOT NULL, " +
+                                "uuid TEXT NOT NULL, world_uid TEXT NOT NULL, cp_name TEXT NOT NULL, " +
                                 "x DOUBLE NOT NULL, y DOUBLE NOT NULL, z DOUBLE NOT NULL, yaw DOUBLE NOT NULL, pitch DOUBLE NOT NULL, " +
-                                "PRIMARY KEY(uuid, world, cp_name))"
+                                "PRIMARY KEY(uuid, world_uid, cp_name))"
                 );
             }
         } catch(Exception e){
