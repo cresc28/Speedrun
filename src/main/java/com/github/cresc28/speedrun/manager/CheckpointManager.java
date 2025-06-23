@@ -141,6 +141,16 @@ public class CheckpointManager {
         globalRecentCp.put(uuid, loc);
     }
 
+    /**
+     * recentCpから特定UUIDのプレイヤーの情報を削除する。(プレイヤー退出時用処理)
+     *
+     * @param uuid UUID
+     */
+    public static void removeRecentCpFromMap(UUID uuid){
+        globalRecentCp.remove(uuid);
+        localRecentCp.remove(uuid);
+    }
+
     public static void setCrossWorldTpAllowed(boolean allowed){
         isCrossWorldTpAllowed = allowed;
     }

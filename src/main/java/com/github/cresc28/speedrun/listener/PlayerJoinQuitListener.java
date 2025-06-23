@@ -31,6 +31,7 @@ public class PlayerJoinQuitListener implements Listener {
 
         if(localRecentCpLoc != null) CheckpointManager.saveRecentCp(uuid, false, localRecentCpLoc.getWorld(), localRecentCpLoc);
         if(globalRecentCpLoc != null) CheckpointManager.saveRecentCp(uuid, true, globalRecentCpLoc.getWorld(), globalRecentCpLoc);
+        CheckpointManager.removeRecentCpFromMap(uuid);
     }
 
     @EventHandler
