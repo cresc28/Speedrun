@@ -21,9 +21,9 @@
 <details>
 <summary><strong>コース設定</strong></summary>
 
-### `/course add start/end [name]`
+### `/course add <start|end> <name>`
 スタート地点またはゴール地点を設定します。(地点はブロック単位です。)<br>
-設定したいスタート地点またはゴール地点の上に立ち、`[name]`にはコースの名前を指定してください。  <br>
+設定したい地点の上に立ち、コースの名前を指定してください。  <br>
 スタート地点とゴール地点には同じ名前を設定する必要があります。
 
 同じ名前のスタート地点やゴール地点が複数存在する場合は、
@@ -31,7 +31,7 @@
 
 ---
 
-### `/course remove start/end [name]　または  /course remove [name]`
+### `/course remove <start|end> <name>　または  /course remove <name>`
 指定した名前のコースのスタート地点またはゴール地点を削除します。
 後者のコマンドでは、スタート地点及びゴール地点の両方を削除します。
 
@@ -45,19 +45,19 @@
 <details>
 <summary><strong>チェックポイント設定</strong></summary>
 
-### `/cp [name] または /cp`
+### `/cp <name> または /cp`
 現在位置に指定した名前のチェックポイント(以下CP)を登録します。</br>
 名前を指定しなかった場合tmpという名前のCPを登録します。<br>
 ネザースターを右クリックすると、その位置にテレポートします。
 
 ---
 
-### `/cp remove [name]`
+### `/cp remove <name>`
 指定した名前のCPを削除します。
 
 ---
 
-### `/cp tp [name]`
+### `/cp tp <name>`
 指定した名前のCPへTPします。
 
 ---
@@ -67,7 +67,7 @@
 
 ---
 
-### `/cp allowCrossWorldTp true/false`
+### `/cp allowCrossWorldTp <true|false>`
 ワールドを跨ぐCPでの移動を許可または禁止します。
 
 </details>
