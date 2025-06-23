@@ -119,7 +119,7 @@ public class RecentCheckpointDAO {
      */
     public void updateGlobal(UUID uuid, World world){
         String sql1 = "UPDATE recentCheckpoints SET is_global = 0 WHERE uuid = ? AND is_global = 1";
-        String sql2 = "UPDATE recentCheckpoints SET is_global = 1 WHERE uuid = ? AND world_uuid = ?";
+        String sql2 = "UPDATE recentCheckpoints SET is_global = 1 WHERE uuid = ? AND world_uid = ?";
 
         try (PreparedStatement ps1 = RecentCheckpointsDatabase.getConnection().prepareStatement(sql1);
              PreparedStatement ps2 = RecentCheckpointsDatabase.getConnection().prepareStatement(sql2)) {

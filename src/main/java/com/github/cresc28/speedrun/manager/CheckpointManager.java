@@ -13,11 +13,10 @@ import java.util.*;
  * 現在位置や最後に踏んだチェックポイントの情報も保持する。
  */
 public class CheckpointManager {
-    private static final Map<UUID, Location> globalRecentCp = new HashMap<>(); //最後に設定されたCP
-    private static final Map<UUID, Location> localRecentCp = new HashMap<>(); //現在のワールドで最後に設定されたCP
-    private static boolean isCrossWorldTpAllowed; //異なるワールドへのTPを許可するか
-    private static final CheckpointDAO cpDao = new CheckpointDAO();
-    private static final RecentCheckpointDAO recentCpDao = new RecentCheckpointDAO();
+    private final Map<UUID, Location> globalRecentCp = new HashMap<>(); //最後に設定されたCP
+    private final Map<UUID, Location> localRecentCp = new HashMap<>(); //現在のワールドで最後に設定されたCP
+    private final CheckpointDAO cpDao = new CheckpointDAO();
+    private final RecentCheckpointDAO recentCpDao = new RecentCheckpointDAO();
 
     /**
      * 一時的なチェックポイントを登録。
@@ -25,7 +24,7 @@ public class CheckpointManager {
      * @param uuid UUID
      * @param loc プレイヤーのいる座標
      */
-    public static void registerCheckpoint(UUID uuid, Location loc){
+    public void registerCheckpoint(UUID uuid, Location loc){
         registerCheckpoint(uuid, loc, "tmp");
     }
 
@@ -36,7 +35,7 @@ public class CheckpointManager {
      * @param loc プレイヤーのいる座標
      * @param cpName チェックポイント名
      */
-    public static void registerCheckpoint(UUID uuid, Location loc, String cpName){
+    public void registerCheckpoint(UUID uuid, Location loc, String cpName){
         World world = loc.getWorld();
         cpDao.insert(uuid, world, cpName, loc);
 
@@ -53,7 +52,7 @@ public class CheckpointManager {
      * @param cpName 削除したいチェックポイント名
      * @return 削除に成功したか
      */
-    public static boolean removeCheckpoint(UUID uuid, Location loc, String cpName){
+    public boolean removeCheckpoint(UUID uuid, Location loc, String cpName){
         World world = loc.getWorld();
 
         Location toDelete = cpDao.getLocation(uuid, world, cpName);
@@ -79,7 +78,7 @@ public class CheckpointManager {
      * @param cpName チェックポイント名
      * @return 選択に成功したか
      */
-    public static boolean selectCheckpoint(UUID uuid, Location loc, String cpName){
+    public boolean selectCheckpoint(UUID uuid, Location loc, String cpName){
         World world = loc.getWorld();
         Location selectedLoc = cpDao.getLocation(uuid, world, cpName);
 
@@ -97,7 +96,7 @@ public class CheckpointManager {
      * @param loc プレイヤーのいる座標
      * @return チェックポイント名の一覧
      */
-    public static Collection<String> getCheckpointNames(UUID uuid, Location loc){
+    public Collection<String> getCheckpointNames(UUID uuid, Location loc){
         World world = loc.getWorld();
 
         return cpDao.getCheckpointNames(uuid, world);
@@ -111,7 +110,7 @@ public class CheckpointManager {
      * @param world ワールド
      * @param loc 位置
      */
-    public static void saveRecentCp(UUID uuid, Boolean isGlobal, World world, Location loc){
+    public void saveRecentCp(UUID uuid, Boolean isGlobal, World world, Location loc){
         if(!isGlobal) recentCpDao.insert(uuid, false, world, loc);
         else {
             World recentCpWorld = globalRecentCp.get(uuid).getWorld();
@@ -126,7 +125,7 @@ public class CheckpointManager {
      * @param uuid UUID
      * @param world ワールド
      */
-    public static void loadRecentLocalCp(UUID uuid, World world){
+    public void loadRecentLocalCp(UUID uuid, World world){
         Location loc = recentCpDao.getLocalLocation(uuid, world);
         localRecentCp.put(uuid, loc);
     }
@@ -136,7 +135,7 @@ public class CheckpointManager {
      *
      * @param uuid UUID
      */
-    public static void loadRecentGlobalCp(UUID uuid){
+    public void loadRecentGlobalCp(UUID uuid){
         Location loc = recentCpDao.getGlobalLocation(uuid);
         globalRecentCp.put(uuid, loc);
     }
@@ -146,24 +145,16 @@ public class CheckpointManager {
      *
      * @param uuid UUID
      */
-    public static void removeRecentCpFromMap(UUID uuid){
+    public void removeRecentCpFromMap(UUID uuid){
         globalRecentCp.remove(uuid);
         localRecentCp.remove(uuid);
     }
 
-    public static void setCrossWorldTpAllowed(boolean allowed){
-        isCrossWorldTpAllowed = allowed;
-    }
-
-    public static boolean isCrossWorldTpAllowed(){
-        return isCrossWorldTpAllowed;
-    }
-
-    public static Location getGlobalRecentCpLocation(UUID uuid){
+    public Location getGlobalRecentCpLocation(UUID uuid){
         return globalRecentCp.get(uuid);
     }
 
-    public static Location getLocalRecentCpLocation(UUID uuid){
+    public Location getLocalRecentCpLocation(UUID uuid){
         return localRecentCp.get(uuid);
     }
 }

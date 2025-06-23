@@ -1,5 +1,6 @@
 package com.github.cresc28.speedrun.command;
 
+import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.utils.MessageUtils;
 import com.github.cresc28.speedrun.utils.Utils;
@@ -17,6 +18,12 @@ import java.util.*;
  * /cpコマンドの実装クラス。
  */
 public class CheckpointCommand implements CommandExecutor, TabCompleter {
+    private final CheckpointManager cpm;
+
+    public CheckpointCommand(CheckpointManager cpm) {
+        this.cpm = cpm;
+    }
+
     /**
     * Tab補完の処理を行う。
     */
@@ -36,7 +43,7 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
         else if(args.length == 2) {
             if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("tp")) {
-                Utils.completionFromMap(CheckpointManager.getCheckpointNames(player.getUniqueId(), player.getLocation()), args[1].toLowerCase(), completions);
+                Utils.completionFromMap(cpm.getCheckpointNames(player.getUniqueId(), player.getLocation()), args[1].toLowerCase(), completions);
             }
 
             else if(args[0].equalsIgnoreCase("allowCrossWorldTp")){
@@ -62,18 +69,18 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
         if (!command.getName().equalsIgnoreCase("cp")) return false;
 
         if(args.length == 0){
-            CheckpointManager.registerCheckpoint(uuid, loc);
+            cpm.registerCheckpoint(uuid, loc);
             sender.sendMessage("チェックポイントを設定しました。");
             return true;
         }
 
         else if(args.length == 1){
             if(args[0].equalsIgnoreCase("list")){
-                MessageUtils.displayMap(CheckpointManager.getCheckpointNames(uuid, loc), sender, "チェックポイント");
+                MessageUtils.displayMap(cpm.getCheckpointNames(uuid, loc), sender, "チェックポイント");
             }
 
             else{
-                CheckpointManager.registerCheckpoint(uuid, loc, args[0]);
+                cpm.registerCheckpoint(uuid, loc, args[0]);
                 sender.sendMessage("チェックポイントを設定しました。");
             }
 
@@ -82,17 +89,17 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
         if(args.length == 2){
             if(args[0].equalsIgnoreCase("remove")){
-                boolean removed = CheckpointManager.removeCheckpoint(uuid, loc, args[1]);
+                boolean removed = cpm.removeCheckpoint(uuid, loc, args[1]);
                 MessageUtils.sendRemoveMessage(sender, removed, args[1], "チェックポイント");
                 return true;
             }
             else if(args[0].equalsIgnoreCase("tp")){
-                if(!CheckpointManager.selectCheckpoint(uuid, loc, args[1])) {
+                if(!cpm.selectCheckpoint(uuid, loc, args[1])) {
                     sender.sendMessage(ChatColor.RED + "指定された名前のチェックポイントは存在しません。");
                 }
 
                 else{
-                    player.teleport(CheckpointManager.getGlobalRecentCpLocation(uuid));
+                    player.teleport(cpm.getGlobalRecentCpLocation(uuid));
                 }
 
                 return true;
@@ -100,12 +107,12 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
             else if(args[0].equalsIgnoreCase("allowCrossWorldTp")){
                 if(args[1].equalsIgnoreCase("true")){
-                    CheckpointManager.setCrossWorldTpAllowed(Boolean.parseBoolean(args[1]));
+                    ConfigManager.setCrossWorldTpAllowed(Boolean.parseBoolean(args[1]));
                     sender.sendMessage("他ワールドへのCPでの移動を許可しました。");
                 }
 
                 else if(args[1].equalsIgnoreCase("false")){
-                    CheckpointManager.setCrossWorldTpAllowed(Boolean.parseBoolean(args[1]));
+                    ConfigManager.setCrossWorldTpAllowed(Boolean.parseBoolean(args[1]));
                     sender.sendMessage("他ワールドへのCPでの移動を禁止しました。");
                 }
 
