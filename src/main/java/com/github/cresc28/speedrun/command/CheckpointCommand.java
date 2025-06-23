@@ -116,7 +116,7 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage("他ワールドへのCPでの移動を禁止しました。");
                 }
 
-                else sender.sendMessage("/cp arrowCrossWorldTp true/false");
+                else sender.sendMessage("/cp arrowCrossWorldTp <true|false>");
                 return true;
             }
         }
