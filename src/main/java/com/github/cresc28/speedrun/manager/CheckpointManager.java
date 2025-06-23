@@ -107,6 +107,7 @@ public class CheckpointManager {
      * 最後に設定したチェックポイントの位置を更新する。
      *
      * @param uuid UUID
+     * @param isGlobal globalかlocalか
      * @param world ワールド
      * @param loc 位置
      */

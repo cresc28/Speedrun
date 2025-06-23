@@ -23,10 +23,10 @@ public class RecentCheckpointsDatabase {
                 stmt.executeUpdate(
                         "CREATE TABLE IF NOT EXISTS recentCheckpoints (" +
                                 "uuid TEXT NOT NULL, " +
-                                "isGlobal INT NOT NULL, " + //globalRecentCp(全ワールドで最後に設定されたCPを指す)の場合は1に設定する。
-                                "world TEXT NOT NULL, " +
+                                "is_global INT NOT NULL, " + //globalRecentCp(全ワールドで最後に設定されたCPを指す)の場合は1に設定する。
+                                "world_uid TEXT NOT NULL, " + //world.getUID().toString()で取得する。
                                 "x DOUBLE NOT NULL, y DOUBLE NOT NULL, z DOUBLE NOT NULL, yaw DOUBLE NOT NULL, pitch DOUBLE NOT NULL, " +
-                                "PRIMARY KEY(uuid, world))"
+                                "PRIMARY KEY(uuid, world_uid))"
                 );
             }
         } catch(Exception e){

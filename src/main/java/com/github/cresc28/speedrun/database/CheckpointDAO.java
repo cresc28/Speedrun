@@ -1,5 +1,6 @@
 package com.github.cresc28.speedrun.database;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -31,12 +32,12 @@ public class CheckpointDAO {
      */
     public void insert(UUID uuid, World world, String cpName, Location loc){
         String sql = "INSERT OR REPLACE INTO checkpoints " +
-                "(uuid, world, cp_name, x, y, z, yaw, pitch) " +
+                "(uuid, world_uid, cp_name, x, y, z, yaw, pitch) " +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
         try(PreparedStatement ps = CheckpointsDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
-            ps.setString(2, world.getName());
+            ps.setString(2, world.getUID().toString());
             ps.setString(3, cpName);
             ps.setDouble(4, loc.getX());
             ps.setDouble(5, loc.getY());
@@ -58,10 +59,10 @@ public class CheckpointDAO {
      * @return 削除に成功した行数
      */
     public int delete(UUID uuid, World world, String cpName){
-        String sql = "DELETE FROM checkpoints WHERE uuid = ? AND world = ? AND cp_name =?";
+        String sql = "DELETE FROM checkpoints WHERE uuid = ? AND world_uid = ? AND cp_name =?";
         try(PreparedStatement ps = CheckpointsDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
-            ps.setString(2, world.getName());
+            ps.setString(2, world.getUID().toString());
             ps.setString(3, cpName);
             return ps.executeUpdate();
         } catch(SQLException e){
@@ -79,10 +80,10 @@ public class CheckpointDAO {
      * @return チェックポイントの位置
      */
     public Location getLocation(UUID uuid, World world, String cpName){
-        String sql = "SELECT x, y, z, yaw, pitch FROM checkpoints WHERE uuid = ? AND world = ? AND cp_name = ?";
+        String sql = "SELECT x, y, z, yaw, pitch FROM checkpoints WHERE uuid = ? AND world_uid = ? AND cp_name = ?";
         try(PreparedStatement ps = CheckpointsDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
-            ps.setString(2, world.getName());
+            ps.setString(2, world.getUID().toString());
             ps.setString(3, cpName);
             ResultSet rs = ps.executeQuery();
 
@@ -110,11 +111,11 @@ public class CheckpointDAO {
      */
     public List<String> getCheckpointNames(UUID uuid, World world){
         List<String> names = new ArrayList<>();
-        String sql = "SELECT cp_name FROM checkpoints WHERE uuid = ? AND world = ?";
+        String sql = "SELECT cp_name FROM checkpoints WHERE uuid = ? AND world_uid = ?";
 
         try(PreparedStatement ps = CheckpointsDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
-            ps.setString(2, world.getName());
+            ps.setString(2, world.getUID().toString());
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){

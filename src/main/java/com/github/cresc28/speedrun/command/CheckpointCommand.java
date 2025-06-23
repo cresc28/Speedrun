@@ -42,7 +42,7 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
             else if(args[0].equalsIgnoreCase("allowCrossWorldTp")){
                 List<String> options = Arrays.asList("true", "false");
                 for (String option : options) {
-                    if (option.startsWith(args[0].toLowerCase())) completions.add(option);
+                    if (option.startsWith(args[1].toLowerCase())) completions.add(option);
                 }
             }
         }
