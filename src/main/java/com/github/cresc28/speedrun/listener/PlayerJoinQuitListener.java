@@ -13,25 +13,30 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.UUID;
 
 public class PlayerJoinQuitListener implements Listener {
+    private final CheckpointManager cpm;
+
+    public PlayerJoinQuitListener(CheckpointManager cpm){
+        this.cpm = cpm;
+    }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
-        CheckpointManager.loadRecentLocalCp(uuid, player.getWorld());
-        CheckpointManager.loadRecentGlobalCp(uuid);
+        cpm.loadRecentLocalCp(uuid, player.getWorld());
+        cpm.loadRecentGlobalCp(uuid);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event){
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
-        Location globalRecentCpLoc = CheckpointManager.getGlobalRecentCpLocation(uuid);
-        Location localRecentCpLoc = CheckpointManager.getLocalRecentCpLocation(uuid);
+        Location globalRecentCpLoc = cpm.getGlobalRecentCpLocation(uuid);
+        Location localRecentCpLoc = cpm.getLocalRecentCpLocation(uuid);
 
-        if(localRecentCpLoc != null) CheckpointManager.saveRecentCp(uuid, false, localRecentCpLoc.getWorld(), localRecentCpLoc);
-        if(globalRecentCpLoc != null) CheckpointManager.saveRecentCp(uuid, true, globalRecentCpLoc.getWorld(), globalRecentCpLoc);
-        CheckpointManager.removeRecentCpFromMap(uuid);
+        if(localRecentCpLoc != null) cpm.saveRecentCp(uuid, false, localRecentCpLoc.getWorld(), localRecentCpLoc);
+        if(globalRecentCpLoc != null) cpm.saveRecentCp(uuid, true, globalRecentCpLoc.getWorld(), globalRecentCpLoc);
+        cpm.removeRecentCpFromMap(uuid);
     }
 
     @EventHandler
@@ -39,9 +44,9 @@ public class PlayerJoinQuitListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         World fromWorld = event.getFrom();
-        Location prevWorldRecentCpLoc = CheckpointManager.getLocalRecentCpLocation(uuid);
+        Location prevWorldRecentCpLoc = cpm.getLocalRecentCpLocation(uuid);
 
-        if(prevWorldRecentCpLoc != null) CheckpointManager.saveRecentCp(uuid, false, fromWorld, prevWorldRecentCpLoc);
-        CheckpointManager.loadRecentLocalCp(uuid, player.getWorld());
+        if(prevWorldRecentCpLoc != null) cpm.saveRecentCp(uuid, false, fromWorld, prevWorldRecentCpLoc);
+        cpm.loadRecentLocalCp(uuid, player.getWorld());
     }
 }

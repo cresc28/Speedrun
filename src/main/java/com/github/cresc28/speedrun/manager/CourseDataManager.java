@@ -14,6 +14,7 @@ import java.util.logging.*;
 
 /**
  * コースのロード・セーブ・登録・削除・取得を行うクラス。
+ *
  */
 
 public class CourseDataManager {

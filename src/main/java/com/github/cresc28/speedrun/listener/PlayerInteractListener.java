@@ -1,6 +1,7 @@
 package com.github.cresc28.speedrun.listener;
 
 
+import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.manager.CheckpointManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -24,6 +25,11 @@ import java.util.UUID;
  */
 
 public class PlayerInteractListener implements Listener {
+    private final CheckpointManager cpm;
+
+    public PlayerInteractListener(CheckpointManager cpm){
+        this.cpm = cpm;
+    }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event){
@@ -34,8 +40,8 @@ public class PlayerInteractListener implements Listener {
         if(item != null && item.getType() == Material.NETHER_STAR) {
             if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
                 Location loc;
-                if(CheckpointManager.isCrossWorldTpAllowed()) loc = CheckpointManager.getGlobalRecentCpLocation(uuid);
-                else loc = CheckpointManager.getLocalRecentCpLocation(uuid);
+                if(ConfigManager.isCrossWorldTpAllowed()) loc = cpm.getGlobalRecentCpLocation(uuid);
+                else loc = cpm.getLocalRecentCpLocation(uuid);
 
                 if (loc != null) {
                     player.teleport(loc);
