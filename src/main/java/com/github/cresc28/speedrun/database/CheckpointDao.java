@@ -1,6 +1,5 @@
 package com.github.cresc28.speedrun.database;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -18,26 +17,25 @@ import java.util.logging.Logger;
  * チェックポイントはUUID・ワールド・チェックポイント名・位置で管理される。
  */
 
-public class CheckpointDAO {
-    private static final Logger LOGGER = Logger.getLogger("CheckpointsDAO");
+public class CheckpointDao {
+    private static final Logger LOGGER = Logger.getLogger("CheckpointsDao");
 
 
     /**
      * チェックポイントを登録する。
      *
      * @param uuid UUID
-     * @param world ワールド
      * @param cpName チェックポイント名
      * @param loc 位置
      */
-    public void insert(UUID uuid, World world, String cpName, Location loc){
+    public void insert(UUID uuid, String cpName, Location loc){
         String sql = "INSERT OR REPLACE INTO checkpoints " +
                 "(uuid, world_uid, cp_name, x, y, z, yaw, pitch) " +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try(PreparedStatement ps = CheckpointsDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = CheckpointDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
-            ps.setString(2, world.getUID().toString());
+            ps.setString(2, loc.getWorld().getUID().toString());
             ps.setString(3, cpName);
             ps.setDouble(4, loc.getX());
             ps.setDouble(5, loc.getY());
@@ -58,16 +56,16 @@ public class CheckpointDAO {
      * @param cpName チェックポイント名
      * @return 削除に成功した行数
      */
-    public int delete(UUID uuid, World world, String cpName){
+    public boolean delete(UUID uuid, World world, String cpName){
         String sql = "DELETE FROM checkpoints WHERE uuid = ? AND world_uid = ? AND cp_name =?";
-        try(PreparedStatement ps = CheckpointsDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = CheckpointDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
             ps.setString(2, world.getUID().toString());
             ps.setString(3, cpName);
-            return ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch(SQLException e){
             LOGGER.log(Level.SEVERE,"DELETE文でエラーが発生しました。");
-            return 0;
+            return false;
         }
     }
 
@@ -81,7 +79,7 @@ public class CheckpointDAO {
      */
     public Location getLocation(UUID uuid, World world, String cpName){
         String sql = "SELECT x, y, z, yaw, pitch FROM checkpoints WHERE uuid = ? AND world_uid = ? AND cp_name = ?";
-        try(PreparedStatement ps = CheckpointsDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = CheckpointDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
             ps.setString(2, world.getUID().toString());
             ps.setString(3, cpName);
@@ -113,7 +111,7 @@ public class CheckpointDAO {
         List<String> names = new ArrayList<>();
         String sql = "SELECT cp_name FROM checkpoints WHERE uuid = ? AND world_uid = ?";
 
-        try(PreparedStatement ps = CheckpointsDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = CheckpointDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
             ps.setString(2, world.getUID().toString());
             ResultSet rs = ps.executeQuery();

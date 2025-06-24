@@ -18,6 +18,6 @@ public class PlayerMoveListener implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        timerManager.detectStartOrEnd(event.getPlayer());
+        timerManager.checkRunState(event.getPlayer());
     }
 }

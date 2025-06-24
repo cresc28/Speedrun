@@ -3,6 +3,7 @@ package com.github.cresc28.speedrun.utils;
 import org.bukkit.Location;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class Utils {
      */
     public static void completionFromMap(Collection<String> source, String prefix, List<String> completions) {
         for (String value : new HashSet<>(source)) {
-            if (value.toLowerCase().startsWith(prefix)) {
+            if (value != null && value.toLowerCase().startsWith(prefix)) {
                 completions.add(value);
             }
         }
@@ -49,4 +50,5 @@ public class Utils {
     public static Location getBlockLocation(Location loc) {
         return new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
+
 }

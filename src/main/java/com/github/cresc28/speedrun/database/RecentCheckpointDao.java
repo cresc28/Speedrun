@@ -15,26 +15,25 @@ import java.util.logging.Logger;
  * 最後に設定したチェックポイントを管理するクラス。
  */
 
-public class RecentCheckpointDAO {
-    private static final Logger LOGGER = Logger.getLogger("RecentCheckpointsDAO");
+public class RecentCheckpointDao {
+    private static final Logger LOGGER = Logger.getLogger("RecentCheckpointsDao");
 
     /**
      * 最後に設定したCPを登録する。
      *
      * @param uuid UUID
      * @param isGlobal そのワールド内の最新CPか
-     * @param world ワールド
      * @param loc 位置
      */
-    public void insert(UUID uuid, Boolean isGlobal, World world, Location loc){
+    public void insert(UUID uuid, Boolean isGlobal, Location loc){
         String sql = "INSERT OR REPLACE INTO recentCheckpoints " +
                 "(uuid, is_global, world_uid, x, y, z, yaw, pitch) " +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try(PreparedStatement ps = RecentCheckpointsDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = RecentCheckpointDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
             ps.setInt(2, isGlobal ? 1 : 0);
-            ps.setString(3, world.getUID().toString());
+            ps.setString(3, loc.getWorld().getUID().toString());
             ps.setDouble(4, loc.getX());
             ps.setDouble(5, loc.getY());
             ps.setDouble(6, loc.getZ());
@@ -55,7 +54,7 @@ public class RecentCheckpointDAO {
      */
     public Location getLocalLocation(UUID uuid, World world){
         String sql = "SELECT x, y, z, yaw, pitch FROM recentCheckpoints WHERE uuid = ? AND world_uid = ?";
-        try(PreparedStatement ps = RecentCheckpointsDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = RecentCheckpointDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
             ps.setString(2, world.getUID().toString());
             ResultSet rs = ps.executeQuery();
@@ -84,7 +83,7 @@ public class RecentCheckpointDAO {
      */
     public Location getGlobalLocation(UUID uuid){
         String sql = "SELECT world_uid, x, y, z, yaw, pitch FROM recentCheckpoints WHERE uuid = ? AND is_global = 1";
-        try(PreparedStatement ps = RecentCheckpointsDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = RecentCheckpointDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
             ResultSet rs = ps.executeQuery();
 
@@ -121,8 +120,8 @@ public class RecentCheckpointDAO {
         String sql1 = "UPDATE recentCheckpoints SET is_global = 0 WHERE uuid = ? AND is_global = 1";
         String sql2 = "UPDATE recentCheckpoints SET is_global = 1 WHERE uuid = ? AND world_uid = ?";
 
-        try (PreparedStatement ps1 = RecentCheckpointsDatabase.getConnection().prepareStatement(sql1);
-             PreparedStatement ps2 = RecentCheckpointsDatabase.getConnection().prepareStatement(sql2)) {
+        try (PreparedStatement ps1 = RecentCheckpointDatabase.getConnection().prepareStatement(sql1);
+             PreparedStatement ps2 = RecentCheckpointDatabase.getConnection().prepareStatement(sql2)) {
 
             ps1.setString(1, uuid.toString());
             ps1.executeUpdate();
