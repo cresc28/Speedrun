@@ -34,8 +34,8 @@ public class PlayerJoinQuitListener implements Listener {
         Location globalRecentCpLoc = cpm.getGlobalRecentCpLocation(uuid);
         Location localRecentCpLoc = cpm.getLocalRecentCpLocation(uuid);
 
-        if(localRecentCpLoc != null) cpm.saveRecentCp(uuid, false, localRecentCpLoc.getWorld(), localRecentCpLoc);
-        if(globalRecentCpLoc != null) cpm.saveRecentCp(uuid, true, globalRecentCpLoc.getWorld(), globalRecentCpLoc);
+        if(localRecentCpLoc != null) cpm.saveRecentCp(uuid, false, localRecentCpLoc);
+        if(globalRecentCpLoc != null) cpm.saveRecentCp(uuid, true, globalRecentCpLoc);
         cpm.removeRecentCpFromMap(uuid);
     }
 
@@ -46,7 +46,7 @@ public class PlayerJoinQuitListener implements Listener {
         World fromWorld = event.getFrom();
         Location prevWorldRecentCpLoc = cpm.getLocalRecentCpLocation(uuid);
 
-        if(prevWorldRecentCpLoc != null) cpm.saveRecentCp(uuid, false, fromWorld, prevWorldRecentCpLoc);
+        if(prevWorldRecentCpLoc != null) cpm.saveRecentCp(uuid, false, prevWorldRecentCpLoc);
         cpm.loadRecentLocalCp(uuid, player.getWorld());
     }
 }

@@ -10,23 +10,21 @@ import java.util.logging.Logger;
  * SQLiteとの接続を行うクラス。
  */
 
-public class RecentCheckpointsDatabase {
+public class CheckpointDatabase {
     private static Connection con;
-    private static final Logger LOGGER = Logger.getLogger("RecentCheckpointsDatabase");
+    private static final Logger LOGGER = Logger.getLogger("CheckpointsDatabase");
 
     public static void initializeDatabase(){
         try{
             Class.forName("org.sqlite.JDBC");
-            con = DriverManager.getConnection("jdbc:sqlite:plugins/speedrun/recentCheckpoints.sqlite");
+            con = DriverManager.getConnection("jdbc:sqlite:plugins/speedrun/checkpoints.sqlite");
 
             try(Statement stmt = con.createStatement()) {
                 stmt.executeUpdate(
-                        "CREATE TABLE IF NOT EXISTS recentCheckpoints (" +
-                                "uuid TEXT NOT NULL, " +
-                                "is_global INT NOT NULL, " + //globalRecentCp(全ワールドで最後に設定されたCPを指す)の場合は1に設定する。
-                                "world_uid TEXT NOT NULL, " + //world.getUID().toString()で取得する。
+                        "CREATE TABLE IF NOT EXISTS checkpoints (" +
+                                "uuid TEXT NOT NULL, world_uid TEXT NOT NULL, cp_name TEXT NOT NULL, " +
                                 "x DOUBLE NOT NULL, y DOUBLE NOT NULL, z DOUBLE NOT NULL, yaw DOUBLE NOT NULL, pitch DOUBLE NOT NULL, " +
-                                "PRIMARY KEY(uuid, world_uid))"
+                                "PRIMARY KEY(uuid, world_uid, cp_name))"
                 );
             }
         } catch(Exception e){

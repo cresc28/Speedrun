@@ -1,7 +1,7 @@
 package com.github.cresc28.speedrun.manager;
 
-import com.github.cresc28.speedrun.database.CheckpointDAO;
-import com.github.cresc28.speedrun.database.RecentCheckpointDAO;
+import com.github.cresc28.speedrun.database.CheckpointDao;
+import com.github.cresc28.speedrun.database.RecentCheckpointDao;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -15,8 +15,8 @@ import java.util.*;
 public class CheckpointManager {
     private final Map<UUID, Location> globalRecentCp = new HashMap<>(); //最後に設定されたCP
     private final Map<UUID, Location> localRecentCp = new HashMap<>(); //現在のワールドで最後に設定されたCP
-    private final CheckpointDAO cpDao = new CheckpointDAO();
-    private final RecentCheckpointDAO recentCpDao = new RecentCheckpointDAO();
+    private final CheckpointDao cpDao = new CheckpointDao();
+    private final RecentCheckpointDao recentCpDao = new RecentCheckpointDao();
 
     /**
      * 一時的なチェックポイントを登録。
@@ -36,8 +36,7 @@ public class CheckpointManager {
      * @param cpName チェックポイント名
      */
     public void registerCheckpoint(UUID uuid, Location loc, String cpName){
-        World world = loc.getWorld();
-        cpDao.insert(uuid, world, cpName, loc);
+        cpDao.insert(uuid, cpName, loc);
 
         globalRecentCp.put(uuid, loc);
         localRecentCp.put(uuid, loc);
@@ -107,11 +106,10 @@ public class CheckpointManager {
      *
      * @param uuid UUID
      * @param isGlobal globalかlocalか
-     * @param world ワールド
      * @param loc 位置
      */
-    public void saveRecentCp(UUID uuid, Boolean isGlobal, World world, Location loc){
-        if(!isGlobal) recentCpDao.insert(uuid, false, world, loc);
+    public void saveRecentCp(UUID uuid, Boolean isGlobal, Location loc){
+        if(!isGlobal) recentCpDao.insert(uuid, false, loc);
         else {
             World recentCpWorld = globalRecentCp.get(uuid).getWorld();
             if(recentCpWorld == null) return;
