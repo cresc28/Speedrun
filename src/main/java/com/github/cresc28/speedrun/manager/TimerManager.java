@@ -1,5 +1,6 @@
 package com.github.cresc28.speedrun.manager;
 
+import com.github.cresc28.speedrun.data.CourseType;
 import com.github.cresc28.speedrun.data.RunState;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Bukkit;
@@ -18,6 +19,11 @@ import java.util.UUID;
 public class TimerManager {
     private int tick = 0;
     private final Map<UUID, RunState> playerStates = new HashMap<>();
+    private final CourseDataManager cdm;
+
+    public TimerManager(CourseDataManager cdm) {
+        this.cdm = cdm;
+    }
 
     /**
      * タイマーを開始する。
@@ -36,11 +42,11 @@ public class TimerManager {
      *
      * @param player プレイヤー
      */
-    public void detectStartOrEnd(Player player) {
+    public void checkRunState(Player player) {
         UUID uuid = player.getUniqueId();
         Location loc = player.getLocation().getBlock().getLocation();
-        String start = CourseDataManager.getCourseName(loc, "start");
-        String end = CourseDataManager.getCourseName(loc,"end");
+        String start = cdm.getCourseName(loc, CourseType.START);
+        String end = cdm.getCourseName(loc, CourseType.END);
         RunState state = playerStates.computeIfAbsent(uuid, k -> new RunState());
 
         //プレイヤーの現在座標がいずれかのスタート地点と一致するならば処理を開始。
