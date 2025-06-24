@@ -1,5 +1,8 @@
 package com.github.cresc28.speedrun.command;
 
+import com.github.cresc28.speedrun.data.CourseType;
+import com.github.cresc28.speedrun.database.CourseDatabase;
+import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.manager.CourseDataManager;
 import com.github.cresc28.speedrun.utils.MessageUtils;
 import com.github.cresc28.speedrun.utils.Utils;
@@ -16,6 +19,12 @@ import java.util.*;
  * /courseコマンドの実装クラス。
  */
 public class SpeedrunCommand implements CommandExecutor, TabCompleter {
+    private final CourseDataManager cdm;
+
+    public SpeedrunCommand(CourseDataManager cdm) {
+        this.cdm = cdm;
+    }
+
     /**
      * Tab補完の処理を行う。
      */
@@ -34,25 +43,23 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
 
         else if(args.length == 2) {
             if ("add".equalsIgnoreCase(args[0]) || "remove".equalsIgnoreCase(args[0])) {
-                List<String> options = Arrays.asList("start", "end");
-                for (String option : options) {
-                    if (option.startsWith(args[1].toLowerCase())) completions.add(option);
+                for (CourseType type : CourseType.values()) {
+                    String typeName = type.name().toLowerCase();
+                    if (typeName.startsWith(args[1].toLowerCase())) {
+                        completions.add(typeName);
+                    }
                 }
 
                 if ("remove".equalsIgnoreCase(args[0])) {
-                    Utils.completionFromMap(CourseDataManager.getEndMap().values(), args[1].toLowerCase(), completions);
+                    Utils.completionFromMap(cdm.getAllCourseName(), args[1].toLowerCase(), completions);
                 }
             }
         }
 
         else if (args.length == 3) {
             if (args[0].equals("remove")) {
-                if (args[1].equals("start")) {
-                    //startMapに登録されているアスレを表示
-                    Utils.completionFromMap(CourseDataManager.getStartMap().values(), args[2].toLowerCase(), completions);
-                } else if (args[1].equals("end")) {
-                    Utils.completionFromMap(CourseDataManager.getEndMap().values(), args[2].toLowerCase(), completions);
-                }
+                CourseType type = CourseType.fromString(args[1]);
+                Utils.completionFromMap(cdm.getAllCourseName(type), args[2].toLowerCase(), completions);
             }
         }
         return completions;
@@ -66,15 +73,12 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
         if (!command.getName().equalsIgnoreCase("course")) return false;
 
         if(args.length == 1 && args[0].equals("list")) {
-            MessageUtils.displayMap(CourseDataManager.getStartMap().values(), sender, "コース");
+            MessageUtils.displayMap(cdm.getAllCourseName(), sender, "コース");
             return true;
         }
 
         else if (args.length == 2 && args[0].equals("remove")) {
-            boolean removedStart = CourseDataManager.removeCourse(args[1], "start");
-            boolean removedEnd = CourseDataManager.removeCourse(args[1], "end");
-            boolean removed = removedStart || removedEnd;
-            MessageUtils.sendRemoveMessage(sender, removed, args[1], "コース");
+            MessageUtils.sendRemoveMessage(sender, cdm.removeCourse(args[1]), args[1], "コース");
             return true;
         }
 
@@ -84,13 +88,13 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
                 Location loc = Utils.getBlockLocation(player.getLocation());
 
                 if (args[1].equals("start")) {
-                    CourseDataManager.registerCourse(loc,args[2], "start");
+                    cdm.registerCourse(CourseType.START, args[2], loc);
                     sender.sendMessage(String.format("スタート地点(%s) : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                     return true;
                 }
 
                 else if (args[1].equals("end")) {
-                    CourseDataManager.registerCourse(loc,args[2], "end");
+                    cdm.registerCourse(CourseType.END, args[2], loc);
                     sender.sendMessage(String.format("ゴール地点(%s) : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                     return true;
                 }
@@ -98,17 +102,9 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
             }
 
             else if (args[0].equals("remove")) {
-                if (args[1].equals("start")) {
-                    boolean removed = CourseDataManager.removeCourse(args[2], "start");
-                    MessageUtils.sendRemoveMessage(sender, removed, args[2], "コース");
-                    return true;
-                }
-
-                else if (args[1].equals("end")) {
-                    boolean removed = CourseDataManager.removeCourse(args[2], "end");
-                    MessageUtils.sendRemoveMessage(sender, removed, args[2], "コース");
-                    return true;
-                }
+                boolean removed = cdm.removeCourse(args[2], CourseType.fromString(args[1]));
+                MessageUtils.sendRemoveMessage(sender, removed, args[2], "コース");
+                return true;
             }
         }
 
