@@ -10,19 +10,17 @@ public class RunState {
     private int startTime; //スタート時のtick
     private boolean isRunning; //スタートを踏んだ後か
     private boolean isOnEnd; //ゴール地点の上にいるか(ゴールの連発防止用)
+    private boolean isOnViaPoint;
     private String currentCourse; //現在走行中のコース
     private Location lastStartLocation; //最後に踏んだスタートの位置
 
     public RunState() {
         this.isRunning = false;
         this.isOnEnd = false;
+        this.isOnViaPoint = false;
         this.startTime = 0;
         this.currentCourse = null;
         this.lastStartLocation = null;
-    }
-
-    public boolean isOnEnd() {
-        return isOnEnd;
     }
 
     /**
@@ -61,8 +59,36 @@ public class RunState {
         return tick - startTime;
     }
 
+    /**
+     * 現時点のタイムを返す。
+     *
+     * @param tick 現在のick
+     * @param courseName コース名
+     * @return 計測開始がされていたコースならタイムを返す。
+     */
+    public int getCurrentRecord(int tick, String courseName){
+        //speedrunを開始していないまたはゴールしたコースが走行中のコースと不一致なら-1を返す。
+        if (!isRunning || !courseName.equals(currentCourse)) {
+            return -1;
+        }
+
+        return tick - startTime;
+    }
+
+    public boolean isOnEnd() {
+        return isOnEnd;
+    }
+
     public void setOnEnd(boolean onEnd) {
         this.isOnEnd = onEnd;
+    }
+
+    public boolean isOnViaPoint() {
+        return isOnViaPoint;
+    }
+
+    public void setOnViaPoint(boolean isOnViaPoint) {
+        this.isOnViaPoint = isOnViaPoint;
     }
 
     public void updateLastStartLocation(Location loc) {

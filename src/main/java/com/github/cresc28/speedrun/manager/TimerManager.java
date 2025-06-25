@@ -47,6 +47,7 @@ public class TimerManager {
         Location loc = player.getLocation().getBlock().getLocation();
         String start = cdm.getCourseName(loc, CourseType.START);
         String end = cdm.getCourseName(loc, CourseType.END);
+        String viaPoint = cdm.getCourseName(loc, CourseType.VIA_POINT);
         RunState state = playerStates.computeIfAbsent(uuid, k -> new RunState());
 
         //プレイヤーの現在座標がいずれかのスタート地点と一致するならば処理を開始。
@@ -72,8 +73,23 @@ public class TimerManager {
             state.setOnEnd(true);
         }
 
+        else if(viaPoint != null){
+            int currentRecord = state.getCurrentRecord(tick, viaPoint);
+            if(currentRecord > 0){
+                String timeString = Utils.formatTime(currentRecord);
+                Bukkit.broadcastMessage(player.getName() + "さんが" + viaPoint + "の中継地点を" + timeString + "で通過！");
+            }
+
+            else if (!state.isOnViaPoint()) {
+                Bukkit.broadcastMessage(player.getName() + "さんが" + viaPoint + "の中継地点を通過！");
+            }
+
+            state.setOnViaPoint(true);
+        }
+
         else {
             state.setOnEnd(false);
+            state.setOnViaPoint(false);
         }
         state.updateLastStartLocation(loc);
     }

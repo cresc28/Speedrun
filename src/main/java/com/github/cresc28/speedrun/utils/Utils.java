@@ -51,4 +51,14 @@ public class Utils {
         return new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
 
+    /**
+     * 特定の文字が文字列に含まれるかをチェックする。
+     *
+     * @param str チェックする文字列
+     * @param ch チェックする文字
+     * @return 含まれているかどうか
+     */
+    public static boolean containsChar(String str, char ch){
+        return str != null && str.indexOf(ch) >= 0;
+    }
 }
