@@ -54,7 +54,7 @@ public class CheckpointDao {
      * @param uuid UUID
      * @param world ワールド
      * @param cpName チェックポイント名
-     * @return 削除に成功した行数
+     * @return 削除に成功したか
      */
     public boolean delete(UUID uuid, World world, String cpName){
         String sql = "DELETE FROM checkpoints WHERE uuid = ? AND world_uid = ? AND cp_name =?";

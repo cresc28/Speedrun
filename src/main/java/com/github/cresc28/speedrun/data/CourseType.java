@@ -35,8 +35,7 @@ public enum CourseType {
             case "start": return START;
             case "via_point": return VIA_POINT;
             case "end": return END;
-            default:
-                throw new IllegalArgumentException("StringをCourseTypeに変換できません。入力を確認してください。: " + s);
+            default: return null;
         }
     }
 }

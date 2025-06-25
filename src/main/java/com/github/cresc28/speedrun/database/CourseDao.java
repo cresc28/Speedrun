@@ -1,5 +1,6 @@
 package com.github.cresc28.speedrun.database;
 
+import com.github.cresc28.speedrun.data.CourseEntry;
 import com.github.cresc28.speedrun.data.CourseType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -48,7 +49,7 @@ public class CourseDao {
      *
      * @param type コースのタイプ
      * @param courseName コース名
-     * @return 削除に成功した行数
+     * @return 削除に成功したか
      */
     public boolean delete(CourseType type, String courseName){
         String sql = "DELETE FROM courseData WHERE type = ? AND course_name = ?";
@@ -66,7 +67,7 @@ public class CourseDao {
      * コースをタイプによらず削除する。
      *
      * @param courseName コース名
-     * @return 削除に成功した行数
+     * @return 削除に成功したか
      */
     public boolean delete(String courseName){
         String sql = "DELETE FROM courseData WHERE course_name = ?";
@@ -80,12 +81,33 @@ public class CourseDao {
     }
 
     /**
+     * コースを削除する。
+     *
+     * @param loc 位置
+     * @return 削除に成功したか
+     */
+    public boolean delete(Location loc) {
+        String sql = "DELETE FROM courseData WHERE world_uid = ? AND x = ? AND y = ? AND z = ?";
+
+        try (PreparedStatement ps = CourseDatabase.getConnection().prepareStatement(sql)) {
+            ps.setString(1, loc.getWorld().getUID().toString());
+            ps.setDouble(2, loc.getX());
+            ps.setDouble(3, loc.getY());
+            ps.setDouble(4, loc.getZ());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "DELETE文でエラーが発生しました。");
+            return false;
+        }
+    }
+
+    /**
      * コースをすべて取得する。
      *
      * @return コースを格納したマップ
      */
-    public Map<Location, Map<CourseType, String>> getCourses(){
-        Map<Location, Map<CourseType, String>> result = new HashMap<>();
+    public Map<Location, CourseEntry> getCourses(){
+        Map<Location, CourseEntry> result = new HashMap<>();
         String sql = "SELECT type, course_name, world_uid, x, y, z FROM courseData";
 
         try(PreparedStatement ps = CourseDatabase.getConnection().prepareStatement(sql)){
@@ -103,10 +125,10 @@ public class CourseDao {
                 World world = Bukkit.getWorld(UUID.fromString(worldUid));
                 if (world == null) continue; // ワールドが存在しないならスキップ
 
-                Location location = new Location(world, x, y, z);
+                Location loc = new Location(world, x, y, z);
                 CourseType type = CourseType.fromId(typeId); // enum変換（要 fromId 実装）
 
-                result.computeIfAbsent(location, loc -> new EnumMap<>(CourseType.class)).put(type, courseName);
+                result.put(loc, new CourseEntry(type, courseName));
             }
         } catch(SQLException e){
             LOGGER.log(Level.SEVERE, "SELECT文でエラーが発生しました。");

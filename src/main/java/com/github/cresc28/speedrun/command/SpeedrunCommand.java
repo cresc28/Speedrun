@@ -57,11 +57,12 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
         }
 
         else if (args.length == 3) {
-            if (args[0].equals("remove")) {
+            if (args[0].equalsIgnoreCase("remove")) {
                 CourseType type = CourseType.fromString(args[1]);
                 Utils.completionFromMap(cdm.getAllCourseName(type), args[2].toLowerCase(), completions);
             }
         }
+
         return completions;
     }
 
@@ -72,40 +73,58 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!command.getName().equalsIgnoreCase("course")) return false;
 
-        if(args.length == 1 && args[0].equals("list")) {
+        if(args.length == 1 && args[0].equalsIgnoreCase("list")) {
             MessageUtils.displayMap(cdm.getAllCourseName(), sender, "コース");
             return true;
         }
 
-        else if (args.length == 2 && args[0].equals("remove")) {
-            MessageUtils.sendRemoveMessage(sender, cdm.removeCourse(args[1]), args[1], "コース");
-            return true;
+        else if (args.length == 2) {
+            if(args[0].equalsIgnoreCase("remove")) {
+                MessageUtils.sendRemoveMessage(sender, cdm.removeCourse(args[1]), args[1], "コース");
+                return true;
+            }
+
+            else if(args[0].equalsIgnoreCase("list")){
+                CourseType type = CourseType.fromString(args[1]);
+                MessageUtils.displayMap(cdm.getAllCourseName(type), sender, "コース");
+                return true;
+            }
         }
 
-        if (args.length == 3) {
-            if (args[0].equals("add")) {
+        else if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("add")) {
                 Player player = (Player) sender;
                 Location loc = Utils.getBlockLocation(player.getLocation());
 
-                if (args[1].equals("start")) {
+                if (args[1].equalsIgnoreCase("start")) {
                     cdm.registerCourse(CourseType.START, args[2], loc);
-                    sender.sendMessage(String.format("スタート地点(%s) : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+                    sender.sendMessage(String.format("%s（スタート） : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                     return true;
                 }
 
-                else if (args[1].equals("end")) {
+                if (args[1].equalsIgnoreCase("via_point")) {
+                    cdm.registerCourse(CourseType.VIA_POINT, args[2], loc);
+                    sender.sendMessage(String.format("%s（中間） : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+                    return true;
+                }
+
+                else if (args[1].equalsIgnoreCase("end")) {
                     cdm.registerCourse(CourseType.END, args[2], loc);
-                    sender.sendMessage(String.format("ゴール地点(%s) : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+                    sender.sendMessage(String.format("%s（ゴール） : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                     return true;
                 }
 
             }
 
-            else if (args[0].equals("remove")) {
+            else if (args[0].equalsIgnoreCase("remove")) {
                 boolean removed = cdm.removeCourse(args[2], CourseType.fromString(args[1]));
                 MessageUtils.sendRemoveMessage(sender, removed, args[2], "コース");
                 return true;
             }
+        }
+
+        else if (args.length == 4 && args[0].equalsIgnoreCase("add") && args[1].equalsIgnoreCase("via_point")) {
+
         }
 
         return false;
