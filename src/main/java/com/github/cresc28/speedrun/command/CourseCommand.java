@@ -1,8 +1,6 @@
 package com.github.cresc28.speedrun.command;
 
 import com.github.cresc28.speedrun.data.CourseType;
-import com.github.cresc28.speedrun.database.CourseDatabase;
-import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.manager.CourseDataManager;
 import com.github.cresc28.speedrun.utils.MessageUtils;
 import com.github.cresc28.speedrun.utils.Utils;
@@ -18,10 +16,10 @@ import java.util.*;
 /**
  * /courseコマンドの実装クラス。
  */
-public class SpeedrunCommand implements CommandExecutor, TabCompleter {
+public class CourseCommand implements CommandExecutor, TabCompleter {
     private final CourseDataManager cdm;
 
-    public SpeedrunCommand(CourseDataManager cdm) {
+    public CourseCommand(CourseDataManager cdm) {
         this.cdm = cdm;
     }
 
@@ -31,8 +29,6 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
-
-        if (!command.getName().equalsIgnoreCase("course")) return null;
 
         if (args.length == 1) {
             List<String> options = Arrays.asList("add", "remove", "list");
@@ -71,7 +67,8 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!command.getName().equalsIgnoreCase("course")) return false;
+        Player player = (Player) sender;
+        Location loc = Utils.getBlockLocation(player.getLocation());
 
         if(args.length == 1 && args[0].equalsIgnoreCase("list")) {
             MessageUtils.displayMap(cdm.getAllCourseName(), sender, "コース");
@@ -93,8 +90,11 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
 
         else if (args.length == 3) {
             if (args[0].equalsIgnoreCase("add")) {
-                Player player = (Player) sender;
-                Location loc = Utils.getBlockLocation(player.getLocation());
+
+                if(Utils.containsChar(args[2], '.')){
+                    sender.sendMessage("コース名に.は使用できません。");
+                    return true;
+                }
 
                 if (args[1].equalsIgnoreCase("start")) {
                     cdm.registerCourse(CourseType.START, args[2], loc);
@@ -124,7 +124,7 @@ public class SpeedrunCommand implements CommandExecutor, TabCompleter {
         }
 
         else if (args.length == 4 && args[0].equalsIgnoreCase("add") && args[1].equalsIgnoreCase("via_point")) {
-
+            cdm.registerCourse(CourseType.VIA_POINT, args[2] + "." + args[3], loc);
         }
 
         return false;

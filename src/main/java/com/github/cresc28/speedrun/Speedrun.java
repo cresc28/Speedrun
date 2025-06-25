@@ -1,7 +1,7 @@
 package com.github.cresc28.speedrun;
 
 import com.github.cresc28.speedrun.command.CheckpointCommand;
-import com.github.cresc28.speedrun.command.SpeedrunCommand;
+import com.github.cresc28.speedrun.command.CourseCommand;
 import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.database.CheckpointDatabase;
 import com.github.cresc28.speedrun.database.CourseDatabase;
@@ -44,7 +44,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         Bukkit.getLogger().info("Speedrunプラグインが起動しました。");
 
         tm.startTimer(this);
-        getCommand("course").setExecutor(new SpeedrunCommand(cdm));
+        getCommand("course").setExecutor(new CourseCommand(cdm));
         getCommand("cp").setExecutor(new CheckpointCommand(cpm));
     }
 

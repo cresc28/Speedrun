@@ -32,8 +32,6 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
         Player player = (Player) sender;
 
-        if (!command.getName().equalsIgnoreCase("cp")) return null;
-
         if (args.length == 1) {
             List<String> options = Arrays.asList("tp", "remove", "list", "allowCrossWorldTp");
             for (String option : options) {
@@ -65,8 +63,6 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
         Player player = (Player) sender;
         UUID uuid = player.getUniqueId();
         Location loc = player.getLocation();
-
-        if (!command.getName().equalsIgnoreCase("cp")) return false;
 
         if(args.length == 0){
             cpm.registerCheckpoint(uuid, loc);
