@@ -1,5 +1,6 @@
 package com.github.cresc28.speedrun.manager;
 
+import com.github.cresc28.speedrun.data.CourseEntry;
 import com.github.cresc28.speedrun.data.CourseType;
 import com.github.cresc28.speedrun.data.RunState;
 import com.github.cresc28.speedrun.utils.Utils;
@@ -45,52 +46,67 @@ public class TimerManager {
     public void checkRunState(Player player) {
         UUID uuid = player.getUniqueId();
         Location loc = player.getLocation().getBlock().getLocation();
-        String start = cdm.getCourseName(loc, CourseType.START);
-        String end = cdm.getCourseName(loc, CourseType.END);
-        String viaPoint = cdm.getCourseName(loc, CourseType.VIA_POINT);
+        CourseEntry entry = cdm.getCourseEntry(loc);
         RunState state = playerStates.computeIfAbsent(uuid, k -> new RunState());
 
-        //プレイヤーの現在座標がいずれかのスタート地点と一致するならば処理を開始。
-        if (start != null) {
-            if (state.startCourse(start, tick, loc)) {
-                player.sendMessage("計測開始！");
-            }
-        }
-
-        else if (end != null) {
-            int record = state.endCourse(tick, end);
-            if (record > 0) {
-                String timeString = Utils.formatTime(record);
-                Bukkit.broadcastMessage(player.getName() + "さんが" + end + "を" + timeString + " (" + record + "tick)でクリア！");
-            }
-
-            //TAを開始したパルクール以外のパルクールのゴールを踏むとクリア表示のみを出す。
-            // isOnEndはゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
-            else if (!state.isOnEnd()) {
-                Bukkit.broadcastMessage(player.getName() + "さんが" + end + "をクリア！");
-            }
-
-            state.setOnEnd(true);
-        }
-
-        else if(viaPoint != null){
-            int currentRecord = state.getCurrentRecord(tick, viaPoint);
-            if(currentRecord > 0){
-                String timeString = Utils.formatTime(currentRecord);
-                Bukkit.broadcastMessage(player.getName() + "さんが" + viaPoint + "の中継地点を" + timeString + "で通過！");
-            }
-
-            else if (!state.isOnViaPoint()) {
-                Bukkit.broadcastMessage(player.getName() + "さんが" + viaPoint + "の中継地点を通過！");
-            }
-
-            state.setOnViaPoint(true);
-        }
-
-        else {
+        if(entry == null) {
             state.setOnEnd(false);
             state.setOnViaPoint(false);
+            return;
         }
+
+        CourseType type = entry.getType();
+        String courseName = entry.getCourseName();
+
+
+        switch(type) {
+            case START: //プレイヤーの現在座標がいずれかのスタート地点と一致するならば処理を開始。
+                if (state.startCourse(courseName, tick, loc)) {
+                    player.sendMessage("計測開始！");
+                }
+                break;
+
+            case END:
+                int record = state.endCourse(tick, courseName);
+                if (record > 0) {
+                    String timeString = Utils.formatTime(record);
+                    Bukkit.broadcastMessage(player.getName() + "さんが" +courseName + "を" + timeString + " (" + record + "tick)でクリア！");
+                }
+
+                //TAを開始したパルクール以外のパルクールのゴールを踏むとクリア表示のみを出す。
+                // isOnEndはゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
+                else if (!state.isOnEnd()) {
+                    Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "をクリア！");
+                }
+
+                state.setOnEnd(true);
+                break;
+
+            case VIA_POINT:
+                String[] parts = courseName.split("\\."); //xx.yyという登録の場合yyは中継地点の名称を指す。
+                courseName = parts[0];
+
+                int currentRecord = state.getCurrentRecord(tick, courseName);
+
+                if(currentRecord > 0 && !state.isOnViaPoint()){
+                    String timeString = Utils.formatTime(currentRecord);
+                    if (parts.length == 2) { //中継地点に名称が設定されている場合の処理。
+                        Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "の" + parts[1] + "を" + timeString + "で通過！");
+                    }
+
+                    else {
+                        Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "の中継地点を" + timeString + "で通過！");
+                    }
+                }
+
+                else if (!state.isOnViaPoint() ) {
+                    Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "の中継地点を通過！");
+                }
+
+                state.setOnViaPoint(true);
+                break;
+        }
+
         state.updateLastStartLocation(loc);
     }
 }
