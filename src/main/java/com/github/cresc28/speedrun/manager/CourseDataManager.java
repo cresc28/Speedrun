@@ -127,4 +127,8 @@ public class CourseDataManager {
 
         return set;
     }
+
+    public CourseEntry getCourseEntry(Location loc){
+        return courseMap.get(loc);
+    }
 }

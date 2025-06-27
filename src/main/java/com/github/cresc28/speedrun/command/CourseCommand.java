@@ -125,6 +125,8 @@ public class CourseCommand implements CommandExecutor, TabCompleter {
 
         else if (args.length == 4 && args[0].equalsIgnoreCase("add") && args[1].equalsIgnoreCase("via_point")) {
             cdm.registerCourse(CourseType.VIA_POINT, args[2] + "." + args[3], loc);
+            sender.sendMessage(String.format("%s（中間, 地点名: %s） : %d %d %d", args[2], args[3], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+            return true;
         }
 
         return false;
