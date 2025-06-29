@@ -12,14 +12,14 @@ import java.util.*;
  *
  */
 
-public class CourseDataManager {
+public class CourseManager {
     private final CourseDao courseDao = new CourseDao();
     private final Map<Location, CourseEntry> courseMap;
     /**
      * コンストラクタにてデータベースからコースを読み込む。
      *
      */
-    public CourseDataManager() {
+    public CourseManager() {
         courseMap = courseDao.getCourses();
     }
 
@@ -81,18 +81,6 @@ public class CourseDataManager {
         return courseDao.delete(courseName);
     }
 
-    /**
-     * 指定された座標、タイプのコース名を取得する。
-     *
-     * @param loc  座標
-     * @param type       START,END,VIA_POINT
-     * @return コース名、存在しない場合はnull
-     */
-    public String getCourseName(Location loc, CourseType type){
-        CourseEntry courseEntry = courseMap.get(loc);
-        if (courseEntry == null) return null;
-        return courseEntry.getType() == type ? courseEntry.getCourseName() : null;
-    }
 
     /**
      * 指定されたタイプで登録されているコースの名リストを取得する。
@@ -111,6 +99,22 @@ public class CourseDataManager {
         }
 
         return set;
+    }
+
+    /**
+     * 指定されたタイプ、名前の登録位置を一つ返す。
+     *
+     * @param type       START,END,VIA_POINT
+     * @return 位置
+     */
+    public Location getLocation(CourseType type, String courseName){
+        for (Map.Entry<Location, CourseEntry> entry : courseMap.entrySet()) {
+            CourseEntry courseEntry = entry.getValue();
+            if (courseEntry.getType() == type && courseEntry.getCourseName().equals(courseName)) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     /**
