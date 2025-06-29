@@ -1,8 +1,8 @@
 package com.github.cresc28.speedrun.command;
 
 import com.github.cresc28.speedrun.data.CourseType;
-import com.github.cresc28.speedrun.manager.CourseDataManager;
-import com.github.cresc28.speedrun.utils.MessageUtils;
+import com.github.cresc28.speedrun.core.manager.CourseDataManager;
+import com.github.cresc28.speedrun.message.MessageUtils;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.command.Command;

@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun.database;
+package com.github.cresc28.speedrun.db;
 
 import com.github.cresc28.speedrun.data.CourseEntry;
 import com.github.cresc28.speedrun.data.CourseType;

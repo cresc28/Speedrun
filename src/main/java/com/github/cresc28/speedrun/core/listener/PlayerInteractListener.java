@@ -1,8 +1,8 @@
-package com.github.cresc28.speedrun.listener;
+package com.github.cresc28.speedrun.core.listener;
 
 
 import com.github.cresc28.speedrun.config.ConfigManager;
-import com.github.cresc28.speedrun.manager.CheckpointManager;
+import com.github.cresc28.speedrun.core.manager.CheckpointManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
