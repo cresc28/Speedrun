@@ -1,10 +1,9 @@
-package com.github.cresc28.speedrun.manager;
+package com.github.cresc28.speedrun.core.manager;
 
 import com.github.cresc28.speedrun.data.CourseEntry;
 import com.github.cresc28.speedrun.data.CourseType;
 import com.github.cresc28.speedrun.data.RunState;
-import com.github.cresc28.speedrun.utils.Utils;
-import org.bukkit.Bukkit;
+import com.github.cresc28.speedrun.message.TimerMessage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -62,21 +61,20 @@ public class TimerManager {
         switch(type) {
             case START: //プレイヤーの現在座標がいずれかのスタート地点と一致するならば処理を開始。
                 if (state.startCourse(courseName, tick, loc)) {
-                    player.sendMessage("計測開始！");
+                    TimerMessage.startMessage(player, courseName);
                 }
                 break;
 
             case END:
                 int record = state.endCourse(tick, courseName);
                 if (record > 0) {
-                    String timeString = Utils.formatTime(record);
-                    Bukkit.broadcastMessage(player.getName() + "さんが" +courseName + "を" + timeString + " (" + record + "tick)でクリア！");
+                    TimerMessage.endMessage(player, courseName, record);
                 }
 
                 //TAを開始したパルクール以外のパルクールのゴールを踏むとクリア表示のみを出す。
                 // isOnEndはゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
                 else if (!state.isOnEnd()) {
-                    Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "をクリア！");
+                    TimerMessage.endMessage(player, courseName, null);
                 }
 
                 state.setOnEnd(true);
@@ -88,19 +86,23 @@ public class TimerManager {
 
                 int currentRecord = state.getCurrentRecord(tick, courseName);
 
-                if(currentRecord > 0 && !state.isOnViaPoint()){
-                    String timeString = Utils.formatTime(currentRecord);
+                if(currentRecord > 0 && !state.isOnViaPoint()){ //タイム計測が行えている場合
                     if (parts.length == 2) { //中継地点に名称が設定されている場合の処理。
-                        Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "の" + parts[1] + "を" + timeString + "で通過！");
+                        TimerMessage.viaPointPassMessage(player, courseName, parts[1], currentRecord);
                     }
 
                     else {
-                        Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "の中継地点を" + timeString + "で通過！");
+                        TimerMessage.viaPointPassMessage(player, courseName, null, currentRecord);
                     }
                 }
 
-                else if (!state.isOnViaPoint() ) {
-                    Bukkit.broadcastMessage(player.getName() + "さんが" + courseName + "の中継地点を通過！");
+                else if (!state.isOnViaPoint() ) { //タイム計測が行えていない場合
+                    if (parts.length == 2) { //中継地点に名称が設定されている場合の処理。
+                        TimerMessage.viaPointPassMessage(player, courseName, parts[1], null);
+                    }
+                    else {
+                        TimerMessage.viaPointPassMessage(player, courseName, null, null);
+                    }
                 }
 
                 state.setOnViaPoint(true);

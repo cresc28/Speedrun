@@ -1,7 +1,6 @@
-package com.github.cresc28.speedrun.utils;
+package com.github.cresc28.speedrun.message;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
 import java.text.Collator;

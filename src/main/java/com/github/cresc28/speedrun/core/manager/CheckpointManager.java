@@ -1,7 +1,7 @@
-package com.github.cresc28.speedrun.manager;
+package com.github.cresc28.speedrun.core.manager;
 
-import com.github.cresc28.speedrun.database.CheckpointDao;
-import com.github.cresc28.speedrun.database.RecentCheckpointDao;
+import com.github.cresc28.speedrun.db.CheckpointDao;
+import com.github.cresc28.speedrun.db.RecentCheckpointDao;
 import org.bukkit.Location;
 import org.bukkit.World;
 

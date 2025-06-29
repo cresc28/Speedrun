@@ -1,6 +1,6 @@
-package com.github.cresc28.speedrun.listener;
+package com.github.cresc28.speedrun.core.listener;
 
-import com.github.cresc28.speedrun.manager.TimerManager;
+import com.github.cresc28.speedrun.core.manager.TimerManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;

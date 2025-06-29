@@ -3,15 +3,16 @@ package com.github.cresc28.speedrun;
 import com.github.cresc28.speedrun.command.CheckpointCommand;
 import com.github.cresc28.speedrun.command.CourseCommand;
 import com.github.cresc28.speedrun.config.ConfigManager;
-import com.github.cresc28.speedrun.database.CheckpointDatabase;
-import com.github.cresc28.speedrun.database.CourseDatabase;
-import com.github.cresc28.speedrun.database.RecentCheckpointDatabase;
-import com.github.cresc28.speedrun.listener.PlayerJoinQuitListener;
-import com.github.cresc28.speedrun.manager.CheckpointManager;
-import com.github.cresc28.speedrun.manager.CourseDataManager;
-import com.github.cresc28.speedrun.listener.PlayerInteractListener;
-import com.github.cresc28.speedrun.listener.PlayerMoveListener;
-import com.github.cresc28.speedrun.manager.TimerManager;
+import com.github.cresc28.speedrun.db.CheckpointDatabase;
+import com.github.cresc28.speedrun.db.CourseDatabase;
+import com.github.cresc28.speedrun.db.RecentCheckpointDatabase;
+import com.github.cresc28.speedrun.core.listener.PlayerJoinQuitListener;
+import com.github.cresc28.speedrun.core.manager.CheckpointManager;
+import com.github.cresc28.speedrun.core.manager.CourseDataManager;
+import com.github.cresc28.speedrun.core.listener.PlayerInteractListener;
+import com.github.cresc28.speedrun.core.listener.PlayerMoveListener;
+import com.github.cresc28.speedrun.core.manager.TimerManager;
+import com.github.cresc28.speedrun.message.TimerMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -31,6 +32,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         ConfigManager.init(); //設定の読み込みとSpeedrunディレクトリの作成。
+        TimerMessage.init();
         CourseDatabase.initializeDatabase();
         CheckpointDatabase.initializeDatabase();
         RecentCheckpointDatabase.initializeDatabase();
