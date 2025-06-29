@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun.message;
+package com.github.cresc28.speedrun.utils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

@@ -12,7 +12,7 @@ import com.github.cresc28.speedrun.core.manager.CourseDataManager;
 import com.github.cresc28.speedrun.core.listener.PlayerInteractListener;
 import com.github.cresc28.speedrun.core.listener.PlayerMoveListener;
 import com.github.cresc28.speedrun.core.manager.TimerManager;
-import com.github.cresc28.speedrun.message.TimerMessage;
+import com.github.cresc28.speedrun.config.message.CourseMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -32,7 +32,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         ConfigManager.init(); //設定の読み込みとSpeedrunディレクトリの作成。
-        TimerMessage.init();
+        CourseMessage.init();
         CourseDatabase.initializeDatabase();
         CheckpointDatabase.initializeDatabase();
         RecentCheckpointDatabase.initializeDatabase();
