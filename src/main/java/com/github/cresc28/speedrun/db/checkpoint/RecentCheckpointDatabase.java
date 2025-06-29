@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun.db;
+package com.github.cresc28.speedrun.db.checkpoint;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,21 +10,23 @@ import java.util.logging.Logger;
  * SQLiteとの接続を行うクラス。
  */
 
-public class CheckpointDatabase {
+public class RecentCheckpointDatabase {
     private static Connection con;
-    private static final Logger LOGGER = Logger.getLogger("CheckpointsDatabase");
+    private static final Logger LOGGER = Logger.getLogger("RecentCheckpointsDatabase");
 
     public static void initializeDatabase(){
         try{
             Class.forName("org.sqlite.JDBC");
-            con = DriverManager.getConnection("jdbc:sqlite:plugins/speedrun/checkpoints.sqlite");
+            con = DriverManager.getConnection("jdbc:sqlite:plugins/speedrun/recentCheckpoints.sqlite");
 
             try(Statement stmt = con.createStatement()) {
                 stmt.executeUpdate(
-                        "CREATE TABLE IF NOT EXISTS checkpoints (" +
-                                "uuid TEXT NOT NULL, world_uid TEXT NOT NULL, cp_name TEXT NOT NULL, " +
+                        "CREATE TABLE IF NOT EXISTS recentCheckpoints (" +
+                                "uuid TEXT NOT NULL, " +
+                                "is_global INT NOT NULL, " + //globalRecentCp(全ワールドで最後に設定されたCPを指す)の場合は1に設定する。
+                                "world_uid TEXT NOT NULL, " + //world.getUID().toString()で取得する。
                                 "x DOUBLE NOT NULL, y DOUBLE NOT NULL, z DOUBLE NOT NULL, yaw DOUBLE NOT NULL, pitch DOUBLE NOT NULL, " +
-                                "PRIMARY KEY(uuid, world_uid, cp_name))"
+                                "PRIMARY KEY(uuid, world_uid))"
                 );
             }
         } catch(Exception e){

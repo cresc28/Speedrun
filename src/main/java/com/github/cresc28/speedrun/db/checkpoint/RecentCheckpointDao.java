@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun.db;
+package com.github.cresc28.speedrun.db.checkpoint;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
