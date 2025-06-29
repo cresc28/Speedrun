@@ -3,7 +3,7 @@ package com.github.cresc28.speedrun.core.manager;
 import com.github.cresc28.speedrun.data.CourseEntry;
 import com.github.cresc28.speedrun.data.CourseType;
 import com.github.cresc28.speedrun.data.RunState;
-import com.github.cresc28.speedrun.message.TimerMessage;
+import com.github.cresc28.speedrun.config.message.CourseMessage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -61,20 +61,20 @@ public class TimerManager {
         switch(type) {
             case START: //プレイヤーの現在座標がいずれかのスタート地点と一致するならば処理を開始。
                 if (state.startCourse(courseName, tick, loc)) {
-                    TimerMessage.startMessage(player, courseName);
+                    CourseMessage.startMessage(player, courseName);
                 }
                 break;
 
             case END:
                 int record = state.endCourse(tick, courseName);
                 if (record > 0) {
-                    TimerMessage.endMessage(player, courseName, record);
+                    CourseMessage.endMessage(player, courseName, record);
                 }
 
                 //TAを開始したパルクール以外のパルクールのゴールを踏むとクリア表示のみを出す。
                 // isOnEndはゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
                 else if (!state.isOnEnd()) {
-                    TimerMessage.endMessage(player, courseName, null);
+                    CourseMessage.endMessage(player, courseName, null);
                 }
 
                 state.setOnEnd(true);
@@ -88,20 +88,20 @@ public class TimerManager {
 
                 if(currentRecord > 0 && !state.isOnViaPoint()){ //タイム計測が行えている場合
                     if (parts.length == 2) { //中継地点に名称が設定されている場合の処理。
-                        TimerMessage.viaPointPassMessage(player, courseName, parts[1], currentRecord);
+                        CourseMessage.viaPointPassMessage(player, courseName, parts[1], currentRecord);
                     }
 
                     else {
-                        TimerMessage.viaPointPassMessage(player, courseName, null, currentRecord);
+                        CourseMessage.viaPointPassMessage(player, courseName, null, currentRecord);
                     }
                 }
 
                 else if (!state.isOnViaPoint() ) { //タイム計測が行えていない場合
                     if (parts.length == 2) { //中継地点に名称が設定されている場合の処理。
-                        TimerMessage.viaPointPassMessage(player, courseName, parts[1], null);
+                        CourseMessage.viaPointPassMessage(player, courseName, parts[1], null);
                     }
                     else {
-                        TimerMessage.viaPointPassMessage(player, courseName, null, null);
+                        CourseMessage.viaPointPassMessage(player, courseName, null, null);
                     }
                 }
 
