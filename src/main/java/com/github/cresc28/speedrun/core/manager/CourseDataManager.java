@@ -2,7 +2,7 @@ package com.github.cresc28.speedrun.core.manager;
 
 import com.github.cresc28.speedrun.data.CourseEntry;
 import com.github.cresc28.speedrun.data.CourseType;
-import com.github.cresc28.speedrun.db.CourseDao;
+import com.github.cresc28.speedrun.db.course.CourseDao;
 import org.bukkit.Location;
 
 import java.util.*;
