@@ -19,9 +19,9 @@ import java.util.UUID;
 public class TimerManager {
     private int tick = 0;
     private final Map<UUID, RunState> playerStates = new HashMap<>();
-    private final CourseDataManager cdm;
+    private final CourseManager cdm;
 
-    public TimerManager(CourseDataManager cdm) {
+    public TimerManager(CourseManager cdm) {
         this.cdm = cdm;
     }
 

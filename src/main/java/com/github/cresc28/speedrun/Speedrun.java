@@ -8,7 +8,7 @@ import com.github.cresc28.speedrun.db.course.CourseDatabase;
 import com.github.cresc28.speedrun.db.checkpoint.RecentCheckpointDatabase;
 import com.github.cresc28.speedrun.core.listener.PlayerJoinQuitListener;
 import com.github.cresc28.speedrun.core.manager.CheckpointManager;
-import com.github.cresc28.speedrun.core.manager.CourseDataManager;
+import com.github.cresc28.speedrun.core.manager.CourseManager;
 import com.github.cresc28.speedrun.core.listener.PlayerInteractListener;
 import com.github.cresc28.speedrun.core.listener.PlayerMoveListener;
 import com.github.cresc28.speedrun.core.manager.TimerManager;
@@ -37,8 +37,8 @@ public final class Speedrun extends JavaPlugin implements Listener {
         CheckpointDatabase.initializeDatabase();
         RecentCheckpointDatabase.initializeDatabase();
 
-        CourseDataManager cdm = new CourseDataManager();
-        TimerManager tm = new TimerManager(cdm);
+        CourseManager cm = new CourseManager();
+        TimerManager tm = new TimerManager(cm);
 
         Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(tm),this);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(cpm),this);
@@ -46,7 +46,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         Bukkit.getLogger().info("Speedrunプラグインが起動しました。");
 
         tm.startTimer(this);
-        getCommand("course").setExecutor(new CourseCommand(cdm));
+        getCommand("course").setExecutor(new CourseCommand(cm));
         getCommand("cp").setExecutor(new CheckpointCommand(cpm));
     }
 
