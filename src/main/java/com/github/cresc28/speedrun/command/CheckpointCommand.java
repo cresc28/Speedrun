@@ -41,7 +41,7 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
         else if(args.length == 2) {
             if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("tp")) {
-                Utils.completionFromMap(cpm.getCheckpointNames(player.getUniqueId(), player.getLocation()), args[1].toLowerCase(), completions);
+                Utils.completionFromMap(cpm.getCheckpointNames(player.getUniqueId(), player.getLocation().getWorld()), args[1].toLowerCase(), completions);
             }
 
             else if(args[0].equalsIgnoreCase("allowCrossWorldTp")){
@@ -72,7 +72,7 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
         else if(args.length == 1){
             if(args[0].equalsIgnoreCase("list")){
-                MessageUtils.displayMap(cpm.getCheckpointNames(uuid, loc), sender, "チェックポイント");
+                MessageUtils.displayMap(cpm.getCheckpointNames(uuid, loc.getWorld()), sender, "チェックポイント");
             }
 
             else{
@@ -90,7 +90,7 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             else if(args[0].equalsIgnoreCase("tp")){
-                if(!cpm.selectCheckpoint(uuid, loc, args[1])) {
+                if(!cpm.selectCheckpoint(uuid, loc.getWorld(), args[1])) {
                     sender.sendMessage(ChatColor.RED + "指定された名前のチェックポイントは存在しません。");
                 }
 

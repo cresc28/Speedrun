@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class MessageUtils {
     /**
-     * ある要素の一覧をソートして表示する。
+     * あるコレクションの一覧を表示する。
      *
      * @param names 表示する要素の一覧
      * @param sender メッセージ送信先
@@ -22,13 +22,8 @@ public class MessageUtils {
             sender.sendMessage(ChatColor.RED + "登録済みの" + subject + "が存在しません。");
             return;
         }
-        List<String> sortedNames = new ArrayList<>(names);
 
-        Collator collator = Collator.getInstance(Locale.JAPAN);
-        collator.setStrength(Collator.TERTIARY);
-
-        sortedNames.sort(collator);
-        sender.sendMessage(String.join(", ", sortedNames));
+        sender.sendMessage(String.join(", ", Utils.sortCollection(names)));
     }
 
     /**

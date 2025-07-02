@@ -70,15 +70,14 @@ public class CheckpointManager {
     }
 
     /**
-     * 指定された名前のチェックポイントを今のチェックポイントに設定し、その位置を返す。
+     * 指定された名前のチェックポイントを現在のチェックポイントに設定する。
      *
      * @param uuid UUID
-     * @param loc プレイヤーのいる座標
+     * @param world プレイヤーのいるワールド
      * @param cpName チェックポイント名
      * @return 選択に成功したか
      */
-    public boolean selectCheckpoint(UUID uuid, Location loc, String cpName){
-        World world = loc.getWorld();
+    public boolean selectCheckpoint(UUID uuid, World world, String cpName){
         Location selectedLoc = cpDao.getLocation(uuid, world, cpName);
 
         if(selectedLoc == null) return false;
@@ -92,11 +91,10 @@ public class CheckpointManager {
      * 現在のワールドにおいてプレイヤーが登録しているチェックポイント名の一覧を返す。
      *
      * @param uuid UUID
-     * @param loc プレイヤーのいる座標
+     * @param world プレイヤーのいるワールド
      * @return チェックポイント名の一覧
      */
-    public Collection<String> getCheckpointNames(UUID uuid, Location loc){
-        World world = loc.getWorld();
+    public Collection<String> getCheckpointNames(UUID uuid, World world){
 
         return cpDao.getCheckpointNames(uuid, world);
     }
