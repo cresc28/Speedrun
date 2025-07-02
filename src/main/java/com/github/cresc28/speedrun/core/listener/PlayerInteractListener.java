@@ -3,6 +3,7 @@ package com.github.cresc28.speedrun.core.listener;
 
 import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.core.manager.CheckpointManager;
+import com.github.cresc28.speedrun.gui.CheckpointMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
@@ -33,6 +35,8 @@ public class PlayerInteractListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event){
+        if (event.getHand() != EquipmentSlot.HAND) return;
+
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         ItemStack item = event.getItem();
@@ -50,8 +54,11 @@ public class PlayerInteractListener implements Listener {
                     player.sendMessage(ChatColor.RED + "有効なチェックポイントが存在しません。");
                 }
             }
-            else if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK){
 
+            else if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK){
+                event.setCancelled(true); // ブロック破壊を起こさない
+                CheckpointMenu cpMenu = new CheckpointMenu(player, cpm);
+                cpMenu.openInventory();
             }
         }
     }

@@ -3,6 +3,7 @@ package com.github.cresc28.speedrun;
 import com.github.cresc28.speedrun.command.CheckpointCommand;
 import com.github.cresc28.speedrun.command.CourseCommand;
 import com.github.cresc28.speedrun.config.ConfigManager;
+import com.github.cresc28.speedrun.core.listener.InventoryActionListener;
 import com.github.cresc28.speedrun.db.checkpoint.CheckpointDatabase;
 import com.github.cresc28.speedrun.db.course.CourseDatabase;
 import com.github.cresc28.speedrun.db.checkpoint.RecentCheckpointDatabase;
@@ -43,6 +44,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(tm),this);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(cpm),this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinQuitListener(cpm),this);
+        Bukkit.getPluginManager().registerEvents(new InventoryActionListener(cpm),this);
         Bukkit.getLogger().info("Speedrunプラグインが起動しました。");
 
         tm.startTimer(this);

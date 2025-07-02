@@ -2,10 +2,8 @@ package com.github.cresc28.speedrun.utils;
 
 import org.bukkit.Location;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.text.Collator;
+import java.util.*;
 
 /**
  * 汎用ユーティリティクラス。
@@ -60,5 +58,22 @@ public class Utils {
      */
     public static boolean containsChar(String str, char ch){
         return str != null && str.indexOf(ch) >= 0;
+    }
+
+    /**
+     * ある要素をソートする。
+     *
+     * @param collection ソートするコレクション
+     * @return ソートされたコレクション
+     */
+    public static Collection<String> sortCollection(Collection<String> collection){
+        List<String> sortedCollection = new ArrayList<>(collection);
+
+        Collator collator = Collator.getInstance(Locale.JAPAN);
+        collator.setStrength(Collator.TERTIARY);
+
+        sortedCollection.sort(collator);
+
+        return sortedCollection;
     }
 }
