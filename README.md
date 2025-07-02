@@ -97,5 +97,4 @@
 
 ### `/cp allowCrossWorldTp <true|false>`
 ワールドを跨ぐCPでの移動を許可または禁止します。
-
 </details>
