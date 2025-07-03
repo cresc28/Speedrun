@@ -20,17 +20,16 @@ import java.util.UUID;
 
 /**
  * プレイヤーのアイテムクリック時の処理を行うクラス。
- * <p>
  * ネザースターの右クリックを検知するとチェックポイントへTPさせ、
  * 左クリックを検知するとメニューを開く。
- * </p>
+ *
  */
 
 public class PlayerInteractListener implements Listener {
-    private final CheckpointManager cpm;
+    private final CheckpointManager cpManager;
 
-    public PlayerInteractListener(CheckpointManager cpm){
-        this.cpm = cpm;
+    public PlayerInteractListener(CheckpointManager cpManager){
+        this.cpManager = cpManager;
     }
 
     @EventHandler
@@ -44,8 +43,8 @@ public class PlayerInteractListener implements Listener {
         if(item != null && item.getType() == Material.NETHER_STAR) {
             if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
                 Location loc;
-                if(ConfigManager.isCrossWorldTpAllowed()) loc = cpm.getGlobalRecentCpLocation(uuid);
-                else loc = cpm.getLocalRecentCpLocation(uuid);
+                if(ConfigManager.isCrossWorldTpAllowed()) loc = cpManager.getGlobalRecentCpLocation(uuid);
+                else loc = cpManager.getLocalRecentCpLocation(uuid);
 
                 if (loc != null) {
                     player.teleport(loc);
@@ -57,8 +56,7 @@ public class PlayerInteractListener implements Listener {
 
             else if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK){
                 event.setCancelled(true); // ブロック破壊を起こさない
-                CheckpointMenu cpMenu = new CheckpointMenu(player, cpm);
-                cpMenu.openInventory();
+                new CheckpointMenu(player, cpManager, 0).openInventory();
             }
         }
     }

@@ -12,31 +12,34 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.UUID;
 
+/**
+ * プレイヤーのjoin, quit, ワールド変更時の処理。
+ */
 public class PlayerJoinQuitListener implements Listener {
-    private final CheckpointManager cpm;
+    private final CheckpointManager cpManager;
 
-    public PlayerJoinQuitListener(CheckpointManager cpm){
-        this.cpm = cpm;
+    public PlayerJoinQuitListener(CheckpointManager cpManager){
+        this.cpManager = cpManager;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
-        cpm.loadRecentLocalCp(uuid, player.getWorld());
-        cpm.loadRecentGlobalCp(uuid);
+        cpManager.loadRecentLocalCp(uuid, player.getWorld());
+        cpManager.loadRecentGlobalCp(uuid);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event){
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
-        Location globalRecentCpLoc = cpm.getGlobalRecentCpLocation(uuid);
-        Location localRecentCpLoc = cpm.getLocalRecentCpLocation(uuid);
+        Location globalRecentCpLoc = cpManager.getGlobalRecentCpLocation(uuid);
+        Location localRecentCpLoc = cpManager.getLocalRecentCpLocation(uuid);
 
-        if(localRecentCpLoc != null) cpm.saveRecentCp(uuid, false, localRecentCpLoc);
-        if(globalRecentCpLoc != null) cpm.saveRecentCp(uuid, true, globalRecentCpLoc);
-        cpm.removeRecentCpFromMap(uuid);
+        if(localRecentCpLoc != null) cpManager.saveRecentCp(uuid, false, localRecentCpLoc);
+        if(globalRecentCpLoc != null) cpManager.saveRecentCp(uuid, true, globalRecentCpLoc);
+        cpManager.removeRecentCpFromMap(uuid);
     }
 
     @EventHandler
@@ -44,9 +47,9 @@ public class PlayerJoinQuitListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         World fromWorld = event.getFrom();
-        Location prevWorldRecentCpLoc = cpm.getLocalRecentCpLocation(uuid);
+        Location prevWorldRecentCpLoc = cpManager.getLocalRecentCpLocation(uuid);
 
-        if(prevWorldRecentCpLoc != null) cpm.saveRecentCp(uuid, false, prevWorldRecentCpLoc);
-        cpm.loadRecentLocalCp(uuid, player.getWorld());
+        if(prevWorldRecentCpLoc != null) cpManager.saveRecentCp(uuid, false, prevWorldRecentCpLoc);
+        cpManager.loadRecentLocalCp(uuid, player.getWorld());
     }
 }
