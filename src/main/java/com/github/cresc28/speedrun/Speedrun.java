@@ -14,6 +14,8 @@ import com.github.cresc28.speedrun.core.listener.PlayerInteractListener;
 import com.github.cresc28.speedrun.core.listener.PlayerMoveListener;
 import com.github.cresc28.speedrun.core.manager.TimerManager;
 import com.github.cresc28.speedrun.config.message.CourseMessage;
+import com.github.cresc28.speedrun.gui.CheckpointMenu;
+import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -27,8 +29,7 @@ import java.util.UUID;
  */
 
 public final class Speedrun extends JavaPlugin implements Listener {
-    CheckpointManager cpm = new CheckpointManager();
-
+    CheckpointManager cpManager = new CheckpointManager();
 
     @Override
     public void onEnable() {
@@ -38,29 +39,32 @@ public final class Speedrun extends JavaPlugin implements Listener {
         CheckpointDatabase.initializeDatabase();
         RecentCheckpointDatabase.initializeDatabase();
 
-        CourseManager cm = new CourseManager();
-        TimerManager tm = new TimerManager(cm);
+        CourseManager courseManager = new CourseManager();
+        TimerManager timeManager = new TimerManager(courseManager);
 
-        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(tm),this);
-        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(cpm),this);
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinQuitListener(cpm),this);
-        Bukkit.getPluginManager().registerEvents(new InventoryActionListener(cpm),this);
+        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(timeManager),this);
+        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(cpManager),this);
+        Bukkit.getPluginManager().registerEvents(new PlayerJoinQuitListener(cpManager),this);
+        Bukkit.getPluginManager().registerEvents(new InventoryActionListener(cpManager),this);
         Bukkit.getLogger().info("Speedrunプラグインが起動しました。");
 
-        tm.startTimer(this);
-        getCommand("course").setExecutor(new CourseCommand(cm));
-        getCommand("cp").setExecutor(new CheckpointCommand(cpm));
+        timeManager.startTimer(this);
+        getCommand("course").setExecutor(new CourseCommand(courseManager));
+        getCommand("cp").setExecutor(new CheckpointCommand(cpManager));
+
+        Utils.getPlayerHead("MHF_ArrowRight");
+        Utils.getPlayerHead("MHF_ArrowLeft");
     }
 
     @Override
     public void onDisable() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             UUID uuid = player.getUniqueId();
-            Location globalLoc = cpm.getGlobalRecentCpLocation(uuid);
-            Location localLoc = cpm.getLocalRecentCpLocation(uuid);
+            Location globalLoc = cpManager.getGlobalRecentCpLocation(uuid);
+            Location localLoc = cpManager.getLocalRecentCpLocation(uuid);
 
-            if (localLoc != null) cpm.saveRecentCp(uuid, false, localLoc);
-            if (globalLoc != null) cpm.saveRecentCp(uuid, true, globalLoc);
+            if (localLoc != null) cpManager.saveRecentCp(uuid, false, localLoc);
+            if (globalLoc != null) cpManager.saveRecentCp(uuid, true, globalLoc);
         }
 
         CheckpointDatabase.closeConnection();
