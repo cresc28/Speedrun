@@ -1,13 +1,14 @@
 package com.github.cresc28.speedrun.utils;
 
-import org.bukkit.Bukkit;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.lang.reflect.Field;
 import java.text.Collator;
 import java.util.*;
 
@@ -84,21 +85,6 @@ public class Utils {
     }
 
     /**
-     * プレイヤーの頭(マインクラフト1.13以降ではこの関数は動作しない)
-     *
-     * @param name 取得したい頭を持つプレイヤーの名前
-     * @return プレイヤーの頭
-     */
-    public static ItemStack getPlayerHead(String name){
-        ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
-        SkullMeta meta = (SkullMeta) head.getItemMeta();
-        meta.setOwner(name);
-        head.setItemMeta(meta);
-
-        return head;
-    }
-
-    /**
      * アイテムの名前を変更する。
      *
      * @param item アイテム
@@ -110,22 +96,5 @@ public class Utils {
         if(meta == null) return;
         meta.setDisplayName(name);
         item.setItemMeta(meta);
-    }
-
-    /**
-     * ItemStackが特定プレイヤーの頭かどうかを判定する(マインクラフト1.13以降ではこの関数は動作しない)
-     *
-     * @param item 判定対象のアイテム
-     * @param name プレイヤー名
-     * @return 該当プレイヤーの頭であればtrue
-     */
-    public static boolean isPlayerHeadOf(ItemStack item, String name) {
-        if (item == null || item.getType() != Material.SKULL_ITEM) return false;
-
-        ItemMeta meta = item.getItemMeta();
-        if (!(meta instanceof SkullMeta)) return false;
-
-        SkullMeta skullMeta = (SkullMeta) meta;
-        return name.equalsIgnoreCase(skullMeta.getOwner());
     }
 }

@@ -2,7 +2,9 @@ package com.github.cresc28.speedrun.core.listener;
 
 import com.github.cresc28.speedrun.core.manager.CheckpointManager;
 import com.github.cresc28.speedrun.gui.CheckpointMenu;
+import com.github.cresc28.speedrun.utils.HeadUtils;
 import com.github.cresc28.speedrun.utils.Utils;
+import jdk.javadoc.internal.doclets.formats.html.markup.Head;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -10,7 +12,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Set;
 
@@ -39,17 +43,24 @@ public class InventoryActionListener implements Listener {
             return;
         }
 
+        if (event.getRawSlot() >= event.getView().getTopInventory().getSize()) {
+            return; //手持ちのアイテムをクリックしたときに反応させない。
+        }
+
+        ItemMeta meta = clickedItem.getItemMeta();
+        if (meta == null || !meta.hasDisplayName()) return;
+        String displayName = meta.getDisplayName();
+
         if (clickedItem.getType() == Material.NETHER_STAR) {
-            String displayName = event.getCurrentItem().getItemMeta().getDisplayName();
             teleport(player, displayName);
         }
 
-        else if(Utils.isPlayerHeadOf(clickedItem, "MHF_ArrowRight")){
+        else if(displayName.equals("次へ")){
             int currentPage = getCurrentPage(event.getView().getTitle());
             new CheckpointMenu(player, cpManager, (currentPage + 1)).openInventory();
         }
 
-        else if(Utils.isPlayerHeadOf(clickedItem, "MHF_ArrowLeft")){
+        else if(displayName.equals("前へ")){
             int currentPage = getCurrentPage(event.getView().getTitle());
             new CheckpointMenu(player, cpManager, (currentPage - 1)).openInventory();
         }
@@ -75,7 +86,7 @@ public class InventoryActionListener implements Listener {
 
     /**
      *
-     * メニュータイトルから現在のページを取得
+     * メニュータイトルから現在のページを取得(悪ロジックだけど面倒なのでこれで...)
      *
      * @param title メニュータイトル
      * @return 現在のページ
