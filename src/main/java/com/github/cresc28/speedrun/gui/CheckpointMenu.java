@@ -1,6 +1,7 @@
 package com.github.cresc28.speedrun.gui;
 
 import com.github.cresc28.speedrun.core.manager.CheckpointManager;
+import com.github.cresc28.speedrun.utils.HeadUtils;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -39,14 +40,12 @@ public class CheckpointMenu {
         int pages = (cpNames.size() - 1) / CHECKPOINT_SLOT;
 
         if(currentPage < pages) {
-            ItemStack arrowRight = Utils.getPlayerHead("MHF_ArrowRight");
-            Utils.changeItemName(arrowRight, "次へ");
+            ItemStack arrowRight = HeadUtils.getHeadFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliZjMyOTJlMTI2YTEwNWI1NGViYTcxM2FhMWIxNTJkNTQxYTFkODkzODgyOWM1NjM2NGQxNzhlZDIyYmYifX19", "次へ");
             inv.setItem(53, arrowRight);
         }
 
         if(currentPage > 0){
-            ItemStack arrowLeft = Utils.getPlayerHead("MHF_ArrowLeft");
-            Utils.changeItemName(arrowLeft, "前へ");
+            ItemStack arrowLeft = HeadUtils.getHeadFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ==", "前へ");
             inv.setItem(45, arrowLeft);
         }
 
