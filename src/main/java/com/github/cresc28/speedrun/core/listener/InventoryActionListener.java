@@ -2,9 +2,7 @@ package com.github.cresc28.speedrun.core.listener;
 
 import com.github.cresc28.speedrun.core.manager.CheckpointManager;
 import com.github.cresc28.speedrun.gui.CheckpointMenu;
-import com.github.cresc28.speedrun.utils.HeadUtils;
-import com.github.cresc28.speedrun.utils.Utils;
-import jdk.javadoc.internal.doclets.formats.html.markup.Head;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,8 +13,12 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * インベントリのクリック時、閉じた時の処理。
@@ -24,9 +26,12 @@ import java.util.Set;
 
 public class InventoryActionListener implements Listener {
     private final CheckpointManager cpManager;
+    private final Map<UUID, Boolean> deleteModeMap = new HashMap<>();
+    private final JavaPlugin plugin;
 
-    public InventoryActionListener(CheckpointManager cpManager) {
+    public InventoryActionListener(CheckpointManager cpManager, JavaPlugin plugin) {
         this.cpManager = cpManager;
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -50,28 +55,53 @@ public class InventoryActionListener implements Listener {
         ItemMeta meta = clickedItem.getItemMeta();
         if (meta == null || !meta.hasDisplayName()) return;
         String displayName = meta.getDisplayName();
+        int currentPage = getCurrentPage(event.getView().getTitle());
 
         if (clickedItem.getType() == Material.NETHER_STAR) {
-            teleport(player, displayName);
+            if(!isDeleteMode(player)){
+                teleport(player, displayName);
+            }
+            else {
+                cpManager.removeCheckpoint(player.getUniqueId(), player.getWorld(), displayName);
+                new CheckpointMenu(player, cpManager, currentPage, isDeleteMode((player))).openInventory();
+            }
+        }
+
+        else if (clickedItem.getType() == Material.WOOL) {
+            short color = clickedItem.getData().getData();
+            if (color == 13) { //緑
+                deleteModeMap.put(player.getUniqueId(), false);
+                new CheckpointMenu(player, cpManager, currentPage, false).openInventory();
+            }
+            else if(color == 14){ //赤
+                deleteModeMap.put(player.getUniqueId(), true);
+                new CheckpointMenu(player, cpManager, currentPage, true).openInventory();
+            }
         }
 
         else if(displayName.equals("次へ")){
-            int currentPage = getCurrentPage(event.getView().getTitle());
-            new CheckpointMenu(player, cpManager, (currentPage + 1)).openInventory();
+            new CheckpointMenu(player, cpManager, (currentPage + 1), isDeleteMode(player)).openInventory();
         }
 
         else if(displayName.equals("前へ")){
-            int currentPage = getCurrentPage(event.getView().getTitle());
-            new CheckpointMenu(player, cpManager, (currentPage - 1)).openInventory();
+            new CheckpointMenu(player, cpManager, (currentPage - 1), isDeleteMode(player)).openInventory();
         }
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event){
-        Set<String> UserTags = event.getPlayer().getScoreboardTags();
-        if(UserTags.contains("MenuOpen")){
-            event.getPlayer().removeScoreboardTag("MenuOpen");
-        }
+    public void onInventoryClose(InventoryCloseEvent event) {
+        Player player = (Player) event.getPlayer();
+
+        //この遅延がないとインベントリを取得できるため。
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            //インベントリが完全にないとき
+            if (player.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
+                deleteModeMap.remove(player.getUniqueId());
+                if (player.getScoreboardTags().contains("MenuOpen")) {
+                    player.removeScoreboardTag("MenuOpen");
+                }
+            }
+        });
     }
 
     private void teleport(Player player, String displayName) {
@@ -105,5 +135,9 @@ public class InventoryActionListener implements Listener {
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+
+    private boolean isDeleteMode(Player player) {
+        return deleteModeMap.getOrDefault(player.getUniqueId(), false);
     }
 }

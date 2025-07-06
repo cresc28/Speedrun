@@ -20,11 +20,13 @@ public class CheckpointMenu {
     private final Player player;
     private final CheckpointManager cpm;
     private int currentPage = 0;
+    private boolean isDeleteMode = false;
 
-    public CheckpointMenu(Player player, CheckpointManager cpm, int currentPage){
+    public CheckpointMenu(Player player, CheckpointManager cpm, int currentPage, boolean isDeleteMode){
         this.player = player;
         this.cpm = cpm;
         this.currentPage = currentPage;
+        this.isDeleteMode = isDeleteMode;
     }
 
     /**
@@ -47,6 +49,18 @@ public class CheckpointMenu {
         if(currentPage > 0){
             ItemStack arrowLeft = HeadUtils.getHeadFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ==", "前へ");
             inv.setItem(45, arrowLeft);
+        }
+
+        if(!isDeleteMode){
+            ItemStack redWool = new ItemStack(Material.WOOL ,1, (short) 14);
+            Utils.changeItemName(redWool, "削除モードへ切り替え");
+            inv.setItem(51, redWool);
+        }
+
+        else{
+            ItemStack greenWool = new ItemStack(Material.WOOL ,1, (short) 13);
+            Utils.changeItemName(greenWool, "TPモードへ切り替え");
+            inv.setItem(51, greenWool);
         }
 
         int startIndex = currentPage * CHECKPOINT_SLOT;
