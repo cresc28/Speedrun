@@ -12,13 +12,13 @@
 ## **機能**
 
 - 設定したスタート地点から中間地点、ゴール地点間の移動にかかった現実時間及びゲーム内時間を表示
-- 設定したチェックポイントへのテレポート (ネザースターを右クリック)
+- 設定したチェックポイントへのテレポート
 
 ---
 
 ## ダウンロード
 <p align="center">
-  <a href="https://github.com/cresc28/Speedrun/releases/tag/v2.0.0" style="font-size: 1.5em;">
+  <a href="https://github.com/cresc28/Speedrun/releases/tag/v2.1.0" style="font-size: 1.5em;">
     <strong>⬇️ SpeedrunPluginをダウンロード</strong>
   </a>
 </p>
@@ -73,8 +73,14 @@
 <details>
 <summary><strong>チェックポイント設定</strong></summary>
 
+### 使い方
+ネザースターを右クリックで最後に設定したチェックポイント(以下CP)にテレポートします。<br>
+ネザースターを左クリックでGUIメニューを開きます。
+
+---
+
 ### `/cp <CP名> または /cp`
-現在位置に指定した名前のチェックポイント(以下CP)を登録します。</br>
+現在位置に指定した名前のCPを登録します。</br>
 名前を指定しなかった場合tmpという名前のCPを登録します。<br>
 ネザースターを右クリックすると、その位置にテレポートします。
 

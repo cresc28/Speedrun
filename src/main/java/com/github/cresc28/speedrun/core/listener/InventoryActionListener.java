@@ -103,7 +103,7 @@ public class InventoryActionListener implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
 
-        //この遅延がないとインベントリを取得できるため。
+        //この遅延がないと機能しない。
         Bukkit.getScheduler().runTask(plugin, () -> {
             //インベントリが完全にないとき
             if (player.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
