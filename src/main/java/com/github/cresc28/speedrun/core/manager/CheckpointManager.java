@@ -47,12 +47,11 @@ public class CheckpointManager {
      * そのCPがcurrentCpに設定されている場合はcurrentCpをnullにする。
      *
      * @param uuid UUID
-     * @param loc プレイヤーのいる座標
+     * @param world プレイヤーのいるワールド
      * @param cpName 削除したいチェックポイント名
      * @return 削除に成功したか
      */
-    public boolean removeCheckpoint(UUID uuid, Location loc, String cpName){
-        World world = loc.getWorld();
+    public boolean removeCheckpoint(UUID uuid, World world, String cpName){
 
         Location toDelete = cpDao.getLocation(uuid, world, cpName);
         if(toDelete == null) return false;

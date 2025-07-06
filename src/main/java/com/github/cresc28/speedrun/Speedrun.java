@@ -46,7 +46,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(timeManager),this);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(cpManager),this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinQuitListener(cpManager),this);
-        Bukkit.getPluginManager().registerEvents(new InventoryActionListener(cpManager),this);
+        Bukkit.getPluginManager().registerEvents(new InventoryActionListener(cpManager, this),this);
         Bukkit.getLogger().info("Speedrunプラグインが起動しました。");
 
         timeManager.startTimer(this);

@@ -85,7 +85,7 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
         if(args.length == 2){
             if(args[0].equalsIgnoreCase("remove")){
-                boolean removed = cpm.removeCheckpoint(uuid, loc, args[1]);
+                boolean removed = cpm.removeCheckpoint(uuid, loc.getWorld(), args[1]);
                 MessageUtils.sendRemoveMessage(sender, removed, args[1], "チェックポイント");
                 return true;
             }
