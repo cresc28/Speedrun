@@ -38,7 +38,7 @@ public class CheckpointMenu {
     public void openInventory(){
         final int ALL_SLOT = 54; //54枠
         final int CHECKPOINT_SLOT = 45; //ネザースターで埋めるのは45枠まで
-        Inventory inv = Bukkit.createInventory(null, ALL_SLOT,"CheckpointMenu (World: " + world.getName() + " )");
+        Inventory inv = Bukkit.createInventory(null, ALL_SLOT,"CheckpointMenu (World: " + world.getName() + ")");
         Collection<String> cpCollection = cpm.getCheckpointNames(player.getUniqueId(), world);
         Utils.sortCollection(cpCollection);
         ArrayList<String> cpNames = new ArrayList<>(cpCollection);
