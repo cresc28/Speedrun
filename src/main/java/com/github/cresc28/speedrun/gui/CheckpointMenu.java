@@ -79,6 +79,5 @@ public class CheckpointMenu {
         }
 
         player.openInventory(inv);
-        player.addScoreboardTag("MenuOpen");
     }
 }
