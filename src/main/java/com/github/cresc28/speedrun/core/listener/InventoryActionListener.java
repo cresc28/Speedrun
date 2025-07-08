@@ -40,11 +40,12 @@ public class InventoryActionListener implements Listener {
         Set<String> UserTags = event.getWhoClicked().getScoreboardTags();
         ItemStack clickedItem = event.getCurrentItem();
 
-        if(UserTags.contains("MenuOpen")){
-            event.setCancelled(true);
+        if(clickedItem == null || !clickedItem.hasItemMeta()){
+            return;
         }
 
-        if(clickedItem == null || !clickedItem.hasItemMeta()){
+        //普通のチェストなどで誤作動させない。
+        if(!UserTags.contains("MenuOpen")){ //userTagsのセットはInteractListener内で行っている。
             return;
         }
 
@@ -105,8 +106,8 @@ public class InventoryActionListener implements Listener {
 
         //この遅延がないと機能しない。
         Bukkit.getScheduler().runTask(plugin, () -> {
-            //インベントリが完全にないとき
-            if (player.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
+            //インベントリが完全に閉じられたとき
+            if (player.getOpenInventory().getTopInventory().getType() != InventoryType.CHEST) {
                 UUID uuid = player.getUniqueId();
                 menuState.remove(uuid);
                 if (player.getScoreboardTags().contains("MenuOpen")) {

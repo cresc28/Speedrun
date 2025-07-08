@@ -56,6 +56,7 @@ public class PlayerInteractListener implements Listener {
 
             else if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK){
                 event.setCancelled(true); // ブロック破壊を起こさない
+                player.addScoreboardTag("MenuOpen");
                 new CheckpointMenu(player, cpManager, 0, player.getWorld(),false).openInventory();
             }
         }
