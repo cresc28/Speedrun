@@ -28,7 +28,6 @@ public class InventoryActionListener implements Listener {
     private final CheckpointManager cpManager;
     private final Map<UUID, MenuState> menuState = new HashMap<>();
     private final JavaPlugin plugin;
-    List<World> worldList = Bukkit.getWorlds();
 
     public InventoryActionListener(CheckpointManager cpManager, JavaPlugin plugin) {
         this.cpManager = cpManager;

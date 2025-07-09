@@ -74,7 +74,7 @@ public class CourseMessage {
                         + "complete2: \"%player%さんが%course%をクリア！\"\n\n"
 
                         + "# 中継地点通過メッセージ（表示可能:プレイヤー名、コース名、中間地点名、タイム）\n"
-                        + "pass1: \"%player%さんが%course%の中継地点:%viapoint%を%time%(%tick%tick)で通過！\"\n\n"
+                        + "pass1: \"%player%さんが%viapoint%を%time%(%tick%tick)で通過！\"\n\n"
 
                         + "# 中継地点通過メッセージ（タイム計測なし）（表示可能:プレイヤー名、コース名、中間地点名）\n"
                         + "pass2: \"%player%さんが%course%の中継地点:%viapoint%を通過！\"\n\n"
@@ -147,11 +147,11 @@ public class CourseMessage {
 
         if (viaPointName != null && tick != null) {
             key = "pass1";
-            message = config.getString(key, "%player%さんが%course%の中継地点:%viapoint%を%time%(%tick%tick)で通過！");
+            message = config.getString(key, "%player%さんが%viapoint%を%time%(%tick%tick)で通過！");
         }
         else if (viaPointName != null) {
             key = "pass2";
-            message = config.getString(key, "%player%さんが%course%の中継地点:%viapoint%を通過！");
+            message = config.getString(key, "%player%さんが%viapoint%を通過！");
         }
         else if (tick != null) {
             key = "pass3";

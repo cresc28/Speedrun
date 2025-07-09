@@ -94,7 +94,6 @@ public class CheckpointManager {
      * @return チェックポイント名の一覧
      */
     public Collection<String> getCheckpointNames(UUID uuid, World world){
-
         return cpDao.getCheckpointNames(uuid, world);
     }
 

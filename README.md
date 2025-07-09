@@ -96,11 +96,17 @@
 
 ---
 
-### `/cp list`
-現在のワールドに存在するCPの一覧を表示します。
+### `/cp list <ワールド名> または /cp list`
+指定のワールドに存在するCPの一覧を表示します。<br>
+ワールドの指定がない場合は現在のワールドに存在するCPの一覧を表示します。
 
 ---
 
 ### `/cp allowCrossWorldTp <true|false>`
 ワールドを跨ぐCPでの移動を許可または禁止します。
+
+---
+
+### `/cp deleteCpOnStart <true|false>`
+計測開始時にそのコースのCPを削除するか否かを設定します。
 </details>

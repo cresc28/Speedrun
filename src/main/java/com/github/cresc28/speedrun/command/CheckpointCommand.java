@@ -4,8 +4,10 @@ import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.core.manager.CheckpointManager;
 import com.github.cresc28.speedrun.utils.MessageUtils;
 import com.github.cresc28.speedrun.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -33,7 +35,7 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
         Player player = (Player) sender;
 
         if (args.length == 1) {
-            List<String> options = Arrays.asList("tp", "remove", "list", "allowCrossWorldTp");
+            List<String> options = Arrays.asList("tp", "remove", "list", "allowCrossWorldTp", "deleteCpOnStart");
             for (String option : options) {
                 if (option.startsWith(args[0].toLowerCase())) completions.add(option);
             }
@@ -41,14 +43,23 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
         else if(args.length == 2) {
             if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("tp")) {
-                Utils.completionFromMap(cpm.getCheckpointNames(player.getUniqueId(), player.getLocation().getWorld()), args[1].toLowerCase(), completions);
+                Utils.completionFromCollection(cpm.getCheckpointNames(player.getUniqueId(), player.getLocation().getWorld()), args[1].toLowerCase(), completions);
             }
 
-            else if(args[0].equalsIgnoreCase("allowCrossWorldTp")){
+            else if (args[0].equalsIgnoreCase("allowCrossWorldTp") || args[0].equalsIgnoreCase("deleteCpOnStart")){
                 List<String> options = Arrays.asList("true", "false");
                 for (String option : options) {
                     if (option.startsWith(args[1].toLowerCase())) completions.add(option);
                 }
+            }
+
+            else if (args[0].equalsIgnoreCase("list")){
+                List<String> worldNames = new ArrayList<>();
+                for (World world : Bukkit.getWorlds()) {
+                    worldNames.add(world.getName());
+                }
+                Utils.sortCollection(worldNames);
+                Utils.completionFromCollection(worldNames, args[1].toLowerCase(), completions);
             }
         }
 
@@ -101,6 +112,15 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
+            else if(args[0].equalsIgnoreCase("list")) {
+                World world = Bukkit.getWorld(args[1]);
+                if (world == null) {
+                    sender.sendMessage("§指定されたワールドは存在しません。");
+                    return true;
+                }
+                MessageUtils.displayMap(cpm.getCheckpointNames(uuid, world), sender, "チェックポイント");
+            }
+
             else if(args[0].equalsIgnoreCase("allowCrossWorldTp")){
                 if(args[1].equalsIgnoreCase("true")){
                     ConfigManager.setCrossWorldTpAllowed(Boolean.parseBoolean(args[1]));
@@ -113,6 +133,21 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
                 }
 
                 else sender.sendMessage("/cp arrowCrossWorldTp <true|false>");
+                return true;
+            }
+
+            else if(args[0].equalsIgnoreCase("deleteCpOnStart")){
+                if(args[1].equalsIgnoreCase("true")){
+                    ConfigManager.setDeleteCpOnStart(Boolean.parseBoolean(args[1]));
+                    sender.sendMessage("計測開始時にそのコースのCPが削除されるように変更しました。");
+                }
+
+                else if(args[1].equalsIgnoreCase("false")){
+                    ConfigManager.setDeleteCpOnStart(Boolean.parseBoolean(args[1]));
+                    sender.sendMessage("計測開始時にそのコースのCPが削除されないように変更しました。");
+                }
+
+                else sender.sendMessage("/cp deleteCpOnStart <true|false>");
                 return true;
             }
         }

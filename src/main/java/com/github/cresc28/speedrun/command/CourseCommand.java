@@ -49,7 +49,7 @@ public class CourseCommand implements CommandExecutor, TabCompleter {
                 }
 
                 if ("remove".equalsIgnoreCase(args[0]) || "tp".equalsIgnoreCase(args[0])) {
-                    Utils.completionFromMap(cm.getAllCourseName(), args[1].toLowerCase(), completions);
+                    Utils.completionFromCollection(cm.getAllCourseName(), args[1].toLowerCase(), completions);
                 }
             }
         }
@@ -57,7 +57,7 @@ public class CourseCommand implements CommandExecutor, TabCompleter {
         else if (args.length == 3) {
             if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("tp")) {
                 CourseType type = CourseType.fromString(args[1]);
-                Utils.completionFromMap(cm.getAllCourseName(type), args[2].toLowerCase(), completions);
+                Utils.completionFromCollection(cm.getAllCourseName(type), args[2].toLowerCase(), completions);
             }
         }
 

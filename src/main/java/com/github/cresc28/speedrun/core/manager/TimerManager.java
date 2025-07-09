@@ -1,5 +1,6 @@
 package com.github.cresc28.speedrun.core.manager;
 
+import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.data.CourseEntry;
 import com.github.cresc28.speedrun.data.CourseType;
 import com.github.cresc28.speedrun.data.RunState;
@@ -19,10 +20,12 @@ import java.util.UUID;
 public class TimerManager {
     private int tick = 0;
     private final Map<UUID, RunState> playerStates = new HashMap<>();
-    private final CourseManager cdm;
+    private final CourseManager courseManager;
+    private final CheckpointManager cpManager;
 
-    public TimerManager(CourseManager cdm) {
-        this.cdm = cdm;
+    public TimerManager(CourseManager courseManager, CheckpointManager cpManager) {
+        this.courseManager = courseManager;
+        this.cpManager = cpManager;
     }
 
     /**
@@ -45,12 +48,15 @@ public class TimerManager {
     public void checkRunState(Player player) {
         UUID uuid = player.getUniqueId();
         Location loc = player.getLocation().getBlock().getLocation();
-        CourseEntry entry = cdm.getCourseEntry(loc);
+        CourseEntry entry = courseManager.getCourseEntry(loc);
         RunState state = playerStates.computeIfAbsent(uuid, k -> new RunState());
+
+
 
         if(entry == null) {
             state.setOnEnd(false);
             state.setOnViaPoint(false);
+            state.updateRecentStandLocation(loc);
             return;
         }
 
@@ -59,25 +65,31 @@ public class TimerManager {
 
 
         switch(type) {
-            case START: //プレイヤーの現在座標がいずれかのスタート地点と一致するならば処理を開始。
-                if (state.startCourse(courseName, tick, loc)) {
-                    CourseMessage.startMessage(player, courseName);
+            case START:
+                //直前に同じスタート地点を踏んでいる場合はreturnする。
+                if (!state.startCourse(courseName, tick, loc)) return;
+
+                if (ConfigManager.isDeleteCpOnStart()) {
+                    if (cpManager.removeCheckpoint(uuid, loc.getWorld(), courseName)) {
+                        player.sendMessage(courseName + "のCPを削除しました。");
+                    }
                 }
+                CourseMessage.startMessage(player, courseName);
+
                 break;
 
             case END:
                 int record = state.endCourse(tick, courseName);
-                if (record > 0) {
-                    CourseMessage.endMessage(player, courseName, record);
-                }
+                Integer recordValue = record > 0 ? record : null;
 
                 //TAを開始したパルクール以外のパルクールのゴールを踏むとクリア表示のみを出す。
                 // isOnEndはゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
-                else if (!state.isOnEnd()) {
-                    CourseMessage.endMessage(player, courseName, null);
+                if (!state.isOnEnd()) {
+                    CourseMessage.endMessage(player, courseName, recordValue);
                 }
 
                 state.setOnEnd(true);
+                state.updateRecentStandLocation(loc);
                 break;
 
             case VIA_POINT:
@@ -85,30 +97,16 @@ public class TimerManager {
                 courseName = parts[0];
 
                 int currentRecord = state.getCurrentRecord(tick, courseName);
+                Integer currentRecordValue = currentRecord > 0 ? currentRecord : null;
+                String viaPointName = parts.length == 2 ? parts[1] : null;
 
-                if(currentRecord > 0 && !state.isOnViaPoint()){ //タイム計測が行えている場合
-                    if (parts.length == 2) { //中継地点に名称が設定されている場合の処理。
-                        CourseMessage.viaPointPassMessage(player, courseName, parts[1], currentRecord);
-                    }
-
-                    else {
-                        CourseMessage.viaPointPassMessage(player, courseName, null, currentRecord);
-                    }
-                }
-
-                else if (!state.isOnViaPoint() ) { //タイム計測が行えていない場合
-                    if (parts.length == 2) { //中継地点に名称が設定されている場合の処理。
-                        CourseMessage.viaPointPassMessage(player, courseName, parts[1], null);
-                    }
-                    else {
-                        CourseMessage.viaPointPassMessage(player, courseName, null, null);
-                    }
+                if (!state.isOnViaPoint()) {
+                    CourseMessage.viaPointPassMessage(player, courseName, viaPointName, currentRecordValue);
                 }
 
                 state.setOnViaPoint(true);
+                state.updateRecentStandLocation(loc);
                 break;
         }
-
-        state.updateLastStartLocation(loc);
     }
 }

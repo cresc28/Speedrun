@@ -51,6 +51,10 @@ public class ConfigManager {
             config.set("isCrossWorldTpAllowed", false);
             saveConfig();
         }
+        if (!config.contains("isDeleteCpOnStart")) {
+            config.set("isDeleteCpOnStart", false);
+            saveConfig();
+        }
     }
 
     /**
@@ -72,6 +76,15 @@ public class ConfigManager {
 
     public static void setCrossWorldTpAllowed(boolean allowed){
         config.set("isCrossWorldTpAllowed",allowed);
+        saveConfig();
+    }
+
+    public static boolean isDeleteCpOnStart(){
+        return config.getBoolean("isDeleteCpOnStart", false);
+    }
+
+    public static void setDeleteCpOnStart(boolean isDelete){
+        config.set("isDeleteCpOnStart",isDelete);
         saveConfig();
     }
 }
