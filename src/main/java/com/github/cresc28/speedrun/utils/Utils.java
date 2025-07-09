@@ -1,14 +1,9 @@
 package com.github.cresc28.speedrun.utils;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Field;
 import java.text.Collator;
 import java.util.*;
 
@@ -38,7 +33,7 @@ public class Utils {
      * @param prefix 補完する文字列の頭文字
      * @param completions 補完候補の追加先
      */
-    public static void completionFromMap(Collection<String> source, String prefix, List<String> completions) {
+    public static void completionFromCollection(Collection<String> source, String prefix, List<String> completions) {
         for (String value : new HashSet<>(source)) {
             if (value != null && value.toLowerCase().startsWith(prefix)) {
                 completions.add(value);

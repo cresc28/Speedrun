@@ -12,7 +12,7 @@ public class RunState {
     private boolean isOnEnd; //ゴール地点の上にいるか(ゴールの連発防止用)
     private boolean isOnViaPoint;
     private String currentCourse; //現在走行中のコース
-    private Location lastStartLocation; //最後に踏んだスタートの位置
+    private Location recentStandLocation; //最後にいた位置
 
     public RunState() {
         this.isRunning = false;
@@ -20,7 +20,7 @@ public class RunState {
         this.isOnViaPoint = false;
         this.startTime = 0;
         this.currentCourse = null;
-        this.lastStartLocation = null;
+        this.recentStandLocation = null;
     }
 
     /**
@@ -33,11 +33,11 @@ public class RunState {
      */
     public boolean startCourse(String courseName, int tick, Location currentLoc) {
         //直前に同じスタート地点を踏んでいなければ処理を開始。
-        if (lastStartLocation == null || !lastStartLocation.equals(currentLoc)) {
+        if (recentStandLocation == null || !recentStandLocation.equals(currentLoc)) {
             this.currentCourse = courseName;
             this.startTime = tick;
             this.isRunning = true;
-            this.lastStartLocation = currentLoc;
+            this.recentStandLocation = currentLoc;
             return true;
         }
         return false;
@@ -91,7 +91,7 @@ public class RunState {
         this.isOnViaPoint = isOnViaPoint;
     }
 
-    public void updateLastStartLocation(Location loc) {
-        this.lastStartLocation = loc;
+    public void updateRecentStandLocation(Location loc) {
+        this.recentStandLocation = loc;
     }
 }

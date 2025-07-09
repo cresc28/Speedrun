@@ -41,7 +41,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         RecentCheckpointDatabase.initializeDatabase();
 
         CourseManager courseManager = new CourseManager();
-        TimerManager timeManager = new TimerManager(courseManager);
+        TimerManager timeManager = new TimerManager(courseManager, cpManager);
 
         Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(timeManager),this);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(cpManager),this);
