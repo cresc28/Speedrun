@@ -35,10 +35,10 @@ public class InventoryActionListener implements Listener {
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event){
-        Player player = (Player) event.getWhoClicked();
-        Set<String> UserTags = event.getWhoClicked().getScoreboardTags();
-        ItemStack clickedItem = event.getCurrentItem();
+    public void onInventoryClick(InventoryClickEvent e){
+        Player player = (Player) e.getWhoClicked();
+        Set<String> UserTags = e.getWhoClicked().getScoreboardTags();
+        ItemStack clickedItem = e.getCurrentItem();
 
         if(clickedItem == null || !clickedItem.hasItemMeta()){
             return;
@@ -49,7 +49,7 @@ public class InventoryActionListener implements Listener {
             return;
         }
 
-        if (event.getRawSlot() >= event.getView().getTopInventory().getSize()) {
+        if (e.getRawSlot() >= e.getView().getTopInventory().getSize()) {
             return; //手持ちのアイテムをクリックしたときに反応させない。
         }
 

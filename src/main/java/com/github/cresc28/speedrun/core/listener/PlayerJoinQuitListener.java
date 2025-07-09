@@ -23,16 +23,16 @@ public class PlayerJoinQuitListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event){
-        Player player = event.getPlayer();
+    public void onPlayerJoin(PlayerJoinEvent e){
+        Player player = e.getPlayer();
         UUID uuid = player.getUniqueId();
         cpManager.loadRecentLocalCp(uuid, player.getWorld());
         cpManager.loadRecentGlobalCp(uuid);
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event){
-        Player player = event.getPlayer();
+    public void onPlayerQuit(PlayerQuitEvent e){
+        Player player = e.getPlayer();
         UUID uuid = player.getUniqueId();
         Location globalRecentCpLoc = cpManager.getGlobalRecentCpLocation(uuid);
         Location localRecentCpLoc = cpManager.getLocalRecentCpLocation(uuid);
@@ -43,10 +43,10 @@ public class PlayerJoinQuitListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerChangeWorld(PlayerChangedWorldEvent event){
-        Player player = event.getPlayer();
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent e){
+        Player player = e.getPlayer();
         UUID uuid = player.getUniqueId();
-        World fromWorld = event.getFrom();
+        World fromWorld = e.getFrom();
         Location prevWorldRecentCpLoc = cpManager.getLocalRecentCpLocation(uuid);
 
         if(prevWorldRecentCpLoc != null) cpManager.saveRecentCp(uuid, false, prevWorldRecentCpLoc);
