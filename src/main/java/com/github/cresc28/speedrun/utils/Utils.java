@@ -92,4 +92,21 @@ public class Utils {
         meta.setDisplayName(name);
         item.setItemMeta(meta);
     }
+
+    /**
+     * ブロックデータから方角を得る。
+     *
+     * @param data block.getData()
+     * @return 方角(yaw)
+     */
+    public static float getYaw(byte data) {
+        switch (data) {
+            case 0: return 180f; //北
+            case 4: return -90f; //東
+            case 8: return 0f; //南
+            case 12: return 90f; //西
+
+            default: return 180f;   // デフォルトは北向き
+        }
+    }
 }

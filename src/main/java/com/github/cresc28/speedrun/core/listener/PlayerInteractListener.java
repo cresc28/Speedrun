@@ -4,9 +4,13 @@ package com.github.cresc28.speedrun.core.listener;
 import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.core.manager.CheckpointManager;
 import com.github.cresc28.speedrun.gui.CheckpointMenu;
+import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,32 +37,80 @@ public class PlayerInteractListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event){
-        if (event.getHand() != EquipmentSlot.HAND) return;
+    public void onPlayerInteract(PlayerInteractEvent e){
+        if (e.getHand() != EquipmentSlot.HAND) return;
+        ItemStack item = e.getItem();
+        Block clickedBlock = e.getClickedBlock();
 
-        Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
-        ItemStack item = event.getItem();
-
+        //看板クリックよりこちらの処理を優先する。
         if(item != null && item.getType() == Material.NETHER_STAR) {
-            if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
-                Location loc;
-                if(ConfigManager.isCrossWorldTpAllowed()) loc = cpManager.getGlobalRecentCpLocation(uuid);
-                else loc = cpManager.getLocalRecentCpLocation(uuid);
+            netherStarClickEvent(e);
+            return; //CPでの移動と同時に看板をクリックできないようにする。(不本意なCPセットを防止)
+        }
 
-                if (loc != null) {
-                    player.teleport(loc);
-                }
-                else {
-                    player.sendMessage(ChatColor.RED + "有効なチェックポイントが存在しません。");
-                }
+        if (clickedBlock != null && clickedBlock.getState() instanceof Sign && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            signClickEvent(e, (Sign) clickedBlock.getState());
+        }
+    }
+
+    private void netherStarClickEvent(PlayerInteractEvent e){
+        Player player = e.getPlayer();
+        UUID uuid = player.getUniqueId();
+
+        if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK){
+            Location loc;
+            if(ConfigManager.isCrossWorldTpAllowed()) loc = cpManager.getGlobalRecentCpLocation(uuid);
+            else loc = cpManager.getLocalRecentCpLocation(uuid);
+
+            if (loc != null) {
+                player.teleport(loc);
             }
-
-            else if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK){
-                event.setCancelled(true); // ブロック破壊を起こさない
-                player.addScoreboardTag("MenuOpen");
-                new CheckpointMenu(player, cpManager, 0, player.getWorld(),false).openInventory();
+            else {
+                player.sendMessage(ChatColor.RED + "有効なチェックポイントが存在しません。");
             }
         }
+
+        else if(e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK){
+            e.setCancelled(true); // ブロック破壊を起こさない
+            player.addScoreboardTag("MenuOpen");
+            new CheckpointMenu(player, cpManager, 0, player.getWorld(),false).openInventory();
+        }
+    }
+
+    private void signClickEvent(PlayerInteractEvent e, Sign sign){
+        Player player = e.getPlayer();
+        UUID uuid = player.getUniqueId();
+        String firstLine = ChatColor.stripColor(sign.getLine(0));
+        String courseName = ChatColor.stripColor(sign.getLine(1));
+
+        if(!"☆☆☆ Checkpoint ☆☆☆".equals(firstLine)) {
+            return;
+        }
+
+        String type = ChatColor.stripColor(sign.getLine(2));
+        if(!"player".equals(type) && !"fixed".equals(type) && !"fly".equals(type)) {
+            return;
+        }
+
+        Location loc;
+
+        if (type.equals("fixed")) {
+            Location blockLoc = sign.getLocation(); //これはブロックの角の座標を返す。
+            loc = blockLoc.add(0.5,0,0.5); //ブロックの中心に座標を持ってくる。
+            loc.setPitch(0);
+            byte signData = sign.getBlock().getData();
+            loc.setYaw(Utils.getYaw(signData));
+        }
+
+        else {
+            if ("player".equals(type) && !player.isOnGround()) {
+                player.sendMessage("空中でのCP設定は禁止されています");
+                return;
+            }
+            loc = player.getLocation();
+        }
+
+        cpManager.registerCheckpoint(uuid, loc, courseName);
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_HARP, 1.0f, 1.4f);
     }
 }

@@ -3,15 +3,12 @@ package com.github.cresc28.speedrun;
 import com.github.cresc28.speedrun.command.CheckpointCommand;
 import com.github.cresc28.speedrun.command.CourseCommand;
 import com.github.cresc28.speedrun.config.ConfigManager;
-import com.github.cresc28.speedrun.core.listener.InventoryActionListener;
+import com.github.cresc28.speedrun.core.listener.*;
 import com.github.cresc28.speedrun.db.checkpoint.CheckpointDatabase;
 import com.github.cresc28.speedrun.db.course.CourseDatabase;
 import com.github.cresc28.speedrun.db.checkpoint.RecentCheckpointDatabase;
-import com.github.cresc28.speedrun.core.listener.PlayerJoinQuitListener;
 import com.github.cresc28.speedrun.core.manager.CheckpointManager;
 import com.github.cresc28.speedrun.core.manager.CourseManager;
-import com.github.cresc28.speedrun.core.listener.PlayerInteractListener;
-import com.github.cresc28.speedrun.core.listener.PlayerMoveListener;
 import com.github.cresc28.speedrun.core.manager.TimerManager;
 import com.github.cresc28.speedrun.config.message.CourseMessage;
 import com.github.cresc28.speedrun.gui.CheckpointMenu;
@@ -47,6 +44,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(cpManager),this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinQuitListener(cpManager),this);
         Bukkit.getPluginManager().registerEvents(new InventoryActionListener(cpManager, this),this);
+        Bukkit.getPluginManager().registerEvents(new SignChangeListener(),this);
         Bukkit.getLogger().info("Speedrunプラグインが起動しました。");
 
         timeManager.startTimer(this);
