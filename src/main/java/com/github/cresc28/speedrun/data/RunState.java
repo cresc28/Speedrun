@@ -4,7 +4,6 @@ import org.bukkit.Location;
 /**
  * プレイヤーの走行状態を管理するクラス。
  *　管理する情報はコメントアウトの通り。
- *
  */
 public class RunState {
     private int startTime; //スタート時のtick

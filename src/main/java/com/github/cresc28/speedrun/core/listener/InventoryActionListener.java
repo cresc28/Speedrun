@@ -34,6 +34,11 @@ public class InventoryActionListener implements Listener {
         this.plugin = plugin;
     }
 
+    /**
+     * インベントリをクリックしたときの処理。
+     *
+     * @param e InventoryClickEvent
+     */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e){
         Player player = (Player) e.getWhoClicked();
@@ -127,9 +132,14 @@ public class InventoryActionListener implements Listener {
         }
     }
 
+    /**
+     * インベントリを閉じたときの処理。
+     *
+     * @param e InventoryCloseEvent
+     */
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        Player player = (Player) event.getPlayer();
+    public void onInventoryClose(InventoryCloseEvent e) {
+        Player player = (Player) e.getPlayer();
 
         //この遅延がないと機能しない。
         Bukkit.getScheduler().runTask(plugin, () -> {
@@ -144,6 +154,13 @@ public class InventoryActionListener implements Listener {
         });
     }
 
+    /**
+     * プレイヤーをあるCPにTPさせる。
+     *
+     * @param player プレイヤー
+     * @param world ワールド
+     * @param displayName CP名
+     */
     private void teleport(Player player, World world, String displayName) {
         if (!cpManager.selectCheckpoint(player.getUniqueId(), world, displayName)) {
             player.sendMessage(ChatColor.RED + "指定された名前のチェックポイントは存在しません。");

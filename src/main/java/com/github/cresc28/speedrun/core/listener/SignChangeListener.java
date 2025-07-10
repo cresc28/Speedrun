@@ -12,6 +12,11 @@ import org.bukkit.event.block.SignChangeEvent;
 
 public class SignChangeListener implements Listener {
 
+    /**
+     * 看板の編集確定時の処理。
+     *
+     * @param e SignChangeEvent
+     */
     @EventHandler
     public void onSignChange(SignChangeEvent e){
         Player player = e.getPlayer();

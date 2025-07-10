@@ -3,7 +3,6 @@ package com.github.cresc28.speedrun.data;
 import org.bukkit.World;
 
 /**
- *
  * メニューの状態管理クラス。
  */
 public class MenuState {

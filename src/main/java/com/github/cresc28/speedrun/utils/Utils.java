@@ -106,7 +106,7 @@ public class Utils {
             case 8: return 0f; //南
             case 12: return 90f; //西
 
-            default: return 180f;   // デフォルトは北向き
+            default: return 180f;
         }
     }
 }

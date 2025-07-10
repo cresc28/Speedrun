@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * チェックポイントをインベントリ形式で表示するクラス。
+ * ワールドをインベントリ形式で表示するクラス。
  */
 
 public class WorldMenu {
@@ -29,7 +29,7 @@ public class WorldMenu {
     }
 
     /**
-     * チェックポイントメニューを開く
+     * ワールドメニューを開く
      */
     public void openInventory(){
         final int ALL_SLOT = 54; //54枠

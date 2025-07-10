@@ -22,6 +22,11 @@ public class PlayerJoinQuitListener implements Listener {
         this.cpManager = cpManager;
     }
 
+    /**
+     * プレイヤー参加時の処理。
+     *
+     * @param e PlayerJoinEvent
+     */
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         Player player = e.getPlayer();
@@ -30,6 +35,11 @@ public class PlayerJoinQuitListener implements Listener {
         cpManager.loadRecentGlobalCp(uuid);
     }
 
+    /**
+     * プレイヤー退出時の処理。
+     *
+     * @param e PlayerQuitEvent
+     */
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
         Player player = e.getPlayer();
@@ -42,6 +52,11 @@ public class PlayerJoinQuitListener implements Listener {
         cpManager.removeRecentCpFromMap(uuid);
     }
 
+    /**
+     * プレイヤーのワールド変更時の処理。
+     *
+     * @param e PlayerChangedWorldEvent
+     */
     @EventHandler
     public void onPlayerChangeWorld(PlayerChangedWorldEvent e){
         Player player = e.getPlayer();
