@@ -13,8 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * チェックポイントのを管理するクラス。
- * チェックポイントはUUID・ワールド・チェックポイント名・位置で管理される。
+ * Checkpointsデータベースへのアクセスクラス。
  */
 
 public class CheckpointDao {

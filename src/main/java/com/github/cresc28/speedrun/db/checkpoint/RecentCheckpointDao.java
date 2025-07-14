@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * 最後に設定したチェックポイントを管理するクラス。
+ * RecentCheckpointデータベースへのアクセスクラス。
  */
 
 public class RecentCheckpointDao {
