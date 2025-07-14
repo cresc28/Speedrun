@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * コースデータを管理するクラス。
+ * Courseデータベースへのアクセスクラス。
  */
 public class CourseDao {
     private static final Logger LOGGER = Logger.getLogger("CourseDataDao");

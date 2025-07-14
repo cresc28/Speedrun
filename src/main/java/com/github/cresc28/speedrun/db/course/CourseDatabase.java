@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * SQLiteとの連携を行うクラス
+ * Courseデータベースの定義クラス。
  */
 
 public class CourseDatabase {
@@ -30,7 +30,7 @@ public class CourseDatabase {
                 );
             }
         } catch(Exception e){
-            LOGGER.log(Level.SEVERE, "データベース初期化中にエラーが発生しました", e);
+            LOGGER.log(Level.SEVERE, "Courseデータベース初期化中にエラーが発生しました", e);
         }
     }
 
@@ -44,7 +44,7 @@ public class CourseDatabase {
             try{
                 con.close();
             } catch(Exception e){
-                LOGGER.log(Level.SEVERE, "データベースのクローズに失敗しました。", e);
-            }
+                LOGGER.log(Level.SEVERE, "Courseデータベースのクローズに失敗しました。", e);
+        }
     }
 }

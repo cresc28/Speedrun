@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * SQLiteとの接続を行うクラス。
+ * Checkpointsデータベースの定義クラス。
  */
 
 public class CheckpointDatabase {
@@ -28,7 +28,7 @@ public class CheckpointDatabase {
                 );
             }
         } catch(Exception e){
-            LOGGER.log(Level.SEVERE, "データベース初期化中にエラーが発生しました", e);
+            LOGGER.log(Level.SEVERE, "Checkpointsデータベース初期化中にエラーが発生しました", e);
         }
     }
 
@@ -42,7 +42,7 @@ public class CheckpointDatabase {
             try{
                 con.close();
             } catch(Exception e){
-                LOGGER.log(Level.SEVERE, "データベースのクローズに失敗しました。", e);
+                LOGGER.log(Level.SEVERE, "Checkpointsデータベースのクローズに失敗しました。", e);
             }
     }
 }
