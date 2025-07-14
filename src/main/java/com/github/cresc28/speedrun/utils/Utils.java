@@ -109,4 +109,18 @@ public class Utils {
             default: return 180f;
         }
     }
+
+    /**
+     * 入力された文字列が数字か判断する。
+     *
+     * @param str 文字列
+     * @return 数字か
+     */
+    public static boolean isNumeric(String str) {
+        if (str == null || str.isEmpty()) return false;
+        for (char c : str.toCharArray()) {
+            if (!Character.isDigit(c)) return false;
+        }
+        return true;
+    }
 }
