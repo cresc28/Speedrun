@@ -55,6 +55,11 @@ public class ConfigManager {
             config.set("isDeleteCpOnStart", false);
             saveConfig();
         }
+
+        if (!config.contains("maxRecordStored")) {
+            config.set("maxRecordStored", 10);
+            saveConfig();
+        }
     }
 
     /**
@@ -86,5 +91,9 @@ public class ConfigManager {
     public static void setDeleteCpOnStart(boolean isDelete){
         config.set("isDeleteCpOnStart",isDelete);
         saveConfig();
+    }
+
+    public static int getMaxRecordStored(){
+        return config.getInt("maxRecordStored", 10);
     }
 }
