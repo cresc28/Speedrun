@@ -1,6 +1,7 @@
 package com.github.cresc28.speedrun.command;
 
 import com.github.cresc28.speedrun.core.manager.CourseManager;
+import com.github.cresc28.speedrun.db.course.RecordDao;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -17,10 +18,11 @@ import java.util.UUID;
 
 public class RecordCommand implements CommandExecutor, TabCompleter {
     private final CourseManager courseManager;
+    private final RecordDao recordDao;
 
-
-    public RecordCommand(CourseManager courseManager){
+    public RecordCommand(CourseManager courseManager, RecordDao recordDao){
         this.courseManager = courseManager;
+        this.recordDao = recordDao;
     }
     /**
      * Tab補完の処理を行う。
@@ -54,10 +56,10 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
         }
 
         String courseName = args[0];
-        String playerName = null; //プレイヤー名
-        boolean dup = false; //同じプレイヤーの複数記録を表示するか
-        boolean detailInputed = false; //詳細を表示するか
-        boolean above = false; //自分より上の10位表示モード
+        String targetPlayer = null; //プレイヤー名
+        boolean allowDup = false; //同じプレイヤーの複数記録を表示するか
+        boolean isDetail = false; //詳細を表示するか
+        boolean showAbove = false; //自分より上の10位表示モード
         int displayCount = 10; //何位まで表示するか
 
 
@@ -65,18 +67,18 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
             String arg = args[i].toLowerCase();
 
             if ("dup".equalsIgnoreCase(arg)) {
-                dup = true;
+                allowDup = true;
                 continue;
             }
 
             else if ("detail".equalsIgnoreCase(arg)) {
-                if(playerName == null) playerName = player.getDisplayName();
-                detailInputed = true;
+                if(targetPlayer == null) targetPlayer = player.getDisplayName();
+                isDetail = true;
                 continue;
             }
 
             else if ("above".equalsIgnoreCase(arg)) {
-                above = true;
+                showAbove = true;
                 continue;
             }
 
@@ -86,17 +88,21 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
             }
 
             else { //dup, detail, aboveというプレイヤーが存在する状況は可能性として極めて低いため無視。
-                playerName = arg;
+                targetPlayer = arg;
             }
         }
 
-        if(above) {
+        if(showAbove && isDetail) {
             player.sendMessage("aboveとdetailの両立はできません。aboveを優先します。");
-            detailInputed = false; //aboveが入力されているときはdetailが入力されていないものとする。
+            isDetail = false; //aboveが入力されているときはdetailが入力されていないものとする。
         }
 
         //detailが指定されていても中継地点がない場合はこのコースではdetailは無意味です　と返す
         //
+
+        if(!showAbove){
+
+        }
 
         return false;
     }

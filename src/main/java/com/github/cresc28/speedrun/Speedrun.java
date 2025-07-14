@@ -45,7 +45,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         TimerManager timerManager = new TimerManager(courseManager, cpManager, recordDao);
 
         registerEvents(timerManager);
-        registerCommands(courseManager, cpManager);
+        registerCommands(courseManager, cpManager, recordDao);
 
         timerManager.startTimer(this);
 
@@ -88,9 +88,9 @@ public final class Speedrun extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new SignChangeListener(),this);
     }
 
-    private void registerCommands(CourseManager courseManager, CheckpointManager cpManager) {
+    private void registerCommands(CourseManager courseManager, CheckpointManager cpManager, RecordDao recordDao) {
         getCommand("course").setExecutor(new CourseCommand(courseManager));
         getCommand("cp").setExecutor(new CheckpointCommand(cpManager));
-        getCommand("top").setExecutor(new RecordCommand(courseManager));
+        getCommand("top").setExecutor(new RecordCommand(courseManager, recordDao));
     }
 }

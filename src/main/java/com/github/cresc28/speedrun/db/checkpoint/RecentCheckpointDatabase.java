@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * RecentCheckpointデータベースの定義クラス。
+ * RecentCheckpointデータベースの定義クラス。(CheckpointDatabaseは膨大になりうるので用意)
  */
 
 public class RecentCheckpointDatabase {
