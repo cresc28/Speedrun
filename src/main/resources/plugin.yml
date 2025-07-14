@@ -12,10 +12,14 @@ commands:
     permission-message: "このコマンドを使用する権限がありません。"
 
   cp:
-    description: set Checkpoint
+    description: set checkpoint
     usage: /cp <name> or /cp remove <name> or /cp list
     permission: speedrun.cp
     permission-message: "このコマンドを使用する権限がありません。"
+
+  top:
+    description: view records
+    usage: /top <コース名> [dup] [detail] [above] [何位まで表示するか(最大30)] [player]
 
 permissions:
   speedrun.course:
