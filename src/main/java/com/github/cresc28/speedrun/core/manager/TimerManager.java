@@ -5,6 +5,7 @@ import com.github.cresc28.speedrun.data.CourseEntry;
 import com.github.cresc28.speedrun.data.CourseType;
 import com.github.cresc28.speedrun.data.RunState;
 import com.github.cresc28.speedrun.config.message.CourseMessage;
+import com.github.cresc28.speedrun.db.course.RecordDao;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,10 +23,12 @@ public class TimerManager {
     private final Map<UUID, RunState> playerStates = new HashMap<>();
     private final CourseManager courseManager;
     private final CheckpointManager cpManager;
+    private final RecordDao recordDao;
 
-    public TimerManager(CourseManager courseManager, CheckpointManager cpManager) {
+    public TimerManager(CourseManager courseManager, CheckpointManager cpManager, RecordDao recordDao) {
         this.courseManager = courseManager;
         this.cpManager = cpManager;
+        this.recordDao = recordDao;
     }
 
     /**
@@ -86,6 +89,10 @@ public class TimerManager {
                 // isOnEndはゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
                 if (!state.isOnEnd()) {
                     CourseMessage.endMessage(player, courseName, recordValue);
+                }
+
+                if(record > 0){
+                    recordDao.insertAndRemoveSomeBadRecord(uuid, courseName, record);
                 }
 
                 state.setOnEnd(true);

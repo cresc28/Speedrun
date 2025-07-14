@@ -13,13 +13,14 @@ import java.util.*;
  */
 
 public class CourseManager {
-    private final CourseDao courseDao = new CourseDao();
+    private final CourseDao courseDao;
     private final Map<Location, CourseEntry> courseMap;
     /**
      * コンストラクタにてデータベースからコースを読み込む。
      *
      */
-    public CourseManager() {
+    public CourseManager(CourseDao courseDao) {
+        this.courseDao = courseDao;
         courseMap = courseDao.getCourses();
     }
 
