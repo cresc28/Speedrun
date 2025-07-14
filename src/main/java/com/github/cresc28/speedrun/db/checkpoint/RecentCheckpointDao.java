@@ -41,7 +41,7 @@ public class RecentCheckpointDao {
             ps.setDouble(8, loc.getPitch());
             ps.executeUpdate();
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"INSERT文でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"insert()でエラーが発生しました。");
         }
     }
 
@@ -69,7 +69,7 @@ public class RecentCheckpointDao {
                 return new Location(world, x, y, z, yaw, pitch);
             }
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"SELECT文でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"getLocalLocation()でエラーが発生しました。");
         }
 
         return null;
@@ -102,7 +102,7 @@ public class RecentCheckpointDao {
                 }
             }
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"SELECT文でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"getGlobalLocation()でエラーが発生しました。");
         }
 
         return null;
@@ -131,7 +131,7 @@ public class RecentCheckpointDao {
             ps2.executeUpdate();
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "UPDATE文でエラーが発生しました。", e);
+            LOGGER.log(Level.SEVERE, "updateGlobal()でエラーが発生しました。", e);
         }
     }
 }

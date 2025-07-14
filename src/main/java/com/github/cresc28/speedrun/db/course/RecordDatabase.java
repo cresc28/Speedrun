@@ -24,7 +24,7 @@ public class RecordDatabase {
                                 "record_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                 "uuid TEXT NOT NULL, " +
                                 "course_name TEXT NOT NULL, " +
-                                "record INTEGER NOT NULL, " +
+                                "record_time INTEGER NOT NULL, " +
                                 "record_at DATETIME NOT NULL)"
                 );
             }

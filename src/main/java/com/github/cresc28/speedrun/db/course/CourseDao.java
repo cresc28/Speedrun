@@ -40,7 +40,7 @@ public class CourseDao {
             ps.setDouble(6, loc.getZ());
             ps.executeUpdate();
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"INSERT文でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"insert()でエラーが発生しました。");
         }
     }
 
@@ -58,7 +58,7 @@ public class CourseDao {
             ps.setString(2, courseName);
             return ps.executeUpdate() > 0;
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"DELETE文でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"delete()でエラーが発生しました。");
             return false;
         }
     }
@@ -75,7 +75,7 @@ public class CourseDao {
             ps.setString(1, courseName);
             return ps.executeUpdate() > 0;
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"DELETE文でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"delete()でエラーが発生しました。");
             return false;
         }
     }
@@ -96,7 +96,7 @@ public class CourseDao {
             ps.setDouble(4, loc.getZ());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "DELETE文でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。");
             return false;
         }
     }
@@ -131,7 +131,7 @@ public class CourseDao {
                 result.put(loc, new CourseEntry(type, courseName));
             }
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE, "SELECT文でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE, "getCourses()でエラーが発生しました。");
         }
 
         return result;
