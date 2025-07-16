@@ -92,7 +92,7 @@ public class TimerManager {
                 }
 
                 if(record > 0){
-                    recordDao.insertAndRemoveSomeBadRecord(uuid, courseName, record);
+                    recordDao.insertAndRemoveSomeRecord(uuid, courseName, record);
                 }
 
                 state.setOnEnd(true);

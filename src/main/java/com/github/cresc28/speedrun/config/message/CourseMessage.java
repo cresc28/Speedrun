@@ -68,19 +68,19 @@ public class CourseMessage {
                         + "start: \"計測開始！\"\n\n"
 
                         + "# ゴールメッセージ（表示可能:プレイヤー名、コース名、タイム）\n"
-                        + "complete1: \"%player%さんが%course%を%time%(%tick%tick)でクリア！\"\n\n"
+                        + "complete1: \"%player%さんが%course%を%time%(%tick%ticks)でクリア！\"\n\n"
 
                         + "# ゴールメッセージ（タイム計測なし）（表示可能:プレイヤー名、コース名）\n"
                         + "complete2: \"%player%さんが%course%をクリア！\"\n\n"
 
                         + "# 中継地点通過メッセージ（表示可能:プレイヤー名、コース名、中継地点名、タイム）\n"
-                        + "pass1: \"%player%さんが%viapoint%を%time%(%tick%tick)で通過！\"\n\n"
+                        + "pass1: \"%player%さんが%viapoint%を%time%(%tick%ticks)で通過！\"\n\n"
 
                         + "# 中継地点通過メッセージ（タイム計測なし）（表示可能:プレイヤー名、コース名、中継地点名）\n"
                         + "pass2: \"%player%さんが%course%の中継地点:%viapoint%を通過！\"\n\n"
 
                         + "# 中継地点通過メッセージ（中継地点名なし）（表示可能:プレイヤー名、コース名、タイム）\n"
-                        + "pass3: \"%player%さんが%course%の中継地点を%time%(%tick%tick)で通過！\"\n\n"
+                        + "pass3: \"%player%さんが%course%の中継地点を%time%(%tick%ticks)で通過！\"\n\n"
 
                         + "# 中継地点通過メッセージ（タイム計測なし、中継地点名なし）（表示可能:プレイヤー名、コース名）\n"
                         + "pass4: \"%player%さんが%course%の中継地点を通過！\"\n";
@@ -117,8 +117,8 @@ public class CourseMessage {
         String message;
 
         if (tick != null) {
-            message = config.getString("completion1", "%player%さんが%course%を%time%(%tick%tick)でクリア！");
-            message = message.replace("%time%", Utils.formatTime(tick));
+            message = config.getString("completion1", "%player%さんが%course%を%time%(%tick%ticks)でクリア！");
+            message = message.replace("%time%", Utils.tickToTime(tick));
             message = message.replace("%tick%", String.valueOf(tick));
         }
 
@@ -147,7 +147,7 @@ public class CourseMessage {
 
         if (viaPointName != null && tick != null) {
             key = "pass1";
-            message = config.getString(key, "%player%さんが%viapoint%を%time%(%tick%tick)で通過！");
+            message = config.getString(key, "%player%さんが%viapoint%を%time%(%tick%ticks)で通過！");
         }
         else if (viaPointName != null) {
             key = "pass2";
@@ -155,7 +155,7 @@ public class CourseMessage {
         }
         else if (tick != null) {
             key = "pass3";
-            message = config.getString(key, "%player%さんが%course%の中継地点を%time%(%tick%tick)で通過！");
+            message = config.getString(key, "%player%さんが%course%の中継地点を%time%(%tick%ticks)で通過！");
         }
         else {
             key = "pass4";
@@ -164,7 +164,7 @@ public class CourseMessage {
 
         if (viaPointName != null) message = message.replace("%viapoint%", viaPointName);
         if (tick != null) {
-            message = message.replace("%time%", Utils.formatTime(tick));
+            message = message.replace("%time%", Utils.tickToTime(tick));
             message = message.replace("%tick%", String.valueOf(tick));
         }
 

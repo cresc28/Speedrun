@@ -40,7 +40,7 @@ public class CourseDao {
             ps.setDouble(6, loc.getZ());
             ps.executeUpdate();
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"insert()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"insert()でエラーが発生しました。", e);
         }
     }
 
@@ -52,13 +52,15 @@ public class CourseDao {
      * @return 削除に成功したか
      */
     public boolean delete(CourseType type, String courseName){
-        String sql = "DELETE FROM courseData WHERE type = ? AND course_name = ?";
+        String prefix = courseName + ".%";
+        String sql = "DELETE FROM courseData WHERE type = ? AND (course_name = ? OR course_name LIKE ?)"; //courseName.から始まるもの(中継地点の場合)も削除
         try(PreparedStatement ps = CourseDatabase.getConnection().prepareStatement(sql)){
             ps.setInt(1, type.getId());
             ps.setString(2, courseName);
+            ps.setString(3, prefix);
             return ps.executeUpdate() > 0;
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"delete()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"delete()でエラーが発生しました。", e);
             return false;
         }
     }
@@ -70,12 +72,14 @@ public class CourseDao {
      * @return 削除に成功したか
      */
     public boolean delete(String courseName){
-        String sql = "DELETE FROM courseData WHERE course_name = ?";
+        String prefix = courseName + ".%";
+        String sql = "DELETE FROM courseData WHERE course_name = ? OR course_name LIKE ?"; //courseName.から始まるもの(中継地点の場合)も削除
         try(PreparedStatement ps = CourseDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, courseName);
+            ps.setString(2, prefix);
             return ps.executeUpdate() > 0;
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"delete()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"delete()でエラーが発生しました。", e);
             return false;
         }
     }
@@ -96,7 +100,7 @@ public class CourseDao {
             ps.setDouble(4, loc.getZ());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。", e);
             return false;
         }
     }
@@ -131,7 +135,7 @@ public class CourseDao {
                 result.put(loc, new CourseEntry(type, courseName));
             }
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE, "getCourses()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE, "getCourses()でエラーが発生しました。", e);
         }
 
         return result;
