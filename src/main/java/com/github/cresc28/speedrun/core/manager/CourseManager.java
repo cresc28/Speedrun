@@ -135,6 +135,12 @@ public class CourseManager {
         return set;
     }
 
+    /**
+     * ある位置に登録されているコースがあればそのtypeとコース名を返す
+     *
+     * @param loc 位置
+     * @return typeとコース名
+     */
     public CourseEntry getCourseEntry(Location loc){
         return courseMap.get(loc);
     }

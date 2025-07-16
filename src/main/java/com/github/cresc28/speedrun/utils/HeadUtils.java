@@ -58,7 +58,7 @@ public class HeadUtils {
             field.setAccessible(true);
             field.set(meta, profile);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            LOGGER.log(Level.SEVERE, "headの読み込みで例外が発生しました。");
+            LOGGER.log(Level.SEVERE, "headの読み込みで例外が発生しました。", e);
         }
 
         meta.setDisplayName(displayName);

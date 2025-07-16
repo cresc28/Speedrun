@@ -18,7 +18,7 @@
 
 ## ダウンロード
 <p align="center">
-  <a href="https://github.com/cresc28/Speedrun/releases/tag/v2.1.0" style="font-size: 1.5em;">
+  <a href="https://github.com/cresc28/Speedrun/releases/tag/v2.2.0" style="font-size: 1.5em;">
     <strong>⬇️ SpeedrunPluginをダウンロード</strong>
   </a>
 </p>
