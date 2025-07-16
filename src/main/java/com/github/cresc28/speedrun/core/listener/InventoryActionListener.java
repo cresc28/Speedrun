@@ -23,7 +23,6 @@ import java.util.*;
 /**
  * インベントリのクリック時、閉じた時の処理。
  */
-
 public class InventoryActionListener implements Listener {
     private final CheckpointManager cpManager;
     private final Map<UUID, MenuState> menuState = new HashMap<>();

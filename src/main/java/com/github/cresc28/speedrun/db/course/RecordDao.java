@@ -32,7 +32,7 @@ public class RecordDao {
 
     public void deleteRecordIfExceedLimit(UUID uuid, String courseName){
         String sql = "DELETE FROM record WHERE record_id IN( " +
-                "SELECT record_id FROM record WHERE uuid = ? AND course_name = ? ORDER BY finish_time ASC, record_at DESC " +
+                "SELECT record_id FROM record WHERE uuid = ? AND course_name = ? ORDER BY finish_time DESC, record_at DESC " +
                 "LIMIT ( SELECT MAX(COUNT(*) - ?, 0) FROM record WHERE uuid = ? AND course_name = ?))";
 
         try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
@@ -53,13 +53,14 @@ public class RecordDao {
         deleteRecordIfExceedLimit(uuid, courseName);
     }
 
-    public List<Map.Entry<String, String>> getTopRecordNoDup(String courseName, int num){
+    public List<Map.Entry<String, String>> getTopRecordNoDup(String courseName, int startRank, int count){
         List<Map.Entry<String, String>> result = new ArrayList<>();
-        String sql = "SELECT uuid, MIN(finish_time) AS best_time FROM record WHERE course_name = ? GROUP BY uuid ORDER BY best_time ASC LIMIT ?";
+        String sql = "SELECT uuid, MIN(finish_time) AS best_time FROM record WHERE course_name = ? GROUP BY uuid ORDER BY best_time ASC LIMIT ? OFFSET ?";
 
         try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, courseName);
-            ps.setInt(2, num);
+            ps.setInt(2, count);
+            ps.setInt(3, startRank - 1);
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
@@ -79,13 +80,14 @@ public class RecordDao {
         return result;
     }
 
-    public List<Map.Entry<String, String>> getTopRecordDup(String courseName, int num){
+    public List<Map.Entry<String, String>> getTopRecordDup(String courseName, int startRank, int count){
         List<Map.Entry<String, String>> result = new ArrayList<>();
-        String sql = "SELECT uuid, finish_time FROM record WHERE course_name = ? ORDER BY finish_time ASC LIMIT ?";
+        String sql = "SELECT uuid, finish_time FROM record WHERE course_name = ? ORDER BY finish_time ASC LIMIT ? OFFSET ?";
 
         try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, courseName);
-            ps.setInt(2, num);
+            ps.setInt(2, count);
+            ps.setInt(3, startRank - 1);
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
@@ -105,12 +107,15 @@ public class RecordDao {
         return result;
     }
 
-    public Map.Entry<Integer, String> getRankAndRecordNoDup(UUID uuid, String courseName) {
+    public Map.Entry<Integer, String> getRankAndRecordNoDup(UUID uuid, String courseName, boolean worstTie) {
+        String sign = worstTie ? " <= " : " < ";
+        String plusOne = worstTie ? " " : " + 1 ";
+
         //ROW_NUMBER()が使えないため強引に...。
         String sql = "SELECT best_time, (" +
                 "SELECT COUNT(*) FROM (" +
                 "SELECT uuid, MIN(finish_time) AS best_time FROM record WHERE course_name = ? GROUP BY uuid) AS sub " +
-                "WHERE sub.best_time < ranked.best_time) + 1 AS rank FROM (" +
+                "WHERE sub.best_time" + sign +  "ranked.best_time) " + plusOne + " AS rank FROM (" +
                 "SELECT uuid, MIN(finish_time) AS best_time FROM record WHERE course_name = ? GROUP BY uuid) AS ranked WHERE uuid = ? LIMIT 1";
 
         try (PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)) {
@@ -133,10 +138,13 @@ public class RecordDao {
         return null;
     }
 
-    public Map.Entry<Integer, String> getRankAndRecordDup(UUID uuid, String courseName) {
+    public Map.Entry<Integer, String> getRankAndRecordDup(UUID uuid, String courseName, boolean worstTie) {
+        String sign = worstTie ? " <= " : " < ";
+        String plusOne = worstTie ? " " : " + 1 ";
         //ROW_NUMBER()が使えない。
         String sql = "SELECT finish_time, ( " +
-                "SELECT COUNT(*) FROM record r2 WHERE r2.course_name = r1.course_name AND r2.finish_time < r1.finish_time) + 1 AS rank FROM record" +
+                "SELECT COUNT(*) FROM record r2 WHERE r2.course_name = r1.course_name AND r2.finish_time"
+                + sign + "r1.finish_time) " + plusOne + " AS rank FROM record" +
                 " r1 WHERE r1.uuid = ? AND r1.course_name = ? ORDER BY r1.finish_time ASC LIMIT 1";
 
         try (PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)) {
@@ -157,5 +165,20 @@ public class RecordDao {
         }
 
         return null;
+    }
+
+    public boolean contains(String courseName){
+        String sql = "SELECT 1 FROM record WHERE course_name = ?";
+
+        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
+            ps.setString(1, courseName);
+
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        }catch(SQLException e){
+            LOGGER.log(Level.SEVERE, "contains()でエラーが発生しました", e);
+        }
+
+        return false;
     }
 }

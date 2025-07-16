@@ -5,7 +5,6 @@ import com.github.cresc28.speedrun.db.course.RecordDao;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -35,7 +34,7 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
         }
 
         else {
-            completions.addAll(Arrays.asList("dup", "detail", "above", player.getDisplayName()));
+            completions.addAll(Arrays.asList("dup", "detail", "above", player.getName()));
         }
         return completions;
     }
@@ -46,15 +45,13 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
-        UUID uuid = player.getUniqueId();
-        Location loc = player.getLocation();
 
         if (args.length < 1) {
             return false;
         }
 
         String courseName = args[0];
-        String targetPlayer = null; //プレイヤー名
+        String targetPlayerId = null; //プレイヤー名
         boolean allowDup = false; //同じプレイヤーの複数記録を表示するか
         boolean isDetail = false; //詳細を表示するか
         boolean showAbove = false; //自分より上の10位表示モード
@@ -64,30 +61,22 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
         for (int i = 1; i < args.length; i++) {
             String arg = args[i].toLowerCase();
 
-            if ("dup".equalsIgnoreCase(arg)) {
-                allowDup = true;
-                continue;
+            switch (arg) {
+                case "dup": allowDup = true; break;
+                case "above": showAbove = true; break;
+                case "detail":
+                    if (targetPlayerId == null) targetPlayerId = player.getName();
+                    isDetail = true;
+                    break;
+                default:
+                    if (Utils.isNumeric(arg)) displayCount = Integer.parseInt(arg); //dup, detail, aboveというプレイヤーが存在する可能性は極めて低いため無視。
+                    else targetPlayerId = arg;
             }
+        }
 
-            else if ("detail".equalsIgnoreCase(arg)) {
-                if(targetPlayer == null) targetPlayer = player.getDisplayName();
-                isDetail = true;
-                continue;
-            }
-
-            else if ("above".equalsIgnoreCase(arg)) {
-                showAbove = true;
-                continue;
-            }
-
-            if(Utils.isNumeric(arg)) {
-                displayCount = Integer.parseInt(arg);
-                continue;
-            }
-
-            else { //dup, detail, aboveというプレイヤーが存在する状況は可能性として極めて低いため無視。
-                targetPlayer = arg;
-            }
+        if(!recordDao.contains(courseName)){
+            player.sendMessage("そのコース又はそのコースの記録は存在しません。");
+            return true;
         }
 
         if(showAbove && isDetail) {
@@ -100,74 +89,81 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
             allowDup = false;
         }
 
-        if(displayCount > 30) {
-            player.sendMessage("表示可能件数は最大30です。");
-            displayCount = 30;
+        if(displayCount > 100) {
+            player.sendMessage("表示可能件数は最大100です。");
+            displayCount = 100;
         }
+
+        UUID targetUuid = targetPlayerId == null || player.getName().equals(targetPlayerId) ?
+                player.getUniqueId() : Bukkit.getOfflinePlayer(targetPlayerId).getUniqueId();
+        String targetName = targetPlayerId == null || player.getName().equals(targetPlayerId) ? "あなた" : targetPlayerId + "さん";
 
         //detailが指定されていても中継地点がない場合はこのコースではdetailは無意味です　と返す
-        //
 
-        if(targetPlayer != null){
-            int rank;
-            String timeRecord;
-            UUID targetUuid;
-            String targetName;
-
-            if (targetPlayer.equals(player.getName())) {
-                targetUuid = player.getUniqueId();
-                targetName = "あなた";
-            }
-
-            else {
-                targetUuid = Bukkit.getOfflinePlayer(targetPlayer).getUniqueId();;
-                targetName = targetPlayer + "さん";
-            }
-
-            Map.Entry<Integer, String> rankAndTime = allowDup ? recordDao.getRankAndRecordDup(targetUuid, courseName) : recordDao.getRankAndRecordNoDup(targetUuid, courseName);
-
-
-            if(rankAndTime == null){
-                player.sendMessage(targetName + "の記録は存在しません。");
-                return true;
-            }
-
-            else {
-                rank = rankAndTime.getKey();
-                timeRecord = rankAndTime.getValue();
-                String formatedTime = Utils.tickToTime(Integer.parseInt(timeRecord));
-                player.sendMessage(targetName + "の記録は" + formatedTime + "です。" + "(順位:" + rank + "位)");
-            }
-
+        if(showAbove){
+            showAboveRanking(player, courseName, targetUuid, targetName, allowDup, displayCount);
             return true;
         }
 
-        if(!showAbove){
-            if(allowDup){
-                List<Map.Entry<String, String>> recordList = recordDao.getTopRecordDup(courseName, displayCount);
-                showRanking(recordList, player, 1);
-            }
-
-            else {
-                List<Map.Entry<String, String>> recordList = recordDao.getTopRecordNoDup(courseName, displayCount);
-                showRanking(recordList, player, 1);
-            }
+        if (targetPlayerId != null) {
+            showTargetRank(player, courseName, targetUuid, targetName, allowDup);
             return true;
         }
 
-        return false;
+        else {
+            List<Map.Entry<String, String>> recordList = allowDup ?
+                    recordDao.getTopRecordDup(courseName, 1, displayCount) : recordDao.getTopRecordNoDup(courseName, 1, displayCount);
+            showRanking(recordList, player, 1);
+            return true;
+        }
     }
 
-    private void showRanking(List<Map.Entry<String, String>> recordList, Player sender, int startRank) {
+    private void showRanking(List<Map.Entry<String, String>> recordList, Player player, int startRank) {
         int rank = startRank;
 
-        sender.sendMessage(ChatColor.LIGHT_PURPLE + "----------ランキング----------");
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "----------ランキング----------");
         for (Map.Entry<String, String> entry : recordList) {
             int tick = Integer.parseInt(entry.getValue());
             String time = Utils.tickToTime(tick);
             String line = String.format(ChatColor.GREEN + "%2d. %-16s %10s %6d" + "ticks", rank, entry.getKey(), time, tick);
-            sender.sendMessage(line);
+            player.sendMessage(line);
             rank++;
         }
+    }
+
+    private void showAboveRanking(Player player, String courseName, UUID uuid, String targetName, boolean allowDup, int count) {
+        Map.Entry<Integer, String> rankAndTime = allowDup ?
+                recordDao.getRankAndRecordDup(uuid, courseName, true) : recordDao.getRankAndRecordNoDup(uuid, courseName, true);
+
+        if (rankAndTime == null) {
+            player.sendMessage(targetName + "の記録は存在しません。");
+            return;
+        }
+
+        int rank = Objects.requireNonNull(rankAndTime).getKey();
+        int startRank = Math.max(1, rank - count);
+        int fetchCount = rank - startRank + 1;
+        if(fetchCount == 1){
+            player.sendMessage(targetName + "は1位です。");
+            return;
+        }
+
+        List<Map.Entry<String, String>> recordList = allowDup ? recordDao.getTopRecordDup(courseName, startRank, fetchCount) : recordDao.getTopRecordNoDup(courseName, startRank, fetchCount);
+        showRanking(recordList, player, startRank);
+    }
+
+    private void showTargetRank(Player player, String courseName, UUID uuid, String targetName, boolean allowDup) {
+        Map.Entry<Integer, String> rankAndTime = allowDup ?
+                recordDao.getRankAndRecordDup(uuid, courseName, false) : recordDao.getRankAndRecordNoDup(uuid, courseName, false);
+
+        if (rankAndTime == null) {
+            player.sendMessage(targetName + "の記録は存在しません。");
+            return;
+        }
+
+        int rank = Objects.requireNonNull(rankAndTime).getKey();
+        String timeRecord = rankAndTime.getValue();
+        String formattedTime = Utils.tickToTime(Integer.parseInt(timeRecord));
+        player.sendMessage(targetName + "のベスト記録は" + formattedTime + "です。(順位:" + rank + "位)");
     }
 }
