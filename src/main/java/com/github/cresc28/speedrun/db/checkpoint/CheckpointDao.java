@@ -43,7 +43,7 @@ public class CheckpointDao {
             ps.setDouble(8, loc.getPitch());
             ps.executeUpdate();
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"insert()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"insert()でエラーが発生しました。", e);
         }
     }
 
@@ -63,7 +63,7 @@ public class CheckpointDao {
             ps.setString(3, cpName);
             return ps.executeUpdate() > 0;
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"delete()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"delete()でエラーが発生しました。", e);
             return false;
         }
     }
@@ -93,7 +93,7 @@ public class CheckpointDao {
                 return new Location(world, x, y, z, yaw, pitch);
             }
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"getLocation()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE,"getLocation()でエラーが発生しました。", e);
         }
 
         return null;
@@ -119,7 +119,7 @@ public class CheckpointDao {
                 names.add(rs.getString("cp_name"));
             }
         } catch(SQLException e){
-            LOGGER.log(Level.SEVERE, "getCheckpointNames()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE, "getCheckpointNames()でエラーが発生しました。", e);
         }
 
         return names;

@@ -51,9 +51,10 @@ public class CourseManager {
         while (iterator.hasNext()) {
             Map.Entry<Location, CourseEntry> entry = iterator.next();
             CourseEntry courseEntry = entry.getValue();
+            String entryCourseName = courseEntry.getCourseName();
 
             // タイプと名前の両方が一致する場合に削除
-            if (courseEntry.getType() == type && courseName.equals(courseEntry.getCourseName())) {
+            if (courseEntry.getType() == type && (entryCourseName.equals(courseName) || entryCourseName.startsWith(courseName + "."))) {
                 iterator.remove();
             }
         }
@@ -73,8 +74,9 @@ public class CourseManager {
         while (iterator.hasNext()) {
             Map.Entry<Location, CourseEntry> entry = iterator.next();
             CourseEntry courseEntry = entry.getValue();
+            String entryCourseName = courseEntry.getCourseName();
 
-            if (courseName.equals(courseEntry.getCourseName())) {
+            if (entryCourseName.equals(courseName) || entryCourseName.startsWith(courseName + ".")) {
                 iterator.remove();
             }
         }

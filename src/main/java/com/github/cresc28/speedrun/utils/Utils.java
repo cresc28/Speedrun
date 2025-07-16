@@ -17,7 +17,7 @@ public class Utils {
      * @param ticks tick数
      * @return 現実時間表示
      */
-    public static String formatTime(int ticks){
+    public static String tickToTime(int ticks){
         int commas = (ticks % 20) * 5;
         int seconds = (ticks / 20) % 60;
         int minutes = (ticks / (60 * 20)) % 60;
@@ -37,6 +37,33 @@ public class Utils {
         for (String value : new HashSet<>(source)) {
             if (value != null && value.toLowerCase().startsWith(prefix)) {
                 completions.add(value);
+            }
+        }
+    }
+
+    /**
+     * 指定されたcollectionの要素を全てTAB補完リストに追加する。
+     *
+     * @param source 補完対象のコレクション
+     * @param prefix 補完する文字列の頭文字
+     * @param completions 補完候補の追加先
+     */
+    public static void completionExcludeViaPoint(Collection<String> source, String prefix, List<String> completions) {
+        Set<String> added = new HashSet<>(); // 重複防止
+
+        for (String value : source) {
+            if (value != null) {
+                int dotIndex = value.indexOf('.');
+                String beforeDot;
+                if (dotIndex > 0) {
+                    beforeDot = value.substring(0, dotIndex);
+                } else {
+                    beforeDot = value;
+                }
+
+                if (beforeDot.toLowerCase().startsWith(prefix) && added.add(beforeDot)) {
+                    completions.add(beforeDot);
+                }
             }
         }
     }
