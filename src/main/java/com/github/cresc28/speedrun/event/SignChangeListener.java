@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun.core.listener;
+package com.github.cresc28.speedrun.event;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

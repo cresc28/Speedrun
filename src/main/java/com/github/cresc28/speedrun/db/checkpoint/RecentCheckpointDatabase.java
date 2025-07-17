@@ -17,7 +17,7 @@ public class RecentCheckpointDatabase {
     public static void initializeDatabase(){
         try{
             Class.forName("org.sqlite.JDBC");
-            con = DriverManager.getConnection("jdbc:sqlite:plugins/speedrun/recentCheckpoints.sqlite");
+            con = DriverManager.getConnection("jdbc:sqlite:plugins/speedrun/checkpoints.sqlite");
 
             try(Statement stmt = con.createStatement()) {
                 stmt.executeUpdate(
@@ -32,19 +32,5 @@ public class RecentCheckpointDatabase {
         } catch(Exception e){
             LOGGER.log(Level.SEVERE, "RecentCheckpointデータベース初期化中にエラーが発生しました", e);
         }
-    }
-
-    public static Connection getConnection(){
-        if (con == null) LOGGER.warning("initializeDatabase()が呼ばれていません。");
-        return con;
-    }
-
-    public static void closeConnection(){
-        if(con != null)
-            try{
-                con.close();
-            } catch(Exception e){
-                LOGGER.log(Level.SEVERE, "RecentCheckpointデータベースのクローズに失敗しました。", e);
-            }
     }
 }

@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,18 +17,22 @@ import java.util.logging.Logger;
 public class RecordDao {
     private static final Logger LOGGER = Logger.getLogger("RecordDao");
 
-    public void insert(UUID uuid, String courseName, int record){
+    public int insert(UUID uuid, String courseName, int record){
         String sql = "INSERT INTO record (uuid, course_name, finish_time, record_at) VALUES(?, ?, ?, datetime('now', 'localtime'))";
 
-        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             ps.setString(1, uuid.toString());
             ps.setString(2, courseName);
             ps.setInt(3, record);
-
             ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) return rs.getInt(1);  //挿入されたIDを返す
+
         } catch(SQLException e) {
             LOGGER.log(Level.SEVERE,"insert()でエラーが発生しました。", e);
         }
+        return -1;
     }
 
     public void deleteRecordIfExceedLimit(UUID uuid, String courseName){
@@ -48,9 +53,10 @@ public class RecordDao {
         }
     }
 
-    public void insertAndRemoveSomeRecord(UUID uuid, String courseName, int record){
-        insert(uuid, courseName, record);
+    public int insertAndRemoveSomeRecord(UUID uuid, String courseName, int record){
+        int id = insert(uuid, courseName, record);
         deleteRecordIfExceedLimit(uuid, courseName);
+        return id;
     }
 
     public List<Map.Entry<String, String>> getTopRecordNoDup(String courseName, int startRank, int count){
@@ -180,5 +186,44 @@ public class RecordDao {
         }
 
         return false;
+    }
+
+    public void insertViaPointRecord(int recordId, Map<String, Integer> viaPointRecord){
+        for(Map.Entry<String, Integer> entry : viaPointRecord.entrySet()){
+            String sql = "INSERT INTO record_via_point (record_id, via_point_name, tick) VALUES (?, ?, ?)";
+            try (PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)) {
+                ps.setInt(1, recordId);
+                ps.setString(2, entry.getKey());
+                ps.setInt(3, entry.getValue());
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "registerViaPoint()でエラーが発生しました", e);
+            }
+        }
+    }
+
+    public Map<String, Integer> getViaPointRecord(UUID uuid, String courseName){
+        Map<String, Integer> viaPointRecord = new LinkedHashMap<>();
+
+        String sql = "SELECT v.via_point_name, v.tick FROM record_via_point v WHERE v.record_id = (" +
+                "SELECT record_id FROM record WHERE uuid = ? AND course_name = ? ORDER BY finish_time ASC LIMIT 1)";
+
+        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
+            ps.setString(1, uuid.toString());
+            ps.setString(2, courseName);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                String viaPointName = rs.getString("via_point_name");
+                int tick = rs.getInt("tick");
+
+                viaPointRecord.put(viaPointName, tick);
+            }
+        }catch (SQLException e){
+            LOGGER.log(Level.SEVERE, "getViaPointRecord()でエラーが発生しました。", e);
+        }
+
+        return viaPointRecord;
     }
 }

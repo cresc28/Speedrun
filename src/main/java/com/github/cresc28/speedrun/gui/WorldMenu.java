@@ -1,6 +1,6 @@
 package com.github.cresc28.speedrun.gui;
 
-import com.github.cresc28.speedrun.core.manager.CheckpointManager;
+import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.utils.HeadUtils;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Bukkit;
@@ -11,7 +11,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 

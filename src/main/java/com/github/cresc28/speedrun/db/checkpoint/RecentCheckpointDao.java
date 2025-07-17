@@ -30,7 +30,7 @@ public class RecentCheckpointDao {
                 "(uuid, is_global, world_uid, x, y, z, yaw, pitch) " +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try(PreparedStatement ps = RecentCheckpointDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = CheckpointDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
             ps.setInt(2, isGlobal ? 1 : 0);
             ps.setString(3, loc.getWorld().getUID().toString());
@@ -54,7 +54,7 @@ public class RecentCheckpointDao {
      */
     public Location getLocalLocation(UUID uuid, World world){
         String sql = "SELECT x, y, z, yaw, pitch FROM recentCheckpoints WHERE uuid = ? AND world_uid = ?";
-        try(PreparedStatement ps = RecentCheckpointDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = CheckpointDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
             ps.setString(2, world.getUID().toString());
             ResultSet rs = ps.executeQuery();
@@ -83,7 +83,7 @@ public class RecentCheckpointDao {
      */
     public Location getGlobalLocation(UUID uuid){
         String sql = "SELECT world_uid, x, y, z, yaw, pitch FROM recentCheckpoints WHERE uuid = ? AND is_global = 1";
-        try(PreparedStatement ps = RecentCheckpointDatabase.getConnection().prepareStatement(sql)){
+        try(PreparedStatement ps = CheckpointDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, uuid.toString());
             ResultSet rs = ps.executeQuery();
 
@@ -120,8 +120,8 @@ public class RecentCheckpointDao {
         String sql1 = "UPDATE recentCheckpoints SET is_global = 0 WHERE uuid = ? AND is_global = 1";
         String sql2 = "UPDATE recentCheckpoints SET is_global = 1 WHERE uuid = ? AND world_uid = ?";
 
-        try (PreparedStatement ps1 = RecentCheckpointDatabase.getConnection().prepareStatement(sql1);
-             PreparedStatement ps2 = RecentCheckpointDatabase.getConnection().prepareStatement(sql2)) {
+        try (PreparedStatement ps1 = CheckpointDatabase.getConnection().prepareStatement(sql1);
+             PreparedStatement ps2 = CheckpointDatabase.getConnection().prepareStatement(sql2)) {
 
             ps1.setString(1, uuid.toString());
             ps1.executeUpdate();

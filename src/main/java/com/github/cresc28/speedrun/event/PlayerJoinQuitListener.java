@@ -1,6 +1,6 @@
-package com.github.cresc28.speedrun.core.listener;
+package com.github.cresc28.speedrun.event;
 
-import com.github.cresc28.speedrun.core.manager.CheckpointManager;
+import com.github.cresc28.speedrun.manager.CheckpointManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

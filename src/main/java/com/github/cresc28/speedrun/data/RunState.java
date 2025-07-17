@@ -1,23 +1,28 @@
 package com.github.cresc28.speedrun.data;
 
 import org.bukkit.Location;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * プレイヤーの走行状態を管理するクラス。
  *　管理する情報はコメントアウトの通り。
  */
 public class RunState {
-    private int startTime; //スタート時のtick
+    private int startTick; //スタート時のtick
     private boolean isRunning; //スタートを踏んだ後か
     private boolean isOnEnd; //ゴール地点の上にいるか(ゴールの連発防止用)
     private boolean isOnViaPoint;
     private String currentCourse; //現在走行中のコース
     private Location recentStandLocation; //最後にいた位置
+    Map<String, Integer> recordMap = new LinkedHashMap<>();
 
     public RunState() {
         this.isRunning = false;
         this.isOnEnd = false;
         this.isOnViaPoint = false;
-        this.startTime = 0;
+        this.startTick = 0;
         this.currentCourse = null;
         this.recentStandLocation = null;
     }
@@ -34,9 +39,10 @@ public class RunState {
         //直前に同じスタート地点を踏んでいなければ処理を開始。
         if (recentStandLocation == null || !recentStandLocation.equals(currentLoc)) {
             this.currentCourse = courseName;
-            this.startTime = tick;
+            this.startTick = tick;
             this.isRunning = true;
             this.recentStandLocation = currentLoc;
+            recordMap.clear();
             return true;
         }
         return false;
@@ -55,7 +61,7 @@ public class RunState {
             return -1;
         }
         isRunning = false;
-        return tick - startTime;
+        return tick - startTick;
     }
 
     /**
@@ -65,13 +71,16 @@ public class RunState {
      * @param courseName コース名
      * @return 計測開始がされていたコースならタイムを返す。
      */
-    public int getCurrentRecord(int tick, String courseName){
+    public int viaPointPass(int tick, String courseName, String viaPointName){
         //speedrunを開始していないまたはゴールしたコースが走行中のコースと不一致なら-1を返す。
         if (!isRunning || !courseName.equals(currentCourse)) {
             return -1;
         }
 
-        return tick - startTime;
+        if(viaPointName == null) viaPointName = "中継地点";
+        if(!recordMap.containsKey(viaPointName)) recordMap.put(viaPointName, tick - startTick);
+
+        return tick - startTick;
     }
 
     public boolean isOnEnd() {
@@ -92,5 +101,9 @@ public class RunState {
 
     public void updateRecentStandLocation(Location loc) {
         this.recentStandLocation = loc;
+    }
+
+    public Map<String, Integer> getRecordMap(){
+        return recordMap;
     }
 }

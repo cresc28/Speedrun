@@ -1,7 +1,7 @@
 package com.github.cresc28.speedrun.command;
 
 import com.github.cresc28.speedrun.config.ConfigManager;
-import com.github.cresc28.speedrun.core.manager.CheckpointManager;
+import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.utils.MessageUtils;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Bukkit;

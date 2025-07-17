@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun.core.manager;
+package com.github.cresc28.speedrun.manager;
 
 import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.data.CourseEntry;
@@ -92,7 +92,14 @@ public class TimerManager {
                 }
 
                 if(record > 0){
-                    recordDao.insertAndRemoveSomeRecord(uuid, courseName, record);
+                    int recordId = recordDao.insertAndRemoveSomeRecord(uuid, courseName, record);
+                    Map<String, Integer> viaPointRecord = state.getRecordMap();
+                    if(!viaPointRecord.isEmpty()) {
+                        for(Map.Entry<String, Integer> ent : viaPointRecord.entrySet()){
+                            System.out.println(ent.getKey() + " " + ent.getValue());
+                        }
+                        recordDao.insertViaPointRecord(recordId, viaPointRecord);
+                    }
                 }
 
                 state.setOnEnd(true);
@@ -103,9 +110,10 @@ public class TimerManager {
                 String[] parts = courseName.split("\\."); //xx.yyという登録の場合yyは中継地点の名称を指す。
                 courseName = parts[0];
 
-                int currentRecord = state.getCurrentRecord(tick, courseName);
-                Integer currentRecordValue = currentRecord > 0 ? currentRecord : null;
                 String viaPointName = parts.length == 2 ? parts[1] : null;
+                int currentRecord = state.viaPointPass(tick, courseName, viaPointName);
+                Integer currentRecordValue = currentRecord > 0 ? currentRecord : null;
+
 
                 if (!state.isOnViaPoint()) {
                     CourseMessage.viaPointPassMessage(player, courseName, viaPointName, currentRecordValue);

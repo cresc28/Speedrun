@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun.core.manager;
+package com.github.cresc28.speedrun.manager;
 
 import com.github.cresc28.speedrun.data.CourseEntry;
 import com.github.cresc28.speedrun.data.CourseType;
