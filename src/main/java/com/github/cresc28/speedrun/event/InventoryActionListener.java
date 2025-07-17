@@ -1,6 +1,6 @@
-package com.github.cresc28.speedrun.core.listener;
+package com.github.cresc28.speedrun.event;
 
-import com.github.cresc28.speedrun.core.manager.CheckpointManager;
+import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.data.MenuState;
 import com.github.cresc28.speedrun.gui.CheckpointMenu;
 import com.github.cresc28.speedrun.gui.WorldMenu;

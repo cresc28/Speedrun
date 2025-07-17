@@ -4,24 +4,18 @@ import com.github.cresc28.speedrun.command.CheckpointCommand;
 import com.github.cresc28.speedrun.command.CourseCommand;
 import com.github.cresc28.speedrun.command.RecordCommand;
 import com.github.cresc28.speedrun.config.ConfigManager;
-import com.github.cresc28.speedrun.core.listener.*;
+import com.github.cresc28.speedrun.event.*;
 import com.github.cresc28.speedrun.db.checkpoint.CheckpointDatabase;
-import com.github.cresc28.speedrun.db.course.CourseDao;
-import com.github.cresc28.speedrun.db.course.CourseDatabase;
+import com.github.cresc28.speedrun.db.course.*;
 import com.github.cresc28.speedrun.db.checkpoint.RecentCheckpointDatabase;
-import com.github.cresc28.speedrun.core.manager.CheckpointManager;
-import com.github.cresc28.speedrun.core.manager.CourseManager;
-import com.github.cresc28.speedrun.core.manager.TimerManager;
+import com.github.cresc28.speedrun.manager.CheckpointManager;
+import com.github.cresc28.speedrun.manager.CourseManager;
+import com.github.cresc28.speedrun.manager.TimerManager;
 import com.github.cresc28.speedrun.config.message.CourseMessage;
-import com.github.cresc28.speedrun.db.course.RecordDao;
-import com.github.cresc28.speedrun.db.course.RecordDatabase;
-import com.github.cresc28.speedrun.gui.CheckpointMenu;
-import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
@@ -64,8 +58,8 @@ public final class Speedrun extends JavaPlugin implements Listener {
         }
 
         CheckpointDatabase.closeConnection();
-        RecentCheckpointDatabase.closeConnection();
         CourseDatabase.closeConnection();
+        RecordDatabase.closeConnection();
     }
 
     private void initConfigs(){
@@ -78,6 +72,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         CheckpointDatabase.initializeDatabase();
         RecentCheckpointDatabase.initializeDatabase();
         RecordDatabase.initializeDatabase();
+        ViaPointRecordDatabase.initializeDatabase();
     }
 
     private void registerEvents(TimerManager timerManager){

@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun.core.manager;
+package com.github.cresc28.speedrun.manager;
 
 import com.github.cresc28.speedrun.db.checkpoint.CheckpointDao;
 import com.github.cresc28.speedrun.db.checkpoint.RecentCheckpointDao;

@@ -1,7 +1,7 @@
 package com.github.cresc28.speedrun.command;
 
 import com.github.cresc28.speedrun.data.CourseType;
-import com.github.cresc28.speedrun.core.manager.CourseManager;
+import com.github.cresc28.speedrun.manager.CourseManager;
 import com.github.cresc28.speedrun.utils.MessageUtils;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Location;
@@ -39,8 +39,7 @@ public class CourseCommand implements CommandExecutor, TabCompleter {
 
         else if(args.length == 2) {
             List<String> options = Arrays.asList("add", "remove", "list", "tp");
-            String str = args[0].toLowerCase();
-            if (options.contains(str)) {
+            if (options.contains(args[0].toLowerCase())) {
                 for (CourseType type : CourseType.values()) {
                     String typeName = type.name().toLowerCase();
                     if (typeName.startsWith(args[1].toLowerCase())) {
@@ -109,19 +108,19 @@ public class CourseCommand implements CommandExecutor, TabCompleter {
 
                 if (args[1].equalsIgnoreCase("start")) {
                     cm.registerCourse(CourseType.START, args[2], loc);
-                    sender.sendMessage(String.format("%s（スタート） : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+                    sender.sendMessage(String.format("コース名:%s タイプ:スタート） 座標:%d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                     return true;
                 }
 
                 if (args[1].equalsIgnoreCase("via_point")) {
                     cm.registerCourse(CourseType.VIA_POINT, args[2], loc);
-                    sender.sendMessage(String.format("%s（中間） : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+                    sender.sendMessage(String.format("コース名:%s タイプ:中継地点） 座標:%d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                     return true;
                 }
 
                 else if (args[1].equalsIgnoreCase("end")) {
                     cm.registerCourse(CourseType.END, args[2], loc);
-                    sender.sendMessage(String.format("%s（ゴール） : %d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+                    sender.sendMessage(String.format("コース名:%s タイプ:ゴール） 座標:%d %d %d", args[2], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                     return true;
                 }
 
