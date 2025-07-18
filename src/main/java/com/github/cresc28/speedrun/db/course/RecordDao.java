@@ -36,6 +36,46 @@ public class RecordDao {
         return -1;
     }
 
+    public boolean delete(UUID uuid, String courseName){
+        String sql = "DELETE FROM record WHERE uuid = ? AND course_name = ?";
+
+        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
+            ps.setString(1, uuid.toString());
+            ps.setString(2, courseName);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        }catch (SQLException e){
+            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。");
+        }
+        return false;
+    }
+
+    public boolean delete(UUID uuid){
+        String sql = "DELETE FROM record WHERE uuid = ?";
+
+        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
+            ps.setString(1, uuid.toString());
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        }catch (SQLException e){
+            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。");
+        }
+        return false;
+    }
+
+    public boolean delete(String courseName){
+        String sql = "DELETE FROM record WHERE ourse_name = ?";
+
+        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
+            ps.setString(1, courseName);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        }catch (SQLException e){
+            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。");
+        }
+        return false;
+    }
+
     public void deleteRecordIfExceedLimit(UUID uuid, String courseName){
         String sql = "DELETE FROM record WHERE record_id IN( " +
                 "SELECT record_id FROM record WHERE uuid = ? AND course_name = ? ORDER BY finish_time DESC, record_at DESC " +

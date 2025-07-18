@@ -143,7 +143,7 @@ public class Utils {
      * @param str 文字列
      * @return 数字か
      */
-    public static boolean isNumeric(String str) {
+    public static boolean isPositiveInteger(String str) {
         if (str == null || str.isEmpty()) return false;
         for (char c : str.toCharArray()) {
             if (!Character.isDigit(c)) return false;
