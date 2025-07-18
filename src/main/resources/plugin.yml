@@ -21,6 +21,10 @@ commands:
     description: view records
     usage: /top <コース名> [dup] [detail] [above] [何位まで表示するか(最大30)] [player]
 
+  record:
+    description: manipulate records
+    usage: /record <add|remove|removeAll>
+
 permissions:
   speedrun.course:
     description: /courseの使用制限
@@ -28,4 +32,16 @@ permissions:
 
   speedrun.cp:
     description: /cpの使用制限
+    default: op
+
+  speedrun.record.add:
+    description: 記録を追加できる
+    default: op
+
+  speedrun.record.remove:
+    description: 記録を一つ削除できる
+    default: op
+
+  speedrun.record.removeAll:
+    description: ある記録をすべて削除する
     default: op

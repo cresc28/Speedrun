@@ -2,7 +2,7 @@ package com.github.cresc28.speedrun;
 
 import com.github.cresc28.speedrun.command.CheckpointCommand;
 import com.github.cresc28.speedrun.command.CourseCommand;
-import com.github.cresc28.speedrun.command.RecordCommand;
+import com.github.cresc28.speedrun.command.TopCommand;
 import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.event.*;
 import com.github.cresc28.speedrun.db.checkpoint.CheckpointDatabase;
@@ -86,6 +86,6 @@ public final class Speedrun extends JavaPlugin implements Listener {
     private void registerCommands(CourseManager courseManager, CheckpointManager cpManager, RecordDao recordDao) {
         getCommand("course").setExecutor(new CourseCommand(courseManager));
         getCommand("cp").setExecutor(new CheckpointCommand(cpManager));
-        getCommand("top").setExecutor(new RecordCommand(courseManager, recordDao));
+        getCommand("top").setExecutor(new TopCommand(courseManager, recordDao));
     }
 }
