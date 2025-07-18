@@ -3,6 +3,7 @@ package com.github.cresc28.speedrun.db.course;
 import com.github.cresc28.speedrun.config.ConfigManager;
 import org.bukkit.Bukkit;
 
+import java.lang.Record;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -113,7 +114,7 @@ public class RecordDao {
         return result;
     }
 
-    public Map.Entry<Integer, String> getRankAndRecordNoDup(UUID uuid, String courseName, boolean worstTie) {
+    public Map.Entry<Integer, Integer> getRankAndRecordNoDup(UUID uuid, String courseName, boolean worstTie) {
         String sign = worstTie ? " <= " : " < ";
         String plusOne = worstTie ? " " : " + 1 ";
 
@@ -132,7 +133,7 @@ public class RecordDao {
 
             if(rs.next()){
                 int rank = rs.getInt("rank");
-                String record = rs.getString("best_time");
+                int record = rs.getInt("best_time");
 
                 return new AbstractMap.SimpleEntry<>(rank, record);
             }
@@ -144,7 +145,7 @@ public class RecordDao {
         return null;
     }
 
-    public Map.Entry<Integer, String> getRankAndRecordDup(UUID uuid, String courseName, boolean worstTie) {
+    public Map.Entry<Integer, Integer> getRankAndRecordDup(UUID uuid, String courseName, boolean worstTie) {
         String sign = worstTie ? " <= " : " < ";
         String plusOne = worstTie ? " " : " + 1 ";
         //ROW_NUMBER()が使えない。
@@ -161,7 +162,7 @@ public class RecordDao {
 
             if(rs.next()){
                 int rank = rs.getInt("rank");
-                String record = rs.getString("finish_time");
+                int record = rs.getInt("finish_time");
 
                 return new AbstractMap.SimpleEntry<>(rank, record);
             }
@@ -225,5 +226,23 @@ public class RecordDao {
         }
 
         return viaPointRecord;
+    }
+
+    public int getRank(String courseName, int finishTime){
+        String sql = "SELECT COUNT(*) + 1 FROM (" +
+                "SELECT MIN(finish_time) AS best_time FROM record WHERE course_name = ? GROUP BY uuid) AS best_record WHERE best_time < ?";
+
+        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
+            ps.setString(1, courseName);
+            ps.setInt(2, finishTime);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) return rs.getInt(1);
+        }catch(SQLException e){
+            LOGGER.log(Level.SEVERE, "getRank()でエラーが発生しました。", e);
+        }
+
+        return 1;
     }
 }

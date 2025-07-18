@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,8 +50,13 @@ public class CourseMessage {
                         + "# %player%   → プレイヤー名\n"
                         + "# %course%   → コース名\n"
                         + "# %time%     → タイム(xx:xx:xx.xx表記)\n"
-                        + "# %tick%     → tick\n"
+                        + "# %tick%     → ライム(tick表記)\n"
+                        + "# %rank%     → 記録の順位\n"
+                        + "# %bestRank%     → ベスト記録の順位\n"
+                        + "# %bestTime%     → ベスト記録のタイム(xx:xx:xx.xx表記)\n"
+                        + "# %bestTick%     → ベスト記録のタイム(tick表記)\n"
                         + "# %viapoint% → 中継地点名\n"
+                        + "# %n% → 改行\n"
                         + "#\n"
                         + "# 色・装飾コードについて:\n"
                         + "# &0: 黒         &1: 濃青        &2: 濃緑        &3: 青緑\n"
@@ -67,20 +74,20 @@ public class CourseMessage {
                         + "# 計測開始時のメッセージ（表示可能:プレイヤー名、コース名）\n"
                         + "start: \"計測開始！\"\n\n"
 
-                        + "# ゴールメッセージ（表示可能:プレイヤー名、コース名、タイム）\n"
-                        + "complete1: \"%player%さんが%course%を%time%(%tick%ticks)でクリア！\"\n\n"
+                        + "# ゴールメッセージ（表示可能:プレイヤー名、コース名、タイム、順位、ベスト順位、ベスト記録）\n"
+                        + "complete1: \"%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！%n%この記録の順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位&r)\"\n\n"
 
                         + "# ゴールメッセージ（タイム計測なし）（表示可能:プレイヤー名、コース名）\n"
                         + "complete2: \"%player%さんが%course%をクリア！\"\n\n"
 
                         + "# 中継地点通過メッセージ（表示可能:プレイヤー名、コース名、中継地点名、タイム）\n"
-                        + "pass1: \"%player%さんが%viapoint%を%time%(%tick%ticks)で通過！\"\n\n"
+                        + "pass1: \"%player%さんが%viapoint%を&a%time%(%tick%ticks)&rで通過！\"\n\n"
 
                         + "# 中継地点通過メッセージ（タイム計測なし）（表示可能:プレイヤー名、コース名、中継地点名）\n"
                         + "pass2: \"%player%さんが%course%の中継地点:%viapoint%を通過！\"\n\n"
 
                         + "# 中継地点通過メッセージ（中継地点名なし）（表示可能:プレイヤー名、コース名、タイム）\n"
-                        + "pass3: \"%player%さんが%course%の中継地点を%time%(%tick%ticks)で通過！\"\n\n"
+                        + "pass3: \"%player%さんが%course%の中継地点を&a%time%(%tick%ticks)&rで通過！\"\n\n"
 
                         + "# 中継地点通過メッセージ（タイム計測なし、中継地点名なし）（表示可能:プレイヤー名、コース名）\n"
                         + "pass4: \"%player%さんが%course%の中継地点を通過！\"\n";
@@ -103,7 +110,10 @@ public class CourseMessage {
         message = message.replace("%player%", player.getName());
         message = message.replace("%course%", courseName);
         message = ChatColor.translateAlternateColorCodes('&', message);
-        player.sendMessage(message);
+
+        for (String line : message.split("%n%")) {
+            player.sendMessage(message);
+        }
     }
 
     /**
@@ -113,24 +123,30 @@ public class CourseMessage {
      * @param courseName コース名
      * @param tick タイム(tick)
      */
-    public static void endMessage(Player player, String courseName, Integer tick) {
+    public static void endMessage(Player player, String courseName, Integer tick, int rank, Map.Entry<Integer, Integer> rankAndTime) {
         String message;
 
         if (tick != null) {
-            message = config.getString("completion1", "%player%さんが%course%を%time%(%tick%ticks)でクリア！");
+            message = config.getString("complete1", "%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！%n%あなたの順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位)&r");
             message = message.replace("%time%", Utils.tickToTime(tick));
             message = message.replace("%tick%", String.valueOf(tick));
+            message = message.replace("%rank%", String.valueOf(rank));
+            message = message.replace("%bestRank%", String.valueOf(rankAndTime.getKey()));
+            message = message.replace("%bestTick%", String.valueOf(rankAndTime.getValue()));
+            message = message.replace("%bestTime%", Utils.tickToTime(rankAndTime.getValue()));
         }
 
         else {
-            message = config.getString("completion2", "%player%さんが%course%をクリア！");
+            message = config.getString("complete2", "%player%さんが%course%をクリア！");
         }
 
         message = message.replace("%player%", player.getName());
         message = message.replace("%course%", courseName);
         message = ChatColor.translateAlternateColorCodes('&', message);
 
-        Bukkit.broadcastMessage(message);
+        for (String line : message.split("%n%")) {
+            Bukkit.broadcastMessage(line);
+        }
     }
 
     /**
@@ -147,7 +163,7 @@ public class CourseMessage {
 
         if (viaPointName != null && tick != null) {
             key = "pass1";
-            message = config.getString(key, "%player%さんが%viapoint%を%time%(%tick%ticks)で通過！");
+            message = config.getString(key, "%player%さんが%viapoint%を&a%time%(%tick%ticks)&rで通過！");
         }
         else if (viaPointName != null) {
             key = "pass2";
@@ -155,7 +171,7 @@ public class CourseMessage {
         }
         else if (tick != null) {
             key = "pass3";
-            message = config.getString(key, "%player%さんが%course%の中継地点を%time%(%tick%ticks)で通過！");
+            message = config.getString(key, "%player%さんが%course%の中継地点を&a%time%(%tick%ticks)&rで通過！");
         }
         else {
             key = "pass4";
@@ -172,6 +188,8 @@ public class CourseMessage {
         message = message.replace("%course%", courseName);
         message = ChatColor.translateAlternateColorCodes('&', message);
 
-        Bukkit.broadcastMessage(message);
+        for (String line : message.split("%n%")) {
+            Bukkit.broadcastMessage(line);
+        }
     }
 }

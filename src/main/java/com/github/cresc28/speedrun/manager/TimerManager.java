@@ -54,8 +54,6 @@ public class TimerManager {
         CourseEntry entry = courseManager.getCourseEntry(loc);
         RunState state = playerStates.computeIfAbsent(uuid, k -> new RunState());
 
-
-
         if(entry == null) {
             state.setOnEnd(false);
             state.setOnViaPoint(false);
@@ -84,22 +82,22 @@ public class TimerManager {
             case END:
                 int record = state.endCourse(tick, courseName);
                 Integer recordValue = record > 0 ? record : null;
+                int rank = recordDao.getRank(courseName, record);
+
+                if(record > 0){ //記録を登録
+                    int recordId = recordDao.insertAndRemoveSomeRecord(uuid, courseName, record);
+
+                    Map<String, Integer> viaPointRecord = state.getRecordMap();
+                    if(!viaPointRecord.isEmpty()) {
+                        recordDao.insertViaPointRecord(recordId, viaPointRecord);
+                    }
+                }
 
                 //TAを開始したパルクール以外のパルクールのゴールを踏むとクリア表示のみを出す。
                 // isOnEndはゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
                 if (!state.isOnEnd()) {
-                    CourseMessage.endMessage(player, courseName, recordValue);
-                }
-
-                if(record > 0){
-                    int recordId = recordDao.insertAndRemoveSomeRecord(uuid, courseName, record);
-                    Map<String, Integer> viaPointRecord = state.getRecordMap();
-                    if(!viaPointRecord.isEmpty()) {
-                        for(Map.Entry<String, Integer> ent : viaPointRecord.entrySet()){
-                            System.out.println(ent.getKey() + " " + ent.getValue());
-                        }
-                        recordDao.insertViaPointRecord(recordId, viaPointRecord);
-                    }
+                    Map.Entry<Integer, Integer> bestRecord = recordDao.getRankAndRecordNoDup(uuid, courseName, false);
+                    CourseMessage.endMessage(player, courseName, recordValue, rank, bestRecord);
                 }
 
                 state.setOnEnd(true);
@@ -113,7 +111,6 @@ public class TimerManager {
                 String viaPointName = parts.length == 2 ? parts[1] : null;
                 int currentRecord = state.viaPointPass(tick, courseName, viaPointName);
                 Integer currentRecordValue = currentRecord > 0 ? currentRecord : null;
-
 
                 if (!state.isOnViaPoint()) {
                     CourseMessage.viaPointPassMessage(player, courseName, viaPointName, currentRecordValue);
