@@ -7,13 +7,13 @@ description: SpeedrunPlugin
 commands:
   course:
     description: Set speedrun course
-    usage: /course <add|remove> <start|end|via_point> <name> or /course list
+    usage: /course <add|remove> <start|end|via_point> <name>
     permission: speedrun.course
     permission-message: "このコマンドを使用する権限がありません。"
 
   cp:
     description: set checkpoint
-    usage: /cp <name> or /cp remove <name> or /cp list
+    usage: /cp <remove|tp> <CP名>
     permission: speedrun.cp
     permission-message: "このコマンドを使用する権限がありません。"
 

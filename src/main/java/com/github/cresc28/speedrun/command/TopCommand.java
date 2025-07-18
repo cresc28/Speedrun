@@ -5,10 +5,7 @@ import com.github.cresc28.speedrun.db.course.RecordDao;
 import com.github.cresc28.speedrun.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -47,6 +44,11 @@ public class TopCommand implements CommandExecutor, TabCompleter {
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if(sender instanceof ConsoleCommandSender){
+            sender.sendMessage("このコマンドはサーバコンソールでは実行できません。");
+            return true;
+        }
+
         Player player = (Player) sender;
 
         if (args.length < 1) {
@@ -72,7 +74,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
                     isDetail = true;
                     break;
                 default:
-                    if (Utils.isNumeric(arg)) displayCount = Integer.parseInt(arg); //dup, detail, aboveというプレイヤーが存在する可能性は極めて低いため無視。
+                    if (Utils.isPositiveInteger(arg)) displayCount = Integer.parseInt(arg); //dup, detail, aboveというプレイヤーが存在する可能性は極めて低いため無視。
                     else targetPlayerId = arg;
             }
         }
@@ -102,7 +104,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
             if(sumTick < 0) return true;
             Map<String, Integer> viaPointRecord = recordDao.getViaPointRecord(targetUuid, courseName);
 
-            if(viaPointRecord.isEmpty()) player.sendMessage("このコースの詳細情報はありません。");
+            if(viaPointRecord.isEmpty()) sender.sendMessage("このコースの詳細情報はありません。");
             else showDetail(player, viaPointRecord, sumTick);
 
             return true;

@@ -8,12 +8,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
+import java.io.Console;
 import java.util.*;
 
 /**
@@ -71,6 +69,11 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
     */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if(sender instanceof ConsoleCommandSender){
+            sender.sendMessage("このコマンドはサーバコンソールでは実行できません。");
+            return true;
+        }
+
         Player player = (Player) sender;
         UUID uuid = player.getUniqueId();
         Location loc = player.getLocation();
