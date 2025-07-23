@@ -1,8 +1,10 @@
 package com.github.cresc28.speedrun.command;
 
+import com.github.cresc28.speedrun.data.SpeedrunFacade;
 import com.github.cresc28.speedrun.manager.CourseManager;
 import com.github.cresc28.speedrun.db.course.RecordDao;
-import com.github.cresc28.speedrun.utils.Utils;
+import com.github.cresc28.speedrun.utils.GameUtils;
+import com.github.cresc28.speedrun.utils.TextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.*;
@@ -14,9 +16,9 @@ public class TopCommand implements CommandExecutor, TabCompleter {
     private final CourseManager courseManager;
     private final RecordDao recordDao;
 
-    public TopCommand(CourseManager courseManager, RecordDao recordDao){
-        this.courseManager = courseManager;
-        this.recordDao = recordDao;
+    public TopCommand(SpeedrunFacade facade){
+        courseManager = facade.getCourseManager();
+        recordDao = facade.getRecordDao();
     }
     /**
      * Tab補完の処理を行う。
@@ -27,7 +29,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
         Player player = (Player) sender;
 
         if (args.length == 1) {
-            Utils.completionExcludeViaPoint(courseManager.getAllCourseName(), args[0].toLowerCase(), completions);
+            TextUtils.completionExcludeViaPoint(courseManager.getAllCourseName(), args[0].toLowerCase(), completions);
         }
 
         else {
@@ -74,7 +76,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
                     isDetail = true;
                     break;
                 default:
-                    if (Utils.isPositiveInteger(arg)) displayCount = Integer.parseInt(arg); //dup, detail, aboveというプレイヤーが存在する可能性は極めて低いため無視。
+                    if (TextUtils.isPositiveInteger(arg)) displayCount = Integer.parseInt(arg); //dup, detail, aboveというプレイヤーが存在する可能性は極めて低いため無視。
                     else targetPlayerId = arg;
             }
         }
@@ -134,7 +136,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ChatColor.LIGHT_PURPLE + "----------ランキング----------");
         for (Map.Entry<String, String> entry : recordList) {
             int tick = Integer.parseInt(entry.getValue());
-            String time = Utils.tickToTime(tick);
+            String time = GameUtils.tickToTime(tick);
             String line = String.format(ChatColor.GREEN + "%2d. %-16s %10s %6d" + "ticks", rank, entry.getKey(), time, tick);
             player.sendMessage(line);
             rank++;
@@ -173,7 +175,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
 
         int rank = Objects.requireNonNull(rankAndTime).getKey();
         int timeRecord = rankAndTime.getValue();
-        String formattedTime = Utils.tickToTime(timeRecord);
+        String formattedTime = GameUtils.tickToTime(timeRecord);
         player.sendMessage(ChatColor.GREEN +"プレイヤー:" + Bukkit.getPlayer(targetUuid).getName() +
                 "     順位:" + rank + "位" + "     ベスト記録:" + formattedTime);
         return timeRecord;
@@ -192,10 +194,10 @@ public class TopCommand implements CommandExecutor, TabCompleter {
              lapTime = tick - prevTick;
              prevTick = tick;
 
-             player.sendMessage(ChatColor.GREEN + viaPointName + ":" + Utils.tickToTime(tick) + "(" + tick + "ticks)   lap:" + Utils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
+             player.sendMessage(ChatColor.GREEN + viaPointName + ":" + GameUtils.tickToTime(tick) + "(" + tick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
          }
 
          lapTime = sumTick - prevTick;
-         player.sendMessage(ChatColor.GOLD + "ゴール:" + Utils.tickToTime(sumTick) + "(" + sumTick + "ticks)   lap:" + Utils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
+         player.sendMessage(ChatColor.GOLD + "ゴール:" + GameUtils.tickToTime(sumTick) + "(" + sumTick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
     }
 }

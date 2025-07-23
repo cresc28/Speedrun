@@ -1,12 +1,16 @@
 package com.github.cresc28.speedrun.command;
 
+import com.github.cresc28.speedrun.data.RecordInfo;
+import com.github.cresc28.speedrun.data.RecordSession;
+import com.github.cresc28.speedrun.data.SpeedrunFacade;
 import com.github.cresc28.speedrun.db.course.RecordDao;
+import com.github.cresc28.speedrun.gui.RecordMenuForDelete;
 import com.github.cresc28.speedrun.manager.CourseManager;
-import com.github.cresc28.speedrun.utils.Utils;
+import com.github.cresc28.speedrun.utils.GameUtils;
+import com.github.cresc28.speedrun.utils.TextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.*;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -15,10 +19,12 @@ import java.util.stream.Collectors;
 public class RecordCommand implements CommandExecutor, TabCompleter {
     private final CourseManager courseManager;
     private final RecordDao recordDao;
+    private final RecordSession recordSession;
 
-    public RecordCommand(CourseManager courseManager, RecordDao recordDao){
-        this.courseManager = courseManager;
-        this.recordDao = recordDao;
+    public RecordCommand(SpeedrunFacade facade){
+        courseManager = facade.getCourseManager();
+        recordDao = facade.getRecordDao();
+        recordSession = facade.getRecordSession();
     }
     /**
      * Tab補完の処理を行う。
@@ -35,18 +41,18 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
         }
 
         if(args.length == 2){
-            if("remove".equalsIgnoreCase(args[1]) || "removeAll".equalsIgnoreCase(args[1])){
-                Utils.completionExcludeViaPoint(courseManager.getAllCourseName(), args[1].toLowerCase(), completions);
+            if("add".equalsIgnoreCase(args[0]) || "remove".equalsIgnoreCase(args[0]) || "removeAll".equalsIgnoreCase(args[0])){
+                TextUtils.completionExcludeViaPoint(courseManager.getAllCourseName(), args[1].toLowerCase(), completions);
             }
         }
 
         if(args.length == 3){
-            if("remove".equalsIgnoreCase(args[1]) || "removeAll".equalsIgnoreCase(args[1])) {
+            if("remove".equalsIgnoreCase(args[0]) || "removeAll".equalsIgnoreCase(args[0])) {
                 List<String> playerNames = Arrays.stream(Bukkit.getOfflinePlayers())
                         .map(OfflinePlayer::getName)
                         .collect(Collectors.toList());
 
-                Utils.completionExcludeViaPoint(playerNames, args[1].toLowerCase(), completions);
+                TextUtils.completionFromCollection(playerNames, args[1].toLowerCase(), completions);
             }
         }
 
@@ -58,6 +64,8 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        UUID senderUuid = ((Player) sender).getUniqueId();
+
         if(args.length == 0) return false;
 
         if("removeCourseAll".equalsIgnoreCase(args[0]) || "removePlayerAll".equalsIgnoreCase(args[0])){
@@ -97,7 +105,17 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
             }
 
             if("remove".equalsIgnoreCase(args[0])){
-
+                UUID deleteUuid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
+                List<Integer> times = recordDao.getFinishTick(deleteUuid, args[1]);
+                if(times.isEmpty()){
+                    sender.sendMessage("コース、プレイヤー、記録のいずれかが存在しません。");
+                    return true;
+                }
+                List<String> timesString = times.stream().map(GameUtils::tickToTime).collect(Collectors.toList());
+                recordSession.setRecord(senderUuid, new RecordInfo(args[1], deleteUuid, timesString));
+                ((Player)sender).addScoreboardTag("MenuOpen");
+                new RecordMenuForDelete((Player) sender, timesString,0).openInventory();
+                return true;
             }
 
             else if("removeAll".equalsIgnoreCase(args[0])){
@@ -125,7 +143,7 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
 
             if(!"add".equalsIgnoreCase(args[0])) return false;
 
-            if(!Utils.isPositiveInteger(args[3])){
+            if(!TextUtils.isPositiveInteger(args[3])){
                 sender.sendMessage("タイムはtick表記の非負の整数で入力してください。");
                 return true;
             }
@@ -133,7 +151,7 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
             UUID uuidToAdd = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
             int tick = Integer.parseInt(args[3]);
             recordDao.insert(uuidToAdd, args[1], tick);
-            sender.sendMessage(String.format("登録完了(コース名:%s  プレイヤー:%s   タイム:%s)", args[1], args[2], Utils.tickToTime(tick)));
+            sender.sendMessage(String.format("登録完了(コース名:%s  プレイヤー:%s   タイム:%s)", args[1], args[2], GameUtils.tickToTime(tick)));
             return true;
         }
 

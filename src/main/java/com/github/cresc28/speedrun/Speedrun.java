@@ -5,6 +5,7 @@ import com.github.cresc28.speedrun.command.CourseCommand;
 import com.github.cresc28.speedrun.command.RecordCommand;
 import com.github.cresc28.speedrun.command.TopCommand;
 import com.github.cresc28.speedrun.config.ConfigManager;
+import com.github.cresc28.speedrun.data.SpeedrunFacade;
 import com.github.cresc28.speedrun.event.*;
 import com.github.cresc28.speedrun.db.checkpoint.CheckpointDatabase;
 import com.github.cresc28.speedrun.db.course.*;
@@ -35,12 +36,12 @@ public final class Speedrun extends JavaPlugin implements Listener {
 
         RecordDao recordDao = new RecordDao();
         CourseDao courseDao = new CourseDao();
-
         CourseManager courseManager = new CourseManager(courseDao);
         TimerManager timerManager = new TimerManager(courseManager, cpManager, recordDao);
+        SpeedrunFacade facade = new SpeedrunFacade(courseManager, cpManager, recordDao);
 
-        registerEvents(timerManager);
-        registerCommands(courseManager, cpManager, recordDao);
+        registerEvents(timerManager, facade);
+        registerCommands(facade);
 
         timerManager.startTimer(this);
 
@@ -76,18 +77,18 @@ public final class Speedrun extends JavaPlugin implements Listener {
         ViaPointRecordDatabase.initializeDatabase();
     }
 
-    private void registerEvents(TimerManager timerManager){
+    private void registerEvents(TimerManager timerManager, SpeedrunFacade facade){
         Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(timerManager),this);
-        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(cpManager),this);
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinQuitListener(cpManager),this);
-        Bukkit.getPluginManager().registerEvents(new InventoryActionListener(cpManager, this),this);
+        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(facade),this);
+        Bukkit.getPluginManager().registerEvents(new PlayerJoinQuitListener(facade),this);
+        Bukkit.getPluginManager().registerEvents(new InventoryActionListener(facade, this),this);
         Bukkit.getPluginManager().registerEvents(new SignChangeListener(),this);
     }
 
-    private void registerCommands(CourseManager courseManager, CheckpointManager cpManager, RecordDao recordDao) {
-        getCommand("course").setExecutor(new CourseCommand(courseManager));
-        getCommand("cp").setExecutor(new CheckpointCommand(cpManager));
-        getCommand("top").setExecutor(new TopCommand(courseManager, recordDao));
-        getCommand("record").setExecutor(new RecordCommand(courseManager, recordDao));
+    private void registerCommands(SpeedrunFacade facade) {
+        getCommand("course").setExecutor(new CourseCommand(facade));
+        getCommand("cp").setExecutor(new CheckpointCommand(facade));
+        getCommand("top").setExecutor(new TopCommand(facade));
+        getCommand("record").setExecutor(new RecordCommand(facade));
     }
 }

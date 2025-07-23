@@ -10,22 +10,7 @@ import java.util.*;
 /**
  * 汎用ユーティリティクラス。
  */
-public class Utils {
-    /**
-     * tick数を現実時間に変更する
-     *
-     * @param ticks tick数
-     * @return 現実時間表示
-     */
-    public static String tickToTime(int ticks){
-        int commas = (ticks % 20) * 5;
-        int seconds = (ticks / 20) % 60;
-        int minutes = (ticks / (60 * 20)) % 60;
-        int hours = ticks / (60 * 60 * 20);
-
-        return String.format("%02d:%02d:%02d.%02d0", hours, minutes, seconds, commas);
-    }
-
+public class TextUtils {
     /**
      * 指定されたcollectionの要素を全てTAB補完リストに追加する。
      *
@@ -69,16 +54,6 @@ public class Utils {
     }
 
     /**
-     * プレイヤーの真下のブロックのLocationをintで返す。
-     *
-     * @param loc 座標
-     * @return 整数化座標
-     */
-    public static Location getBlockLocation(Location loc) {
-        return new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-    }
-
-    /**
      * 特定の文字が文字列に含まれるかをチェックする。
      *
      * @param str チェックする文字列
@@ -118,23 +93,6 @@ public class Utils {
         if(meta == null) return;
         meta.setDisplayName(name);
         item.setItemMeta(meta);
-    }
-
-    /**
-     * ブロックデータから方角を得る。
-     *
-     * @param data block.getData()
-     * @return 方角(yaw)
-     */
-    public static float getYaw(byte data) {
-        switch (data) {
-            case 0: return 180f; //北
-            case 4: return -90f; //東
-            case 8: return 0f; //南
-            case 12: return 90f; //西
-
-            default: return 180f;
-        }
     }
 
     /**

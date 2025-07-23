@@ -1,6 +1,7 @@
 package com.github.cresc28.speedrun.config.message;
 
-import com.github.cresc28.speedrun.utils.Utils;
+import com.github.cresc28.speedrun.utils.GameUtils;
+import com.github.cresc28.speedrun.utils.TextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,7 +11,6 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -128,12 +128,12 @@ public class CourseMessage {
 
         if (tick != null) {
             message = config.getString("complete1", "%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！%n%あなたの順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位)&r");
-            message = message.replace("%time%", Utils.tickToTime(tick));
+            message = message.replace("%time%", GameUtils.tickToTime(tick));
             message = message.replace("%tick%", String.valueOf(tick));
             message = message.replace("%rank%", String.valueOf(rank));
             message = message.replace("%bestRank%", String.valueOf(rankAndTime.getKey()));
             message = message.replace("%bestTick%", String.valueOf(rankAndTime.getValue()));
-            message = message.replace("%bestTime%", Utils.tickToTime(rankAndTime.getValue()));
+            message = message.replace("%bestTime%", GameUtils.tickToTime(rankAndTime.getValue()));
         }
 
         else {
@@ -180,7 +180,7 @@ public class CourseMessage {
 
         if (viaPointName != null) message = message.replace("%viapoint%", viaPointName);
         if (tick != null) {
-            message = message.replace("%time%", Utils.tickToTime(tick));
+            message = message.replace("%time%", GameUtils.tickToTime(tick));
             message = message.replace("%tick%", String.valueOf(tick));
         }
 
