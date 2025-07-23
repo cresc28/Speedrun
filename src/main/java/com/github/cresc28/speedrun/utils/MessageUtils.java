@@ -3,7 +3,6 @@ package com.github.cresc28.speedrun.utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import java.text.Collator;
 import java.util.*;
 
 /**
@@ -23,7 +22,7 @@ public class MessageUtils {
             return;
         }
 
-        sender.sendMessage(String.join(", ", Utils.sortCollection(names)));
+        sender.sendMessage(String.join(", ", TextUtils.sortCollection(names)));
     }
 
     /**

@@ -2,7 +2,7 @@ package com.github.cresc28.speedrun.gui;
 
 import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.utils.HeadUtils;
-import com.github.cresc28.speedrun.utils.Utils;
+import com.github.cresc28.speedrun.utils.TextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -40,7 +40,7 @@ public class CheckpointMenu {
         final int CHECKPOINT_SLOT = 45; //ネザースターで埋めるのは45枠まで
         Inventory inv = Bukkit.createInventory(null, ALL_SLOT,"CheckpointMenu (World: " + world.getName() + ")");
         Collection<String> cpCollection = cpm.getCheckpointNames(player.getUniqueId(), world);
-        Utils.sortCollection(cpCollection);
+        TextUtils.sortCollection(cpCollection);
         ArrayList<String> cpNames = new ArrayList<>(cpCollection);
         int pages = (cpNames.size() - 1) / CHECKPOINT_SLOT;
 
@@ -56,13 +56,13 @@ public class CheckpointMenu {
 
         if(!isDeleteMode){
             ItemStack redWool = new ItemStack(Material.WOOL ,1, (short) 14);
-            Utils.changeItemName(redWool, "削除モードへ切り替え");
+            TextUtils.changeItemName(redWool, "削除モードへ切り替え");
             inv.setItem(51, redWool);
         }
 
         else{
             ItemStack greenWool = new ItemStack(Material.WOOL ,1, (short) 13);
-            Utils.changeItemName(greenWool, "TPモードへ切り替え");
+            TextUtils.changeItemName(greenWool, "TPモードへ切り替え");
             inv.setItem(51, greenWool);
         }
 
@@ -74,7 +74,7 @@ public class CheckpointMenu {
 
         for(int i = startIndex; i < endIndex; i++){
             ItemStack netherStar = new ItemStack(Material.NETHER_STAR,1);
-            Utils.changeItemName(netherStar, cpNames.get(i));
+            TextUtils.changeItemName(netherStar, cpNames.get(i));
             inv.setItem(i - startIndex, netherStar);
         }
 

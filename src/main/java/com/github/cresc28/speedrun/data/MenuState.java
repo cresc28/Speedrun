@@ -7,9 +7,7 @@ import org.bukkit.World;
  */
 public class MenuState {
     boolean deleteMode = false;
-    boolean worldMode = false;
-    int cpPage = 0;
-    int worldPage = 0;
+    int page = 0;
     World selectedWorld;
 
     public MenuState(World initialWorld) {
@@ -23,36 +21,16 @@ public class MenuState {
         this.deleteMode = isDeleteMode;
     }
 
-    public boolean isWorldMode() {
-        return worldMode;
+    public int getPage() {
+        return page;
     }
 
-    public void setWorldMode(boolean isWorldMode) {
-        this.worldMode = isWorldMode;
+    public void incrementPage() {
+        this.page++;
     }
 
-    public int getCpPage() {
-        return cpPage;
-    }
-
-    public void incrementCpPage() {
-        this.cpPage++;
-    }
-
-    public void decrementCpPage() {
-        this.cpPage--;
-    }
-
-    public int getWorldPage() {
-        return worldPage;
-    }
-
-    public void incrementWorldPage() {
-        this.worldPage++;
-    }
-
-    public void decrementWorldPage() {
-        this.worldPage--;
+    public void decrementPage() {
+        this.page--;
     }
 
     public World getWorld() {
@@ -64,9 +42,7 @@ public class MenuState {
     }
 
     public void reset(){
-        this.cpPage = 0;
-        this.worldPage = 0;
+        page = 0;
         this.deleteMode = false;
-        this.worldMode = false;
     }
 }

@@ -3,11 +3,7 @@ package com.github.cresc28.speedrun.db.course;
 import com.github.cresc28.speedrun.config.ConfigManager;
 import org.bukkit.Bukkit;
 
-import java.lang.Record;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,7 +41,7 @@ public class RecordDao {
             int rows = ps.executeUpdate();
             return rows > 0;
         }catch (SQLException e){
-            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。", e);
         }
         return false;
     }
@@ -58,20 +54,43 @@ public class RecordDao {
             int rows = ps.executeUpdate();
             return rows > 0;
         }catch (SQLException e){
-            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。", e);
         }
         return false;
     }
 
     public boolean delete(String courseName){
-        String sql = "DELETE FROM record WHERE ourse_name = ?";
+        String sql = "DELETE FROM record WHERE course_name = ?";
 
         try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
             ps.setString(1, courseName);
             int rows = ps.executeUpdate();
             return rows > 0;
         }catch (SQLException e){
-            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。");
+            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。", e);
+        }
+        return false;
+    }
+
+    /**
+     * あるコースのあるUUIDのプレイヤーの記録を一つ削除する。（面倒なので同じ記録が複数ある場合は最新の記録を消すようにしている）
+     *
+     * @param uuid 削除対象uuid
+     * @param courseName 削除対象コース
+     * @param tick どの記録か
+     * @return 削除に成功したか
+     */
+    public boolean delete(UUID uuid, String courseName, Integer tick){
+        String sql = "DELETE FROM record WHERE ROWID IN ( SELECT ROWID FROM record WHERE uuid = ? AND course_name = ? AND finish_time = ? ORDER BY record_at DESC LIMIT 1)";
+
+        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
+            ps.setString(1, uuid.toString());
+            ps.setString(2, courseName);
+            ps.setInt(3, tick);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        }catch (SQLException e){
+            LOGGER.log(Level.SEVERE, "delete()でエラーが発生しました。", e);
         }
         return false;
     }
@@ -284,5 +303,26 @@ public class RecordDao {
         }
 
         return 1;
+    }
+
+    public List<Integer> getFinishTick(UUID uuid, String courseName) {
+        List<Integer> result = new ArrayList<>();
+        String sql = "SELECT finish_time FROM record WHERE uuid = ? AND course_name = ? ORDER BY finish_time ASC";
+
+        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
+            ps.setString(1, uuid.toString());
+            ps.setString(2, courseName);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                int tick = rs.getInt("finish_time");
+                result.add(tick);
+            }
+        }catch(SQLException e){
+            LOGGER.log(Level.SEVERE, "getTimes()でエラーが発生しました。", e);
+        }
+
+        return result;
     }
 }

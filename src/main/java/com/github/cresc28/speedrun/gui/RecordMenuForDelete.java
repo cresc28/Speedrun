@@ -1,29 +1,28 @@
 package com.github.cresc28.speedrun.gui;
 
-import com.github.cresc28.speedrun.manager.CheckpointManager;
+import com.github.cresc28.speedrun.utils.GameUtils;
 import com.github.cresc28.speedrun.utils.HeadUtils;
 import com.github.cresc28.speedrun.utils.TextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
  * ワールドをインベントリ形式で表示するクラス。
  */
 
-public class WorldMenu {
+public class RecordMenuForDelete {
     private final Player player;
+    private final List<String> times;
     private int currentPage = 0;
 
-    public WorldMenu(Player player, CheckpointManager cpm, int currentPage){
+    public RecordMenuForDelete(Player player, List<String> times, int currentPage){
         this.player = player;
+        this.times = times;
         this.currentPage = currentPage;
     }
 
@@ -32,16 +31,10 @@ public class WorldMenu {
      */
     public void openInventory(){
         final int ALL_SLOT = 54; //54枠
-        final int USE_SLOT = 45; //ネザースターで埋めるのは45枠まで
-        Inventory inv = Bukkit.createInventory(null, ALL_SLOT,"WorldMenu");
-        List<World> worlds = Bukkit.getWorlds();
-        worlds.sort(Comparator.comparing(World::getName)); // 名前でソート
+        final int USE_SLOT = 45; //紙で埋めるのは45枠まで
+        Inventory inv = Bukkit.createInventory(null, ALL_SLOT,"削除する記録をクリックしてください。");
 
-        List<String> worldNames = new ArrayList<>();
-        for (World world : worlds) {
-            worldNames.add(world.getName()); // World → String
-        }
-        int pages = (worldNames.size() - 1) / USE_SLOT;
+        int pages = (times.size() - 1) / USE_SLOT;
 
         if(currentPage < pages) {
             ItemStack arrowRight = HeadUtils.getHeadFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliZjMyOTJlMTI2YTEwNWI1NGViYTcxM2FhMWIxNTJkNTQxYTFkODkzODgyOWM1NjM2NGQxNzhlZDIyYmYifX19", "次へ");
@@ -53,16 +46,12 @@ public class WorldMenu {
             inv.setItem(45, arrowLeft);
         }
 
-        ItemStack netherStar = new ItemStack(Material.NETHER_STAR,1);
-        TextUtils.changeItemName(netherStar, "チェックポイント選択へ切り替え");
-        inv.setItem(52, netherStar);
-
         int startIndex = currentPage * USE_SLOT;
-        int endIndex = Math.min(worldNames.size(), (currentPage + 1) * USE_SLOT);
+        int endIndex = Math.min(times.size(), (currentPage + 1) * USE_SLOT);
 
         for(int i = startIndex; i < endIndex; i++){
             ItemStack paper = new ItemStack(Material.PAPER,1);
-            TextUtils.changeItemName(paper, worldNames.get(i));
+            TextUtils.changeItemName(paper, times.get(i));
             inv.setItem(i - startIndex, paper);
         }
 

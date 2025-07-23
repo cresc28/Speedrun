@@ -2,9 +2,10 @@ package com.github.cresc28.speedrun.event;
 
 
 import com.github.cresc28.speedrun.config.ConfigManager;
+import com.github.cresc28.speedrun.data.SpeedrunFacade;
 import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.gui.CheckpointMenu;
-import com.github.cresc28.speedrun.utils.Utils;
+import com.github.cresc28.speedrun.utils.GameUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,8 +33,8 @@ import java.util.UUID;
 public class PlayerInteractListener implements Listener {
     private final CheckpointManager cpManager;
 
-    public PlayerInteractListener(CheckpointManager cpManager){
-        this.cpManager = cpManager;
+    public PlayerInteractListener(SpeedrunFacade facade){
+        cpManager = facade.getCpManager();
     }
 
     /**
@@ -128,7 +129,7 @@ public class PlayerInteractListener implements Listener {
             loc = blockLoc.add(0.5,0,0.5); //ブロックの中心に座標を持ってくる。
             loc.setPitch(0);
             byte signData = sign.getBlock().getData();
-            loc.setYaw(Utils.getYaw(signData));
+            loc.setYaw(GameUtils.getYaw(signData));
         }
 
         else {

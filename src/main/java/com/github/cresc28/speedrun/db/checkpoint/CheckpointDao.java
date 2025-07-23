@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 public class CheckpointDao {
     private static final Logger LOGGER = Logger.getLogger("CheckpointsDao");
 
-
     /**
      * チェックポイントを登録する。
      *
