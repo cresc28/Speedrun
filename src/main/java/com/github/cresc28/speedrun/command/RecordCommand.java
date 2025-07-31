@@ -2,7 +2,7 @@ package com.github.cresc28.speedrun.command;
 
 import com.github.cresc28.speedrun.data.RecordInfo;
 import com.github.cresc28.speedrun.data.RecordSession;
-import com.github.cresc28.speedrun.data.SpeedrunFacade;
+import com.github.cresc28.speedrun.data.SpeedrunParameters;
 import com.github.cresc28.speedrun.db.course.RecordDao;
 import com.github.cresc28.speedrun.gui.RecordMenuForDelete;
 import com.github.cresc28.speedrun.manager.CourseManager;
@@ -21,10 +21,10 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
     private final RecordDao recordDao;
     private final RecordSession recordSession;
 
-    public RecordCommand(SpeedrunFacade facade){
-        courseManager = facade.getCourseManager();
-        recordDao = facade.getRecordDao();
-        recordSession = facade.getRecordSession();
+    public RecordCommand(SpeedrunParameters p){
+        courseManager = p.getCourseManager();
+        recordDao = p.getRecordDao();
+        recordSession = p.getRecordSession();
     }
     /**
      * Tab補完の処理を行う。
@@ -64,8 +64,6 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        UUID senderUuid = ((Player) sender).getUniqueId();
-
         if(args.length == 0) return false;
 
         if("removeCourseAll".equalsIgnoreCase(args[0]) || "removePlayerAll".equalsIgnoreCase(args[0])){
@@ -97,6 +95,8 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
         }
+
+        UUID senderUuid = ((Player) sender).getUniqueId();
 
         if (args.length == 3) {
             if("add".equalsIgnoreCase(args[0])){

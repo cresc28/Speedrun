@@ -14,8 +14,6 @@ commands:
   cp:
     description: set checkpoint
     usage: /cp <remove|tp> <CP名>
-    permission: speedrun.cp
-    permission-message: "このコマンドを使用する権限がありません。"
 
   top:
     description: view records
@@ -24,14 +22,12 @@ commands:
   record:
     description: manipulate records
     usage: /record <add|remove|removeAll>
+    permission: speedrun.record
+    permission-message: "このコマンドを使用する権限がありません。"
 
 permissions:
   speedrun.course:
     description: /courseの使用制限
-    default: op
-
-  speedrun.cp:
-    description: /cpの使用制限
     default: op
 
   speedrun.record.add:

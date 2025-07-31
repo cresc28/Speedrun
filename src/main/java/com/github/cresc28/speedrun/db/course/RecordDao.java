@@ -325,4 +325,22 @@ public class RecordDao {
 
         return result;
     }
+
+    public Map.Entry<UUID, Integer> getTopRecord(String courseName){
+        String sql = "SELECT uuid, finish_time FROM record WHERE course_name = ? ORDER BY finish_time ASC LIMIT 1";
+        try(PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)){
+            ps.setString(1, courseName);
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) {
+                String uuid = rs.getString(1);
+                int finishTick = rs.getInt(2);
+                return new AbstractMap.SimpleEntry<>(UUID.fromString(uuid),finishTick);
+            }
+        }catch(SQLException e){
+            LOGGER.log(Level.SEVERE, "getTopPlayer()でエラーが発生しました。", e);
+        }
+
+        return null;
+    }
 }

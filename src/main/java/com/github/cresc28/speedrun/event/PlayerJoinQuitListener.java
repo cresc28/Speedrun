@@ -1,6 +1,6 @@
 package com.github.cresc28.speedrun.event;
 
-import com.github.cresc28.speedrun.data.SpeedrunFacade;
+import com.github.cresc28.speedrun.data.SpeedrunParameters;
 import com.github.cresc28.speedrun.manager.CheckpointManager;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -19,8 +19,8 @@ import java.util.UUID;
 public class PlayerJoinQuitListener implements Listener {
     private final CheckpointManager cpManager;
 
-    public PlayerJoinQuitListener(SpeedrunFacade facade){
-        cpManager = facade.getCpManager();
+    public PlayerJoinQuitListener(SpeedrunParameters p){
+        cpManager = p.getCpManager();
     }
 
     /**

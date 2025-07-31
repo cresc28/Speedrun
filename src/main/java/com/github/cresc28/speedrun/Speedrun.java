@@ -5,7 +5,7 @@ import com.github.cresc28.speedrun.command.CourseCommand;
 import com.github.cresc28.speedrun.command.RecordCommand;
 import com.github.cresc28.speedrun.command.TopCommand;
 import com.github.cresc28.speedrun.config.ConfigManager;
-import com.github.cresc28.speedrun.data.SpeedrunFacade;
+import com.github.cresc28.speedrun.data.SpeedrunParameters;
 import com.github.cresc28.speedrun.event.*;
 import com.github.cresc28.speedrun.db.checkpoint.CheckpointDatabase;
 import com.github.cresc28.speedrun.db.course.*;
@@ -38,7 +38,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         CourseDao courseDao = new CourseDao();
         CourseManager courseManager = new CourseManager(courseDao);
         TimerManager timerManager = new TimerManager(courseManager, cpManager, recordDao);
-        SpeedrunFacade facade = new SpeedrunFacade(courseManager, cpManager, recordDao);
+        SpeedrunParameters facade = new SpeedrunParameters(courseManager, cpManager, recordDao);
 
         registerEvents(timerManager, facade);
         registerCommands(facade);
@@ -77,7 +77,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         ViaPointRecordDatabase.initializeDatabase();
     }
 
-    private void registerEvents(TimerManager timerManager, SpeedrunFacade facade){
+    private void registerEvents(TimerManager timerManager, SpeedrunParameters facade){
         Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(timerManager),this);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(facade),this);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinQuitListener(facade),this);
@@ -85,7 +85,7 @@ public final class Speedrun extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new SignChangeListener(),this);
     }
 
-    private void registerCommands(SpeedrunFacade facade) {
+    private void registerCommands(SpeedrunParameters facade) {
         getCommand("course").setExecutor(new CourseCommand(facade));
         getCommand("cp").setExecutor(new CheckpointCommand(facade));
         getCommand("top").setExecutor(new TopCommand(facade));

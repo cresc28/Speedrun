@@ -1,6 +1,6 @@
 package com.github.cresc28.speedrun.command;
 
-import com.github.cresc28.speedrun.data.SpeedrunFacade;
+import com.github.cresc28.speedrun.data.SpeedrunParameters;
 import com.github.cresc28.speedrun.manager.CourseManager;
 import com.github.cresc28.speedrun.db.course.RecordDao;
 import com.github.cresc28.speedrun.utils.GameUtils;
@@ -16,9 +16,9 @@ public class TopCommand implements CommandExecutor, TabCompleter {
     private final CourseManager courseManager;
     private final RecordDao recordDao;
 
-    public TopCommand(SpeedrunFacade facade){
-        courseManager = facade.getCourseManager();
-        recordDao = facade.getRecordDao();
+    public TopCommand(SpeedrunParameters p){
+        courseManager = p.getCourseManager();
+        recordDao = p.getRecordDao();
     }
     /**
      * Tab補完の処理を行う。
@@ -186,18 +186,18 @@ public class TopCommand implements CommandExecutor, TabCompleter {
         int tick;
         int lapTime;
 
-         player.sendMessage(ChatColor.LIGHT_PURPLE + "中継地点名:通過タイム  lap:ラップタイム");
-         for(Map.Entry<String, Integer> entry : viaPointRecord.entrySet()){
-             String viaPointName = entry.getKey();
-             tick = entry.getValue();
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "中継地点名:通過タイム  lap:ラップタイム");
+        for(Map.Entry<String, Integer> entry : viaPointRecord.entrySet()){
+            String viaPointName = entry.getKey();
+            tick = entry.getValue();
 
-             lapTime = tick - prevTick;
-             prevTick = tick;
+            lapTime = tick - prevTick;
+            prevTick = tick;
 
-             player.sendMessage(ChatColor.GREEN + viaPointName + ":" + GameUtils.tickToTime(tick) + "(" + tick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
-         }
+            player.sendMessage(ChatColor.GREEN + viaPointName + ":" + GameUtils.tickToTime(tick) + "(" + tick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
+        }
 
-         lapTime = sumTick - prevTick;
-         player.sendMessage(ChatColor.GOLD + "ゴール:" + GameUtils.tickToTime(sumTick) + "(" + sumTick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
+        lapTime = sumTick - prevTick;
+        player.sendMessage(ChatColor.GOLD + "ゴール:" + GameUtils.tickToTime(sumTick) + "(" + sumTick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
     }
 }

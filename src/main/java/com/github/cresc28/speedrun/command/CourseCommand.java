@@ -1,7 +1,7 @@
 package com.github.cresc28.speedrun.command;
 
 import com.github.cresc28.speedrun.data.CourseType;
-import com.github.cresc28.speedrun.data.SpeedrunFacade;
+import com.github.cresc28.speedrun.data.SpeedrunParameters;
 import com.github.cresc28.speedrun.manager.CourseManager;
 import com.github.cresc28.speedrun.utils.GameUtils;
 import com.github.cresc28.speedrun.utils.MessageUtils;
@@ -18,8 +18,8 @@ import java.util.*;
 public class CourseCommand implements CommandExecutor, TabCompleter {
     private final CourseManager courseManager;
 
-    public CourseCommand(SpeedrunFacade facade) {
-        courseManager = facade.getCourseManager();
+    public CourseCommand(SpeedrunParameters p) {
+        courseManager = p.getCourseManager();
     }
 
     /**

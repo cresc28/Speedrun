@@ -2,14 +2,12 @@ package com.github.cresc28.speedrun.event;
 
 
 import com.github.cresc28.speedrun.config.ConfigManager;
-import com.github.cresc28.speedrun.data.SpeedrunFacade;
+import com.github.cresc28.speedrun.data.SpeedrunParameters;
+import com.github.cresc28.speedrun.db.course.RecordDao;
 import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.gui.CheckpointMenu;
 import com.github.cresc28.speedrun.utils.GameUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -20,6 +18,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -32,9 +32,11 @@ import java.util.UUID;
 
 public class PlayerInteractListener implements Listener {
     private final CheckpointManager cpManager;
+    private final RecordDao recordDao;
 
-    public PlayerInteractListener(SpeedrunFacade facade){
-        cpManager = facade.getCpManager();
+    public PlayerInteractListener(SpeedrunParameters p){
+        cpManager = p.getCpManager();
+        recordDao = p.getRecordDao();
     }
 
     /**
@@ -62,7 +64,7 @@ public class PlayerInteractListener implements Listener {
         }
 
         if (clickedBlock != null && clickedBlock.getState() instanceof Sign && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            signClick(e, (Sign) clickedBlock.getState());
+            signClick(e.getPlayer(), (Sign) clickedBlock.getState());
         }
     }
 
@@ -94,7 +96,6 @@ public class PlayerInteractListener implements Listener {
      */
     private void handNetherStarLeftClick(PlayerInteractEvent e){
         Player player = e.getPlayer();
-        UUID uuid = player.getUniqueId();
 
         e.setCancelled(true); // ブロック破壊を起こさない
         player.addScoreboardTag("MenuOpen");
@@ -104,18 +105,88 @@ public class PlayerInteractListener implements Listener {
     /**
      * 設置されている看板をクリックしたときの処理
      *
-     * @param e PlayerInteractEvent
+     * @param player クリックしたプレイヤー
      * @param sign 看板
      */
-    private void signClick(PlayerInteractEvent e, Sign sign){
-        Player player = e.getPlayer();
-        UUID uuid = player.getUniqueId();
+    private void signClick(Player player, Sign sign){
         String firstLine = ChatColor.stripColor(sign.getLine(0));
-        String courseName = ChatColor.stripColor(sign.getLine(1));
 
-        if(!"☆☆☆ Checkpoint ☆☆☆".equals(firstLine)) {
+        if("☆☆☆ Checkpoint ☆☆☆".equals(firstLine)) {
+            checkpointResister(player, sign);
+        }
+
+        else if("☆☆☆Ranking(All)☆☆☆".equals(firstLine)){
+            showRanking(player, sign, true);
+        }
+
+        else if("☆☆☆ Ranking ☆☆☆".equals(firstLine)){
+            showRanking(player, sign, false);
+        }
+
+        else if("☆☆☆Best Record☆☆☆".equals(firstLine)){
+            showBestRecord(player, sign);
+        }
+
+    }
+
+    private void showBestRecord(Player player, Sign sign) {
+        String courseName = ChatColor.stripColor(sign.getLine(1));
+        Map.Entry<UUID, Integer> topRecord = recordDao.getTopRecord(courseName);
+        if(topRecord == null){
+            player.sendMessage("表示できる記録はありません。");
             return;
         }
+        UUID topPlayerUuid = topRecord.getKey();
+        OfflinePlayer topPlayer = Bukkit.getOfflinePlayer(topPlayerUuid);
+        int sumTick = topRecord.getValue();
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "----------ベスト記録----------");
+        player.sendMessage(ChatColor.GOLD + "1位:" + topPlayer.getName() +",  タイム:" + GameUtils.tickToTime(sumTick));
+
+        Map<String, Integer> viaPointRecord = recordDao.getViaPointRecord(topPlayerUuid, courseName);
+        if(viaPointRecord == null || viaPointRecord.isEmpty()) return;
+
+        int prevTick = 0;
+        int tick;
+        int lapTime;
+
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "中継地点名:通過タイム  lap:ラップタイム");
+        for(Map.Entry<String, Integer> entry : viaPointRecord.entrySet()){
+            String viaPointName = entry.getKey();
+            tick = entry.getValue();
+
+            lapTime = tick - prevTick;
+            prevTick = tick;
+
+            player.sendMessage(ChatColor.GREEN + viaPointName + ":" + GameUtils.tickToTime(tick) + "(" + tick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
+        }
+
+        lapTime = sumTick - prevTick;
+        player.sendMessage(ChatColor.GOLD + "ゴール:" + GameUtils.tickToTime(sumTick) + "(" + sumTick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
+    }
+
+    private void showRanking(Player player, Sign sign, Boolean allowDup) {
+        String courseName = ChatColor.stripColor(sign.getLine(1));
+        String thirdLine = ChatColor.stripColor(sign.getLine(2));
+        int displayCount = Integer.parseInt(thirdLine); //thirdLineが数字であるかのチェックはsignChangeListenerにて行っている。
+        int rank = 1;
+
+        List<Map.Entry<String, String>> recordList = allowDup ?
+                recordDao.getTopRecordDup(courseName, 1, displayCount) : recordDao.getTopRecordNoDup(courseName, 1, displayCount);
+
+
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "----------ランキング----------");
+        for (Map.Entry<String, String> entry : recordList) {
+            int tick = Integer.parseInt(entry.getValue());
+            String time = GameUtils.tickToTime(tick);
+            String line = String.format(ChatColor.GREEN + "%2d. %-16s %10s %6d" + "ticks", rank, entry.getKey(), time, tick);
+            player.sendMessage(line);
+            rank++;
+        }
+    }
+
+    private void checkpointResister(Player player, Sign sign) {
+        UUID uuid = player.getUniqueId();
+        String courseName = ChatColor.stripColor(sign.getLine(1));
 
         String type = ChatColor.stripColor(sign.getLine(2));
         if(!"player".equals(type) && !"fixed".equals(type) && !"fly".equals(type)) {
