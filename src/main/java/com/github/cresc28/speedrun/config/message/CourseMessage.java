@@ -75,7 +75,7 @@ public class CourseMessage {
                         + "start: \"計測開始！\"\n\n"
 
                         + "# ゴールメッセージ（表示可能:プレイヤー名、コース名、タイム、順位、ベスト順位、ベスト記録）\n"
-                        + "complete1: \"%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！%n%この記録の順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位&r)\"\n\n"
+                        + "complete1: \"%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！%n%順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位&r)\"\n\n"
 
                         + "# ゴールメッセージ（タイム計測なし）（表示可能:プレイヤー名、コース名）\n"
                         + "complete2: \"%player%さんが%course%をクリア！\"\n\n"
@@ -127,7 +127,7 @@ public class CourseMessage {
         String message;
 
         if (tick != null) {
-            message = config.getString("complete1", "%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！%n%あなたの順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位)&r");
+            message = config.getString("complete1", "%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！%n%順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位)&r");
             message = message.replace("%time%", GameUtils.tickToTime(tick));
             message = message.replace("%tick%", String.valueOf(tick));
             message = message.replace("%rank%", String.valueOf(rank));

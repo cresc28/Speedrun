@@ -1,14 +1,11 @@
 package com.github.cresc28.speedrun.command;
 
 import com.github.cresc28.speedrun.config.ConfigManager;
-import com.github.cresc28.speedrun.data.SpeedrunFacade;
+import com.github.cresc28.speedrun.data.SpeedrunParameters;
 import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.utils.MessageUtils;
 import com.github.cresc28.speedrun.utils.TextUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
@@ -20,8 +17,8 @@ import java.util.*;
 public class CheckpointCommand implements CommandExecutor, TabCompleter {
     private final CheckpointManager cpManager;
 
-    public CheckpointCommand(SpeedrunFacade facade) {
-        cpManager = facade.getCpManager();
+    public CheckpointCommand(SpeedrunParameters p) {
+        cpManager = p.getCpManager();
     }
 
     /**
@@ -69,12 +66,18 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
     */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        Player player = (Player) sender;
+
         if(sender instanceof ConsoleCommandSender){
             sender.sendMessage("このコマンドはサーバコンソールでは実行できません。");
             return true;
         }
 
-        Player player = (Player) sender;
+        if(player.getGameMode() != GameMode.CREATIVE && !player.isOp()){
+            sender.sendMessage("OP権限不所持の場合、このコマンドはクリエイティブモードでのみ実行可能です。");
+            return true;
+        }
+
         UUID uuid = player.getUniqueId();
         Location loc = player.getLocation();
 

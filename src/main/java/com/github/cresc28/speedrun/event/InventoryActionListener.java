@@ -2,7 +2,7 @@ package com.github.cresc28.speedrun.event;
 
 import com.github.cresc28.speedrun.data.RecordInfo;
 import com.github.cresc28.speedrun.data.RecordSession;
-import com.github.cresc28.speedrun.data.SpeedrunFacade;
+import com.github.cresc28.speedrun.data.SpeedrunParameters;
 import com.github.cresc28.speedrun.db.course.RecordDao;
 import com.github.cresc28.speedrun.gui.RecordMenuForDelete;
 import com.github.cresc28.speedrun.manager.CheckpointManager;
@@ -36,10 +36,10 @@ public class InventoryActionListener implements Listener {
     private final JavaPlugin plugin;
 
 
-    public InventoryActionListener(SpeedrunFacade facade, JavaPlugin plugin) {
-        cpManager = facade.getCpManager();
-        recordDao = facade.getRecordDao();
-        recordSession = facade.getRecordSession();
+    public InventoryActionListener(SpeedrunParameters p, JavaPlugin plugin) {
+        cpManager = p.getCpManager();
+        recordDao = p.getRecordDao();
+        recordSession = p.getRecordSession();
         this.plugin = plugin;
     }
 
