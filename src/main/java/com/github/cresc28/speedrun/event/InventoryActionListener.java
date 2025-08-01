@@ -125,26 +125,29 @@ public class InventoryActionListener implements Listener {
             return;
         }
 
-        if(displayName.equals("次へ")){
-            ms.incrementPage();
-            if (title.contains("CheckpointMenu")) new CheckpointMenu(player, cpManager, ms.getPage(), ms.getWorld(), ms.isDeleteMode()).openInventory();
-            else if(title.contains("WorldMenu")) new WorldMenu(player, cpManager, ms.getPage()).openInventory();
-            else if(title.contains("削除する記録")) new RecordMenuForDelete(player, recordSession.getRecord(uuid).getRecordTimes(), ms.getPage()).openInventory();
-            return;
+        switch (displayName) {
+            case "次へ":
+                ms.incrementPage();
+                if (title.contains("CheckpointMenu"))
+                    new CheckpointMenu(player, cpManager, ms.getPage(), ms.getWorld(), ms.isDeleteMode()).openInventory();
+                else if (title.contains("WorldMenu")) new WorldMenu(player, cpManager, ms.getPage()).openInventory();
+                else if (title.contains("削除する記録"))
+                    new RecordMenuForDelete(player, recordSession.getRecord(uuid).getRecordTimes(), ms.getPage()).openInventory();
+                return;
+            case "前へ":
+                ms.decrementPage();
+                if (title.contains("CheckpointMenu"))
+                    new CheckpointMenu(player, cpManager, ms.getPage(), ms.getWorld(), ms.isDeleteMode()).openInventory();
+                else if (title.contains("WorldMenu")) new WorldMenu(player, cpManager, ms.getPage()).openInventory();
+                else if (title.contains("削除する記録"))
+                    new RecordMenuForDelete(player, recordSession.getRecord(uuid).getRecordTimes(), ms.getPage()).openInventory();
+                return;
+            case "ワールド選択へ切り替え":
+                ms.reset();
+                new WorldMenu(player, cpManager, 0).openInventory();
+                break;
         }
 
-        if(displayName.equals("前へ")){
-            ms.decrementPage();
-            if (title.contains("CheckpointMenu")) new CheckpointMenu(player, cpManager, ms.getPage(), ms.getWorld(), ms.isDeleteMode()).openInventory();
-            else if(title.contains("WorldMenu")) new WorldMenu(player, cpManager, ms.getPage()).openInventory();
-            else if(title.contains("削除する記録")) new RecordMenuForDelete(player, recordSession.getRecord(uuid).getRecordTimes(), ms.getPage()).openInventory();
-            return;
-        }
-
-        if(displayName.equals("ワールド選択へ切り替え")){
-            ms.reset();
-            new WorldMenu(player, cpManager, 0).openInventory();
-        }
     }
 
     /**
