@@ -4,6 +4,7 @@ import org.bukkit.Location;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * プレイヤーの走行状態を管理するクラス。
@@ -15,7 +16,7 @@ public class RunState {
     private boolean isOnEnd; //ゴール地点の上にいるか(ゴールの連発防止用)
     private boolean isOnViaPoint;
     private String currentCourse; //現在走行中のコース
-    private Location recentStandLocation; //最後にいた位置
+    private Location previousLocation; //最後にいた位置
     Map<String, Integer> recordMap = new LinkedHashMap<>();
 
     public RunState() {
@@ -24,7 +25,7 @@ public class RunState {
         this.isOnViaPoint = false;
         this.startTick = 0;
         this.currentCourse = null;
-        this.recentStandLocation = null;
+        this.previousLocation = null;
     }
 
     /**
@@ -37,11 +38,11 @@ public class RunState {
      */
     public boolean startCourse(String courseName, int tick, Location currentLoc) {
         //直前に同じスタート地点を踏んでいなければ処理を開始。
-        if (recentStandLocation == null || !recentStandLocation.equals(currentLoc)) {
+        if (!Objects.equals(previousLocation, currentLoc)) {
             this.currentCourse = courseName;
             this.startTick = tick;
             this.isRunning = true;
-            this.recentStandLocation = currentLoc;
+            this.previousLocation = currentLoc;
             recordMap.clear();
             return true;
         }
@@ -71,14 +72,14 @@ public class RunState {
      * @param courseName コース名
      * @return 計測開始がされていたコースならタイムを返す。
      */
-    public int viaPointPass(int tick, String courseName, String viaPointName){
+    public int passViaPoint(int tick, String courseName, String viaPointName){
         //speedrunを開始していないまたはゴールしたコースが走行中のコースと不一致なら-1を返す。
         if (!isRunning || !courseName.equals(currentCourse)) {
             return -1;
         }
 
         if(viaPointName == null) viaPointName = "中継地点";
-        if(!recordMap.containsKey(viaPointName)) recordMap.put(viaPointName, tick - startTick);
+        recordMap.putIfAbsent(viaPointName, tick - startTick);
 
         return tick - startTick;
     }
@@ -99,8 +100,8 @@ public class RunState {
         this.isOnViaPoint = isOnViaPoint;
     }
 
-    public void updateRecentStandLocation(Location loc) {
-        this.recentStandLocation = loc;
+    public void updatePreviousLocation(Location loc) {
+        this.previousLocation = loc;
     }
 
     public Map<String, Integer> getRecordMap(){

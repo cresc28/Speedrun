@@ -31,6 +31,11 @@ public class SignChangeListener implements Listener {
         }
     }
 
+    /**
+     * チェックポイント看板の作成
+     *
+     * @param e SignChangeEvent
+     */
     private void createCheckpointSign(SignChangeEvent e){
         String secondLine = e.getLine(1);
         String thirdLine = e.getLine(2);
@@ -46,6 +51,11 @@ public class SignChangeListener implements Listener {
         e.setLine(3, ChatColor.DARK_RED + "" + ChatColor.BOLD + "☆☆☆Right Click!☆☆☆");
     }
 
+    /**
+     * ランキング看板の作成
+     *
+     * @param e SignChangeEvent
+     */
     private void createRankingSign(SignChangeEvent e){
         Player player = e.getPlayer();
 

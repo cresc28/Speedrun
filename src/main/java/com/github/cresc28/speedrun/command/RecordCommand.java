@@ -27,7 +27,7 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
         recordSession = p.getRecordSession();
     }
     /**
-     * Tab補完の処理を行う。
+     * TAB補完の実装。
      */
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
@@ -60,52 +60,64 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
     }
 
     /**
-     * コマンドの実行処理を行う。
+     * コマンドの実装。
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(args.length == 0) return false;
 
-        if("removeCourseAll".equalsIgnoreCase(args[0]) || "removePlayerAll".equalsIgnoreCase(args[0])){
-            if(!(sender instanceof ConsoleCommandSender)) {
-                sender.sendMessage("/record <removePlayerAll|removeCourseAll>はサーバコンソールでのみ実行可能です。");
-                return true;
+        String sub = args[0].toLowerCase();
+        UUID deleteUuid;
+
+        if(sender instanceof ConsoleCommandSender){ //コンソールからのコマンド処理
+            switch(sub){
+                case "removecourseall":
+                    if(args.length != 2) return false;
+
+                    if(recordDao.delete(args[1])) sender.sendMessage("削除に成功しました。");
+                    else sender.sendMessage("その名前のコースデータは存在しません。");
+
+                    return true;
+
+                case "removeplayerall":
+                    if(args.length != 2) return false;
+                    deleteUuid = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
+
+                    if(recordDao.delete(deleteUuid)) sender.sendMessage("削除に成功しました。");
+                    else sender.sendMessage("そのプレイヤーの記録は存在しません。");
+
+                    return true;
+
+                default: return false;
             }
         }
 
-        if(args.length == 2){
-            if("removeCourseAll".equalsIgnoreCase(args[0])){
-                if(recordDao.delete(args[1])){
-                    sender.sendMessage("削除に成功しました。");
+        switch(sub){ //ゲーム内からのコマンド処理
+            case "add":
+                if(args.length != 4){
+                    sender.sendMessage("/record add <コース名> <プレイヤー名> <タイム(tick表記)>");
+                    return true;
                 }
-                else {
-                    sender.sendMessage("その名前のコースデータは存在しません。");
+                if(!TextUtils.isPositiveInteger(args[3])){
+                    sender.sendMessage("タイムはtick表記の非負の整数で入力してください。");
+                    return true;
                 }
+
+                UUID uuidToAdd = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
+                int tick = Integer.parseInt(args[3]);
+                recordDao.insert(uuidToAdd, args[1], tick);
+                sender.sendMessage(String.format("登録完了(コース名:%s  プレイヤー:%s   タイム:%s)", args[1], args[2], GameUtils.tickToTime(tick)));
                 return true;
-            }
 
-            else if("removePlayerAll".equalsIgnoreCase(args[0])){
-                UUID deleteUuid = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
-                if(recordDao.delete(deleteUuid)){
-                    sender.sendMessage("削除に成功しました。");
+            case "remove":
+                if(args.length != 3) {
+                    sender.sendMessage("/record remove <コース名> <プレイヤー名>");
+                    return true;
                 }
-                else {
-                    sender.sendMessage("そのプレイヤーの記録は存在しません。");
-                }
-                return true;
-            }
-        }
 
-        UUID senderUuid = ((Player) sender).getUniqueId();
+                deleteUuid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
+                UUID senderUuid = ((Player) sender).getUniqueId();
 
-        if (args.length == 3) {
-            if("add".equalsIgnoreCase(args[0])){
-                sender.sendMessage("/record add <コース名> <プレイヤー名> <タイム(tick表記)>");
-                return true;
-            }
-
-            if("remove".equalsIgnoreCase(args[0])){
-                UUID deleteUuid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
                 List<Integer> times = recordDao.getFinishTick(deleteUuid, args[1]);
                 if(times.isEmpty()){
                     sender.sendMessage("コース、プレイヤー、記録のいずれかが存在しません。");
@@ -116,45 +128,26 @@ public class RecordCommand implements CommandExecutor, TabCompleter {
                 ((Player)sender).addScoreboardTag("MenuOpen");
                 new RecordMenuForDelete((Player) sender, timesString,0).openInventory();
                 return true;
-            }
 
-            else if("removeAll".equalsIgnoreCase(args[0])){
-                UUID deleteUuid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
-                if(!recordDao.delete(deleteUuid, args[1])){
-                    sender.sendMessage("コース、プレイヤー、記録のいずれかが存在しません。");
+            case "removeall":
+                if(args.length != 3) {
+                    sender.sendMessage("/record removeAll <コース名> <プレイヤー名>");
+                    return true;
                 }
-                else {
-                    sender.sendMessage("削除に成功しました。");
-                }
+                deleteUuid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
+
+                if(recordDao.delete(deleteUuid, args[1])) sender.sendMessage("削除に成功しました。");
+                else sender.sendMessage("コース、プレイヤー、記録のいずれかが存在しません。");
+
                 return true;
-            }
+
+            case "removecourseall":
+
+            case "removeplayerall":
+                sender.sendMessage("/record <removePlayerAll|removeCourseAll>はサーバコンソールでのみ実行可能です。");
+                return true;
+
+            default: return false;
         }
-
-        if (args.length == 4) {
-            if("remove".equalsIgnoreCase(args[0])){
-                sender.sendMessage("/record remove <コース名> <プレイヤー名>");
-                return true;
-            }
-
-            else if("removeAll".equalsIgnoreCase(args[0])){
-                sender.sendMessage("/record removeAll [コース名] [プレイヤー名]");
-                return true;
-            }
-
-            if(!"add".equalsIgnoreCase(args[0])) return false;
-
-            if(!TextUtils.isPositiveInteger(args[3])){
-                sender.sendMessage("タイムはtick表記の非負の整数で入力してください。");
-                return true;
-            }
-
-            UUID uuidToAdd = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
-            int tick = Integer.parseInt(args[3]);
-            recordDao.insert(uuidToAdd, args[1], tick);
-            sender.sendMessage(String.format("登録完了(コース名:%s  プレイヤー:%s   タイム:%s)", args[1], args[2], GameUtils.tickToTime(tick)));
-            return true;
-        }
-
-        return false;
     }
 }

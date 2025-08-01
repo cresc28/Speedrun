@@ -36,10 +36,10 @@ public class InventoryActionListener implements Listener {
     private final JavaPlugin plugin;
 
 
-    public InventoryActionListener(SpeedrunParameters p, JavaPlugin plugin) {
-        cpManager = p.getCpManager();
-        recordDao = p.getRecordDao();
-        recordSession = p.getRecordSession();
+    public InventoryActionListener(SpeedrunParameters facade, JavaPlugin plugin) {
+        cpManager = facade.getCpManager();
+        recordDao = facade.getRecordDao();
+        recordSession = facade.getRecordSession();
         this.plugin = plugin;
     }
 

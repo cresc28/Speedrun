@@ -21,7 +21,7 @@ public class RecentCheckpointDao {
     /**
      * 最後に設定したCPを登録する。
      *
-     * @param uuid UUID
+     * @param uuid CP登録者のUUID
      * @param isGlobal そのワールド内の最新CPか
      * @param loc 位置
      */
@@ -48,7 +48,7 @@ public class RecentCheckpointDao {
     /**
      * あるワールドで最後に登録したチェックポイントの位置を検索する。
      *
-     * @param uuid UUID
+     * @param uuid CP登録者のUUID
      * @param world ワールド
      * @return チェックポイントの位置
      */
@@ -78,7 +78,7 @@ public class RecentCheckpointDao {
     /**
      * 全ワールドで最後に登録したチェックポイントの位置を検索する。
      *
-     * @param uuid UUID
+     * @param uuid CP登録者のUUID
      * @return チェックポイントの位置
      */
     public Location getGlobalLocation(UUID uuid){
@@ -113,7 +113,7 @@ public class RecentCheckpointDao {
      * 指定UUIDの全CPに対してisGlobal=0を設定し、
      * 指定されたワールドのチェックポイントをグローバルチェックポイント(isGlobal = 1)とする。。
      *
-     * @param uuid uuid
+     * @param uuid CP登録者のUUID
      * @param world この操作の時点でプレイヤーが最後にいたワールドを渡せばよい。
      */
     public void updateGlobal(UUID uuid, World world){
