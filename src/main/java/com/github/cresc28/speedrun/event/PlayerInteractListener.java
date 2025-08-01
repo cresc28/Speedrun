@@ -129,6 +129,12 @@ public class PlayerInteractListener implements Listener {
 
     }
 
+    /**
+     * ベスト記録を表示
+     *
+     * @param player 表示先のプレイヤー
+     * @param sign 押された看板
+     */
     private void showBestRecord(Player player, Sign sign) {
         String courseName = ChatColor.stripColor(sign.getLine(1));
         Map.Entry<UUID, Integer> topRecord = recordDao.getTopRecord(courseName);
@@ -164,6 +170,13 @@ public class PlayerInteractListener implements Listener {
         player.sendMessage(ChatColor.GOLD + "ゴール:" + GameUtils.tickToTime(sumTick) + "(" + sumTick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
     }
 
+    /**
+     * ランキングを表示
+     *
+     * @param player 表示先のプレイヤー
+     * @param sign 押された看板
+     * @param allowDup 同一プレイヤーの複数記録を表示するか
+     */
     private void showRanking(Player player, Sign sign, Boolean allowDup) {
         String courseName = ChatColor.stripColor(sign.getLine(1));
         String thirdLine = ChatColor.stripColor(sign.getLine(2));
@@ -184,6 +197,12 @@ public class PlayerInteractListener implements Listener {
         }
     }
 
+    /**
+     * チェックポイントの登録
+     *
+     * @param player 登録プレイヤー
+     * @param sign 押された看板
+     */
     private void checkpointResister(Player player, Sign sign) {
         UUID uuid = player.getUniqueId();
         String courseName = ChatColor.stripColor(sign.getLine(1));

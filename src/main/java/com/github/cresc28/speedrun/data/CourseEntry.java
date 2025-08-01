@@ -1,18 +1,18 @@
 package com.github.cresc28.speedrun.data;
 
 /**
- * コースのタイプと名前を管理するクラス。
+ * 地点タイプとコース名を管理するクラス。
  */
 public class CourseEntry {
-    private final CourseType type;
+    private final PointType type;
     private final String courseName;
 
-    public CourseEntry(CourseType type, String courseName) {
+    public CourseEntry(PointType type, String courseName) {
         this.type = type;
         this.courseName = courseName;
     }
 
-    public CourseType getType() {
+    public PointType getType() {
         return type;
     }
 

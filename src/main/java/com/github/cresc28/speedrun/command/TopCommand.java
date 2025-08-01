@@ -21,7 +21,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
         recordDao = p.getRecordDao();
     }
     /**
-     * Tab補完の処理を行う。
+     * TAB補完の実装。
      */
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
@@ -42,11 +42,11 @@ public class TopCommand implements CommandExecutor, TabCompleter {
     }
 
     /**
-     * コマンドの実行処理を行う。
+     * コマンドの実装。
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(sender instanceof ConsoleCommandSender){
+        if(sender instanceof ConsoleCommandSender){ //コンソールからの実行を禁止
             sender.sendMessage("このコマンドはサーバコンソールでは実行できません。");
             return true;
         }
@@ -59,11 +59,10 @@ public class TopCommand implements CommandExecutor, TabCompleter {
 
         String courseName = args[0];
         String targetPlayerId = null; //プレイヤー名
-        boolean allowDup = false; //同じプレイヤーの複数記録を表示するか
+        boolean allowDup = false; //同一プレイヤーの複数記録を表示するか
         boolean isDetail = false; //詳細を表示するか
-        boolean showAbove = false; //自分より上の10位表示モード
+        boolean showAbove = false; //自分基準に自分より上位のプレイヤーを表示するモード
         int displayCount = 10; //何位まで表示するか
-
 
         for (int i = 1; i < args.length; i++) {
             String arg = args[i].toLowerCase();
@@ -100,14 +99,10 @@ public class TopCommand implements CommandExecutor, TabCompleter {
                 player.getUniqueId() : Bukkit.getOfflinePlayer(targetPlayerId).getUniqueId();
         String targetName = targetPlayerId == null || player.getName().equals(targetPlayerId) ? "あなた" : targetPlayerId + "さん";
 
-        //detailが指定されていても中継地点がない場合はこのコースではdetailは無意味です　と返す
         if(isDetail){
             int sumTick = showTargetRank(player, courseName, targetUuid, targetName, allowDup);
             if(sumTick < 0) return true;
-            Map<String, Integer> viaPointRecord = recordDao.getViaPointRecord(targetUuid, courseName);
-
-            if(viaPointRecord.isEmpty()) sender.sendMessage("このコースの詳細情報はありません。");
-            else showDetail(player, viaPointRecord, sumTick);
+            else showDetail(player, courseName, targetUuid, sumTick);
 
             return true;
         }
@@ -123,32 +118,52 @@ public class TopCommand implements CommandExecutor, TabCompleter {
         }
 
         else {
-            List<Map.Entry<String, String>> recordList = allowDup ?
-                    recordDao.getTopRecordDup(courseName, 1, displayCount) : recordDao.getTopRecordNoDup(courseName, 1, displayCount);
-            showRanking(recordList, player, 1);
+            showRanking(player, courseName, 1, allowDup, displayCount);
             return true;
         }
     }
 
-    private void showRanking(List<Map.Entry<String, String>> recordList, Player player, int startRank) {
+    /**
+     * ランキングを表示
+     *
+     * @param sender 表示先のプレイヤー
+     * @param courseName コース名
+     * @param startRank 何位から表示するか
+     * @param allowDup 同一プレイヤーの複数記録を含めるか
+     * @param count 表示件数
+     */
+    private void showRanking(Player sender, String courseName, int startRank, boolean allowDup, int count) {
+        List<Map.Entry<String, String>> recordList = allowDup ?
+                recordDao.getTopRecordDup(courseName, 1, count) : recordDao.getTopRecordNoDup(courseName, 1, count);
+
         int rank = startRank;
 
-        player.sendMessage(ChatColor.LIGHT_PURPLE + "----------ランキング----------");
+        sender.sendMessage(ChatColor.LIGHT_PURPLE + "----------ランキング----------");
         for (Map.Entry<String, String> entry : recordList) {
             int tick = Integer.parseInt(entry.getValue());
             String time = GameUtils.tickToTime(tick);
             String line = String.format(ChatColor.GREEN + "%2d. %-16s %10s %6d" + "ticks", rank, entry.getKey(), time, tick);
-            player.sendMessage(line);
+            sender.sendMessage(line);
             rank++;
         }
     }
 
-    private void showAboveRanking(Player player, String courseName, UUID targetUuid, String targetName, boolean allowDup, int count) {
+    /**
+     * ある基準プレイヤーより上位数件のランキングを表示。
+     *
+     * @param sender 表示先のプレイヤー
+     * @param courseName コース名
+     * @param targetUuid 基準とするプレイヤーのUUID
+     * @param targetName 基準とするプレイヤーの表示名(String) 〇〇さん、あなた等
+     * @param allowDup 同一プレイヤーの複数記録を含めるか
+     * @param count 表示件数
+     */
+    private void showAboveRanking(Player sender, String courseName, UUID targetUuid, String targetName, boolean allowDup, int count) {
         Map.Entry<Integer, Integer> rankAndTime = allowDup ?
                 recordDao.getRankAndRecordDup(targetUuid, courseName, true) : recordDao.getRankAndRecordNoDup(targetUuid, courseName, true);
 
         if (rankAndTime == null) {
-            player.sendMessage(targetName + "の記録は存在しません。");
+            sender.sendMessage(targetName + "の記録は存在しません。");
             return;
         }
 
@@ -156,37 +171,57 @@ public class TopCommand implements CommandExecutor, TabCompleter {
         int startRank = Math.max(1, rank - count);
         int fetchCount = rank - startRank + 1;
         if(fetchCount == 1){
-            player.sendMessage(targetName + "は1位です。");
+            sender.sendMessage(targetName + "は1位です。");
             return;
         }
 
-        List<Map.Entry<String, String>> recordList = allowDup ? recordDao.getTopRecordDup(courseName, startRank, fetchCount) : recordDao.getTopRecordNoDup(courseName, startRank, fetchCount);
-        showRanking(recordList, player, startRank);
+        showRanking(sender, courseName, startRank, allowDup, count);
     }
 
-    private int showTargetRank(Player player, String courseName, UUID targetUuid, String targetName, boolean allowDup) {
+    /**
+     * あるプレイヤーの順位を表示する。
+     *
+     * @param sender 表示先のプレイヤー
+     * @param courseName コース名
+     * @param targetUuid 基準とするプレイヤーのUUID
+     * @param targetName 基準とするプレイヤーの表示名(String) 〇〇さん、あなた等
+     * @param allowDup 同一プレイヤーの複数記録を含めるか
+     * @return タイム
+     */
+    private int showTargetRank(Player sender, String courseName, UUID targetUuid, String targetName, boolean allowDup) {
         Map.Entry<Integer, Integer> rankAndTime = allowDup ?
                 recordDao.getRankAndRecordDup(targetUuid, courseName, false) : recordDao.getRankAndRecordNoDup(targetUuid, courseName, false);
 
         if (rankAndTime == null) {
-            player.sendMessage(targetName + "の記録は存在しません。");
+            sender.sendMessage(targetName + "の記録は存在しません。");
             return -1;
         }
 
         int rank = Objects.requireNonNull(rankAndTime).getKey();
         int timeRecord = rankAndTime.getValue();
         String formattedTime = GameUtils.tickToTime(timeRecord);
-        player.sendMessage(ChatColor.GREEN +"プレイヤー:" + Bukkit.getPlayer(targetUuid).getName() +
+        sender.sendMessage(ChatColor.GREEN +"プレイヤー:" + Bukkit.getPlayer(targetUuid).getName() +
                 "     順位:" + rank + "位" + "     ベスト記録:" + formattedTime);
         return timeRecord;
     }
 
-    private void showDetail(Player player, Map<String, Integer> viaPointRecord, int sumTick) {
+    /**
+     * 中継地点の通過タイムを表示する
+     *
+     * @param sender 表示先のプレイヤー
+     * @param courseName コース名
+     * @param targetUuid 詳細を表示するプレイヤーのUUID
+     * @param sumTick 最終クリアタイム
+     */
+    private void showDetail(Player sender, String courseName, UUID targetUuid, int sumTick) {
+        Map<String, Integer> viaPointRecord = recordDao.getViaPointRecord(targetUuid, courseName);
+        if(viaPointRecord.isEmpty()) sender.sendMessage("このコースの詳細情報はありません。"); //中継地点がないとき。
+
         int prevTick = 0;
         int tick;
         int lapTime;
 
-        player.sendMessage(ChatColor.LIGHT_PURPLE + "中継地点名:通過タイム  lap:ラップタイム");
+        sender.sendMessage(ChatColor.LIGHT_PURPLE + "中継地点名:通過タイム  lap:ラップタイム");
         for(Map.Entry<String, Integer> entry : viaPointRecord.entrySet()){
             String viaPointName = entry.getKey();
             tick = entry.getValue();
@@ -194,10 +229,10 @@ public class TopCommand implements CommandExecutor, TabCompleter {
             lapTime = tick - prevTick;
             prevTick = tick;
 
-            player.sendMessage(ChatColor.GREEN + viaPointName + ":" + GameUtils.tickToTime(tick) + "(" + tick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
+            sender.sendMessage(ChatColor.GREEN + viaPointName + ":" + GameUtils.tickToTime(tick) + "(" + tick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
         }
 
         lapTime = sumTick - prevTick;
-        player.sendMessage(ChatColor.GOLD + "ゴール:" + GameUtils.tickToTime(sumTick) + "(" + sumTick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
+        sender.sendMessage(ChatColor.GOLD + "ゴール:" + GameUtils.tickToTime(sumTick) + "(" + sumTick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
     }
 }

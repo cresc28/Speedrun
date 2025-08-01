@@ -3,15 +3,18 @@ package com.github.cresc28.speedrun.data;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * コース名、UUID、およびそのコースでのそのプレイヤーの記録リストを管理するクラス。
+ */
 public class RecordInfo {
     private final String courseName;
     private final UUID targetUuid;
-    private final List<String> recordTime;
+    private final List<String> recordTimes;
 
-    public RecordInfo(String courseName, UUID targetUuid, List<String> recordTime){
+    public RecordInfo(String courseName, UUID targetUuid, List<String> recordTimes){
         this.courseName = courseName;
         this.targetUuid = targetUuid;
-        this.recordTime = recordTime;
+        this.recordTimes = recordTimes;
     }
 
     public String getCourseName(){
@@ -23,6 +26,6 @@ public class RecordInfo {
     }
 
     public List<String> getRecordTimes(){
-        return recordTime;
+        return recordTimes;
     }
 }

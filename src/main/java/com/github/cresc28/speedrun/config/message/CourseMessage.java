@@ -102,7 +102,7 @@ public class CourseMessage {
     /**
      * 計測開始時のメッセージを体裁を整えて返す。
      *
-     * @param player プレイヤー
+     * @param player 表示するプレイヤー
      * @param courseName コース名
      */
     public static void startMessage(Player player, String courseName){
@@ -119,7 +119,7 @@ public class CourseMessage {
     /**
      * ゴール時のメッセージを体裁を整えて返す。
      *
-     * @param player プレイヤー
+     * @param player 表示するプレイヤー
      * @param courseName コース名
      * @param tick タイム(tick)
      */
@@ -152,7 +152,7 @@ public class CourseMessage {
     /**
      * 中継地点通過時のメッセージを体裁を整えて返す。
      *
-     * @param player プレイヤー
+     * @param player 表示するプレイヤー
      * @param courseName コース名
      * @param viaPointName 中間地点名
      * @param tick タイム(tick)

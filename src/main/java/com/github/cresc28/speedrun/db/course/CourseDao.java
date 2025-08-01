@@ -1,7 +1,7 @@
 package com.github.cresc28.speedrun.db.course;
 
 import com.github.cresc28.speedrun.data.CourseEntry;
-import com.github.cresc28.speedrun.data.CourseType;
+import com.github.cresc28.speedrun.data.PointType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,7 +26,7 @@ public class CourseDao {
      * @param courseName コース名
      * @param loc 位置
      */
-    public void insert(CourseType type, String courseName, Location loc){
+    public void insert(PointType type, String courseName, Location loc){
         String sql = "INSERT OR REPLACE INTO courseData " +
                 "(type, course_name, world_uid, x, y, z) " +
                 "VALUES(?, ?, ?, ?, ?, ?)";
@@ -51,7 +51,7 @@ public class CourseDao {
      * @param courseName コース名
      * @return 削除に成功したか
      */
-    public boolean delete(CourseType type, String courseName){
+    public boolean delete(PointType type, String courseName){
         String prefix = courseName + ".%";
         String sql = "DELETE FROM courseData WHERE type = ? AND (course_name = ? OR course_name LIKE ?)"; //courseName.から始まるもの(中継地点の場合)も削除
         try(PreparedStatement ps = CourseDatabase.getConnection().prepareStatement(sql)){
@@ -130,7 +130,7 @@ public class CourseDao {
                 if (world == null) continue; // ワールドが存在しないならスキップ
 
                 Location loc = new Location(world, x, y, z);
-                CourseType type = CourseType.fromId(typeId); // enum変換（要 fromId 実装）
+                PointType type = PointType.fromId(typeId); // enum変換（要 fromId 実装）
 
                 result.put(loc, new CourseEntry(type, courseName));
             }

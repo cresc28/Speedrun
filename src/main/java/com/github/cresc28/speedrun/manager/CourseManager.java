@@ -1,7 +1,7 @@
 package com.github.cresc28.speedrun.manager;
 
 import com.github.cresc28.speedrun.data.CourseEntry;
-import com.github.cresc28.speedrun.data.CourseType;
+import com.github.cresc28.speedrun.data.PointType;
 import com.github.cresc28.speedrun.db.course.CourseDao;
 import org.bukkit.Location;
 
@@ -31,7 +31,7 @@ public class CourseManager {
      * @param courseName コース名
      * @param loc        登録する座標
      */
-    public void registerCourse(CourseType type, String courseName, Location loc){
+    public void registerCourse(PointType type, String courseName, Location loc){
         courseMap.put(loc, new CourseEntry(type, courseName));
 
         courseDao.delete(loc); //既に登録があれば削除。(重複対策)
@@ -45,7 +45,7 @@ public class CourseManager {
      * @param type       START,END,VIA_POINT
      * @return 削除に成功したか
      */
-    public boolean removeCourse(String courseName, CourseType type) {
+    public boolean removeCourse(String courseName, PointType type) {
         Iterator<Map.Entry<Location, CourseEntry>> iterator = courseMap.entrySet().iterator();
 
         while (iterator.hasNext()) {
@@ -91,7 +91,7 @@ public class CourseManager {
      * @param type       START,END,VIA_POINT
      * @return コース名リスト
      */
-    public Set<String> getAllCourseName(CourseType type){
+    public Set<String> getAllCourseName(PointType type){
         Set<String> set = new HashSet<>();
         if(type == null) return set;
 
@@ -107,10 +107,11 @@ public class CourseManager {
     /**
      * 指定されたタイプ、名前の登録位置を一つ返す。
      *
+     * @param courseName コース名
      * @param type       START,END,VIA_POINT
      * @return 位置
      */
-    public Location getLocation(CourseType type, String courseName){
+    public Location getLocation(String courseName, PointType type){
         for (Map.Entry<Location, CourseEntry> entry : courseMap.entrySet()) {
             CourseEntry courseEntry = entry.getValue();
             if (courseEntry.getType() == type && courseEntry.getCourseName().equals(courseName)) {

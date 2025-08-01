@@ -2,7 +2,7 @@ package com.github.cresc28.speedrun.manager;
 
 import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.data.CourseEntry;
-import com.github.cresc28.speedrun.data.CourseType;
+import com.github.cresc28.speedrun.data.PointType;
 import com.github.cresc28.speedrun.data.RunState;
 import com.github.cresc28.speedrun.config.message.CourseMessage;
 import com.github.cresc28.speedrun.db.course.RecordDao;
@@ -51,74 +51,73 @@ public class TimerManager {
     public void checkRunState(Player player) {
         UUID uuid = player.getUniqueId();
         Location loc = player.getLocation().getBlock().getLocation();
-        CourseEntry entry = courseManager.getCourseEntry(loc);
         RunState state = playerStates.computeIfAbsent(uuid, k -> new RunState());
+        CourseEntry entry = courseManager.getCourseEntry(loc);
 
         if(entry == null) {
+            state.updatePreviousLocation(loc);
             state.setOnEnd(false);
             state.setOnViaPoint(false);
-            state.updateRecentStandLocation(loc);
             return;
         }
 
-        CourseType type = entry.getType();
+        PointType type = entry.getType();
         String courseName = entry.getCourseName();
 
-
         switch(type) {
-            case START:
-                //直前に同じスタート地点を踏んでいる場合はreturnする。
-                if (!state.startCourse(courseName, tick, loc)) return;
-
-                if (ConfigManager.isDeleteCpOnStart()) {
-                    if (cpManager.removeCheckpoint(uuid, loc.getWorld(), courseName)) {
-                        player.sendMessage(courseName + "のCPを削除しました。");
-                    }
-                }
-                CourseMessage.startMessage(player, courseName);
-
-                break;
-
-            case END:
-                int record = state.endCourse(tick, courseName);
-                Integer recordValue = record > 0 ? record : null;
-                int rank = recordDao.getRank(courseName, record);
-
-                if(record > 0){ //記録を登録
-                    int recordId = recordDao.insertAndRemoveSomeRecord(uuid, courseName, record);
-
-                    Map<String, Integer> viaPointRecord = state.getRecordMap();
-                    if(!viaPointRecord.isEmpty()) {
-                        recordDao.insertViaPointRecord(recordId, viaPointRecord);
-                    }
-                }
-
-                //TAを開始したパルクール以外のパルクールのゴールを踏むとクリア表示のみを出す。
-                // isOnEndはゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
-                if (!state.isOnEnd()) {
-                    Map.Entry<Integer, Integer> bestRecord = recordDao.getRankAndRecordNoDup(uuid, courseName, false);
-                    CourseMessage.endMessage(player, courseName, recordValue, rank, bestRecord);
-                }
-
-                state.setOnEnd(true);
-                state.updateRecentStandLocation(loc);
-                break;
-
-            case VIA_POINT:
-                String[] parts = courseName.split("\\."); //xx.yyという登録の場合yyは中継地点の名称を指す。
-                courseName = parts[0];
-
-                String viaPointName = parts.length == 2 ? parts[1] : null;
-                int currentRecord = state.viaPointPass(tick, courseName, viaPointName);
-                Integer currentRecordValue = currentRecord > 0 ? currentRecord : null;
-
-                if (!state.isOnViaPoint()) {
-                    CourseMessage.viaPointPassMessage(player, courseName, viaPointName, currentRecordValue);
-                }
-
-                state.setOnViaPoint(true);
-                state.updateRecentStandLocation(loc);
-                break;
+            case START: handleStart(player, uuid, loc, courseName, state); break;
+            case END: handleEnd(player, uuid, loc, courseName, state); break;
+            case VIA_POINT: handleViaPoint(player, loc, courseName, state); break;
         }
+
+        if(type != PointType.START) state.updatePreviousLocation(loc); //直前の位置を更新
+        if(type != PointType.END) state.setOnEnd(false);
+        if(type != PointType.VIA_POINT) state.setOnViaPoint(false);
+    }
+
+    private void handleStart(Player player, UUID uuid, Location loc, String courseName, RunState state){
+        if (!state.startCourse(courseName, tick, loc)) return; //直前に同じスタート地点を踏んでいる場合はreturnする。
+
+        if (ConfigManager.isDeleteCpOnStart()) {
+            if (cpManager.removeCheckpoint(uuid, loc.getWorld(), courseName)) {
+                player.sendMessage(courseName + "のCPを削除しました。");
+            }
+        }
+        CourseMessage.startMessage(player, courseName);
+    }
+
+    private void handleEnd(Player player, UUID uuid, Location loc, String courseName, RunState state){
+        int record = state.endCourse(tick, courseName);
+        Integer recordValue = record > 0 ? record : null;
+        int rank = -1;
+
+        if(record > 0){ //有効な記録の場合は登録。
+            int recordId = recordDao.insertAndRemoveSomeRecord(uuid, courseName, record);
+            Map<String, Integer> viaPointRecord = state.getRecordMap();
+            rank = recordDao.getRank(courseName, record);
+            if(!viaPointRecord.isEmpty()) recordDao.insertViaPointRecord(recordId, viaPointRecord);
+        }
+
+        //この条件はゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
+        if (!state.isOnEnd()) {
+            Map.Entry<Integer, Integer> bestRecord = recordDao.getRankAndRecordNoDup(uuid, courseName, false);
+            CourseMessage.endMessage(player, courseName, recordValue, rank, bestRecord);
+        }
+
+        state.setOnEnd(true);
+    }
+
+    private void handleViaPoint(Player player, Location loc, String courseName, RunState state){
+        String[] parts = courseName.split("\\."); //xx.yyという登録の場合yyは中継地点の名称を指す。
+        String baseCourseName = parts[0]; //コース名部分
+        String viaPointName = parts.length == 2 ? parts[1] : null; //中継地点名部分
+        int currentRecord = state.passViaPoint(tick, baseCourseName, viaPointName);
+        Integer currentRecordValue = currentRecord > 0 ? currentRecord : null;
+
+        if (!state.isOnViaPoint()) {
+            CourseMessage.viaPointPassMessage(player, baseCourseName, viaPointName, currentRecordValue);
+        }
+
+        state.setOnViaPoint(true);
     }
 }

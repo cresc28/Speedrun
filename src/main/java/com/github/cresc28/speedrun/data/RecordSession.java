@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 記録の共有用クラス。
+ * 記録の他クラスへの共有用クラス。
  */
 public class RecordSession {
     private final Map<UUID, RecordInfo> sessionMap = new HashMap<>();
@@ -16,9 +16,5 @@ public class RecordSession {
 
     public RecordInfo getRecord(UUID requesterUuid) {
         return sessionMap.get(requesterUuid);
-    }
-
-    public void clear(UUID requesterUuid) {
-        sessionMap.remove(requesterUuid);
     }
 }

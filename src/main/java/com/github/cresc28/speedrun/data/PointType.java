@@ -1,17 +1,17 @@
 package com.github.cresc28.speedrun.data;
 
 /**
- * コースのタイプの列挙クラス。
+ * 地点タイプの列挙クラス。
  */
 
-public enum CourseType {
+public enum PointType {
     START(1),
     VIA_POINT(2),
     END(3);
 
     private final int id;
 
-    CourseType(int id){
+    PointType(int id){
         this.id = id;
     }
 
@@ -19,8 +19,8 @@ public enum CourseType {
         return id;
     }
 
-    public static CourseType fromId(int id) {
-        for (CourseType type : values()) {
+    public static PointType fromId(int id) {
+        for (PointType type : values()) {
             if (type.id == id) {
                 return type;
             }
@@ -28,8 +28,8 @@ public enum CourseType {
         throw new IllegalArgumentException("Invalid CourseType id: " + id);
     }
 
-    public static CourseType fromString(String s) {
-        if (s == null) throw new IllegalArgumentException();
+    public static PointType fromString(String s) {
+        if (s == null) return null;
 
         switch (s.toLowerCase()) {
             case "start": return START;

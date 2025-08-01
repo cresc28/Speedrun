@@ -38,10 +38,10 @@ public final class Speedrun extends JavaPlugin implements Listener {
         CourseDao courseDao = new CourseDao();
         CourseManager courseManager = new CourseManager(courseDao);
         TimerManager timerManager = new TimerManager(courseManager, cpManager, recordDao);
-        SpeedrunParameters facade = new SpeedrunParameters(courseManager, cpManager, recordDao);
+        SpeedrunParameters parameters = new SpeedrunParameters(courseManager, cpManager, recordDao);
 
-        registerEvents(timerManager, facade);
-        registerCommands(facade);
+        registerEvents(timerManager, parameters);
+        registerCommands(parameters);
 
         timerManager.startTimer(this);
 
@@ -77,18 +77,23 @@ public final class Speedrun extends JavaPlugin implements Listener {
         ViaPointRecordDatabase.initializeDatabase();
     }
 
-    private void registerEvents(TimerManager timerManager, SpeedrunParameters facade){
-        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(timerManager),this);
-        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(facade),this);
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinQuitListener(facade),this);
-        Bukkit.getPluginManager().registerEvents(new InventoryActionListener(facade, this),this);
-        Bukkit.getPluginManager().registerEvents(new SignChangeListener(),this);
+    private void registerEvents(TimerManager timerManager, SpeedrunParameters parameters){
+        Listener[] listeners = {
+                new PlayerMoveListener(timerManager),
+                new PlayerInteractListener(parameters),
+                new PlayerJoinQuitListener(parameters),
+                new InventoryActionListener(parameters, this),
+                new SignChangeListener()
+        };
+        for (Listener listener : listeners) {
+            Bukkit.getPluginManager().registerEvents(listener, this);
+        }
     }
 
-    private void registerCommands(SpeedrunParameters facade) {
-        getCommand("course").setExecutor(new CourseCommand(facade));
-        getCommand("cp").setExecutor(new CheckpointCommand(facade));
-        getCommand("top").setExecutor(new TopCommand(facade));
-        getCommand("record").setExecutor(new RecordCommand(facade));
+    private void registerCommands(SpeedrunParameters parameters) {
+        getCommand("course").setExecutor(new CourseCommand(parameters));
+        getCommand("cp").setExecutor(new CheckpointCommand(parameters));
+        getCommand("top").setExecutor(new TopCommand(parameters));
+        getCommand("record").setExecutor(new RecordCommand(parameters));
     }
 }
