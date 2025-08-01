@@ -6,7 +6,7 @@
 
   <groupId>com.github.cresc28</groupId>
   <artifactId>SpeedrunPlugin</artifactId>
-  <version>3.1.0</version>
+  <version>3.1.1</version>
   <packaging>jar</packaging>
 
   <name>Speedrun</name>
