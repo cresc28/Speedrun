@@ -235,18 +235,14 @@ public class RecordDao {
      *
      * @param uuid 記録保持者のUUID
      * @param courseName コース名
-     * @param worstTie タイ記録の場合に悪い方に合わせるか、1位タイが対象プレイヤーを含め3人いる場合3位と返す。(特殊用途以外falseで良い)
      * @return ベスト順位とベスト記録
      */
-    public Map.Entry<Integer, Integer> getRankAndRecordNoDup(UUID uuid, String courseName, boolean worstTie) {
-        String sign = worstTie ? " <= " : " < ";
-        String plusOne = worstTie ? " " : " + 1 ";
-
+    public Map.Entry<Integer, Integer> getRankAndRecordNoDup(UUID uuid, String courseName) {
         //ROW_NUMBER()が使えないため強引に...。
         String sql = "SELECT best_time, (" +
                 "SELECT COUNT(*) FROM (" +
                 "SELECT uuid, MIN(finish_tick) AS best_time FROM record WHERE course_name = ? GROUP BY uuid) AS sub " +
-                "WHERE sub.best_time" + sign +  "ranked.best_time) " + plusOne + " AS rank FROM (" +
+                "WHERE sub.best_time < ranked.best_time) + 1 AS rank FROM (" +
                 "SELECT uuid, MIN(finish_tick) AS best_time FROM record WHERE course_name = ? GROUP BY uuid) AS ranked WHERE uuid = ? LIMIT 1";
 
         try (PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)) {
@@ -274,16 +270,12 @@ public class RecordDao {
      *
      * @param uuid 記録保持者のUUID
      * @param courseName コース名
-     * @param worstTie タイ記録の場合に悪い方に合わせるか、1位タイが対象プレイヤーを含め3人いる場合3位と返す。(特殊用途以外falseで良い)
      * @return ベスト順位とベスト記録
      */
-    public Map.Entry<Integer, Integer> getRankAndRecordDup(UUID uuid, String courseName, boolean worstTie) {
-        String sign = worstTie ? " <= " : " < ";
-        String plusOne = worstTie ? " " : " + 1 ";
+    public Map.Entry<Integer, Integer> getRankAndRecordDup(UUID uuid, String courseName) {
         //ROW_NUMBER()が使えない。
         String sql = "SELECT finish_tick, ( " +
-                "SELECT COUNT(*) FROM record r2 WHERE r2.course_name = r1.course_name AND r2.finish_tick"
-                + sign + "r1.finish_tick) " + plusOne + " AS rank FROM record" +
+                "SELECT COUNT(*) FROM record r2 WHERE r2.course_name = r1.course_name AND r2.finish_tick < r1.finish_tick) + 1 AS rank FROM record" +
                 " r1 WHERE r1.uuid = ? AND r1.course_name = ? ORDER BY r1.finish_tick ASC LIMIT 1";
 
         try (PreparedStatement ps = RecordDatabase.getConnection().prepareStatement(sql)) {
