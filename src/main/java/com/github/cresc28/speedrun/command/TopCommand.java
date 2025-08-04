@@ -95,6 +95,11 @@ public class TopCommand implements CommandExecutor, TabCompleter {
             displayCount = 100;
         }
 
+        if(displayCount == 0) {
+            player.sendMessage("表示件数は1以上100以下の半角数字で指定してください。");
+            displayCount = 10;
+        }
+
         UUID targetUuid = targetPlayerId == null || player.getName().equals(targetPlayerId) ?
                 player.getUniqueId() : Bukkit.getOfflinePlayer(targetPlayerId).getUniqueId();
         String targetName = targetPlayerId == null || player.getName().equals(targetPlayerId) ? "あなた" : targetPlayerId + "さん";
@@ -108,7 +113,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
         }
 
         if(showAbove){
-            showAboveRanking(player, courseName, targetUuid, targetName, allowDup, displayCount);
+            showAboveRanks(player, courseName, targetUuid, targetName, allowDup, displayCount);
             return true;
         }
 
@@ -118,7 +123,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
         }
 
         else {
-            showRanking(player, courseName, 1, allowDup, displayCount);
+            showRanks(player, courseName, 1, allowDup, displayCount);
             return true;
         }
     }
@@ -132,18 +137,24 @@ public class TopCommand implements CommandExecutor, TabCompleter {
      * @param allowDup 同一プレイヤーの複数記録を含めるか
      * @param count 表示件数
      */
-    private void showRanking(Player sender, String courseName, int startRank, boolean allowDup, int count) {
+    private void showRanks(Player sender, String courseName, int startRank, boolean allowDup, int count) {
         List<Map.Entry<String, String>> recordList = allowDup ?
-                recordDao.getTopRecordDup(courseName, 1, count) : recordDao.getTopRecordNoDup(courseName, 1, count);
+                recordDao.getTopRecordDup(courseName, startRank, count) : recordDao.getTopRecordNoDup(courseName, startRank, count);
 
         int rank = startRank;
+        int displayRank = rank;
+        int previousTick = -1;
 
         sender.sendMessage(ChatColor.LIGHT_PURPLE + "----------ランキング----------");
         for (Map.Entry<String, String> entry : recordList) {
             int tick = Integer.parseInt(entry.getValue());
+            if(tick != previousTick) displayRank = rank;
+
             String time = GameUtils.tickToTime(tick);
-            String line = String.format(ChatColor.GREEN + "%2d. %-16s %10s %6d" + "ticks", rank, entry.getKey(), time, tick);
+            String line = String.format(ChatColor.GREEN + "%2d. %-16s %10s %6d" + "ticks", displayRank, entry.getKey(), time, tick);
             sender.sendMessage(line);
+
+            previousTick = tick;
             rank++;
         }
     }
@@ -158,9 +169,9 @@ public class TopCommand implements CommandExecutor, TabCompleter {
      * @param allowDup 同一プレイヤーの複数記録を含めるか
      * @param count 表示件数
      */
-    private void showAboveRanking(Player sender, String courseName, UUID targetUuid, String targetName, boolean allowDup, int count) {
+    private void showAboveRanks(Player sender, String courseName, UUID targetUuid, String targetName, boolean allowDup, int count) {
         Map.Entry<Integer, Integer> rankAndTime = allowDup ?
-                recordDao.getRankAndRecordDup(targetUuid, courseName, true) : recordDao.getRankAndRecordNoDup(targetUuid, courseName, true);
+                recordDao.getRankAndRecordDup(targetUuid, courseName) : recordDao.getRankAndRecordNoDup(targetUuid, courseName);
 
         if (rankAndTime == null) {
             sender.sendMessage(targetName + "の記録は存在しません。");
@@ -175,7 +186,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        showRanking(sender, courseName, startRank, allowDup, count);
+        showRanks(sender, courseName, startRank, allowDup, fetchCount);
     }
 
     /**
@@ -190,7 +201,7 @@ public class TopCommand implements CommandExecutor, TabCompleter {
      */
     private int showTargetRank(Player sender, String courseName, UUID targetUuid, String targetName, boolean allowDup) {
         Map.Entry<Integer, Integer> rankAndTime = allowDup ?
-                recordDao.getRankAndRecordDup(targetUuid, courseName, false) : recordDao.getRankAndRecordNoDup(targetUuid, courseName, false);
+                recordDao.getRankAndRecordDup(targetUuid, courseName) : recordDao.getRankAndRecordNoDup(targetUuid, courseName);
 
         if (rankAndTime == null) {
             sender.sendMessage(targetName + "の記録は存在しません。");
