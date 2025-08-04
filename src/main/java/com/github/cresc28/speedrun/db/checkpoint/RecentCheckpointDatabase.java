@@ -21,13 +21,13 @@ public class RecentCheckpointDatabase {
 
             try(Statement stmt = con.createStatement()) {
                 stmt.executeUpdate(
-                                "CREATE TABLE IF NOT EXISTS recentCheckpoints (" +
-                                        "uuid TEXT NOT NULL, " +
-                                        "is_global INT NOT NULL, " + //globalRecentCp(全ワールドで最後に設定されたCPを指す)の場合は1に設定する。
-                                        "world_uid TEXT NOT NULL, " + //world.getUID().toString()で取得する。
-                                        "x DOUBLE NOT NULL, y DOUBLE NOT NULL, z DOUBLE NOT NULL, yaw DOUBLE NOT NULL, pitch DOUBLE NOT NULL, " +
-                                        "PRIMARY KEY(uuid, world_uid))"
-                );
+                        "CREATE TABLE IF NOT EXISTS recentCheckpoints (" +
+                                "uuid TEXT NOT NULL, " +
+                                "is_global INT NOT NULL, " + //globalRecentCp(全ワールドで最後に設定されたCPを指す)の場合は1に設定する。
+                                "world_uid TEXT NOT NULL, " + //world.getUID().toString()で取得する。
+                                "x DOUBLE NOT NULL, y DOUBLE NOT NULL, z DOUBLE NOT NULL, yaw DOUBLE NOT NULL, pitch DOUBLE NOT NULL, " +
+                                "PRIMARY KEY(uuid, world_uid))"
+                ); //重複項目があるが、まとめると挿入が困難になる。
             }
         } catch(Exception e){
             LOGGER.log(Level.SEVERE, "RecentCheckpointデータベース初期化中にエラーが発生しました", e);

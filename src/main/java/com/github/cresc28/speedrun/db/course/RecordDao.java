@@ -182,7 +182,7 @@ public class RecordDao {
                 String uuid = rs.getString("uuid");
                 String playerName = Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName();
                 if (playerName == null) {
-                    playerName = "UnknownPlayer";
+                    playerName = uuid;
                 }
                 String record = rs.getString("best_time");
 
@@ -217,7 +217,7 @@ public class RecordDao {
                 String uuid = rs.getString("uuid");
                 String playerName = Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName();
                 if (playerName == null) {
-                    playerName = "UnknownPlayer";
+                    playerName = uuid;
                 }
                 String record = rs.getString("finish_tick");
 
