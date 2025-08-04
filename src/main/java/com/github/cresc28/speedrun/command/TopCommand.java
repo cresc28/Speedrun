@@ -230,20 +230,20 @@ public class TopCommand implements CommandExecutor, TabCompleter {
 
         int prevTick = 0;
         int tick;
-        int lapTime;
+        int sectorTime;
 
-        sender.sendMessage(ChatColor.LIGHT_PURPLE + "中継地点名:通過タイム  lap:ラップタイム");
+        sender.sendMessage(ChatColor.LIGHT_PURPLE + "中継地点名:通過タイム  sec:区間タイム");
         for(Map.Entry<String, Integer> entry : viaPointRecord.entrySet()){
             String viaPointName = entry.getKey();
             tick = entry.getValue();
 
-            lapTime = tick - prevTick;
+            sectorTime = tick - prevTick;
             prevTick = tick;
 
-            sender.sendMessage(ChatColor.GREEN + viaPointName + ":" + GameUtils.tickToTime(tick) + "(" + tick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
+            sender.sendMessage(ChatColor.GREEN + viaPointName + ":" + GameUtils.tickToTime(tick) + "(" + tick + "ticks)   sec:" + GameUtils.tickToTime(sectorTime) + "(" + sectorTime + "ticks)");
         }
 
-        lapTime = sumTick - prevTick;
-        sender.sendMessage(ChatColor.GOLD + "ゴール:" + GameUtils.tickToTime(sumTick) + "(" + sumTick + "ticks)   lap:" + GameUtils.tickToTime(lapTime) + "(" + lapTime + "ticks)");
+        sectorTime = sumTick - prevTick;
+        sender.sendMessage(ChatColor.GOLD + "ゴール:" + GameUtils.tickToTime(sumTick) + "(" + sumTick + "ticks)   sec:" + GameUtils.tickToTime(sectorTime) + "(" + sectorTime + "ticks)");
     }
 }

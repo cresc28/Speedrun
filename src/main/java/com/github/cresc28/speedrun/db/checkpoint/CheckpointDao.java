@@ -22,7 +22,7 @@ public class CheckpointDao {
     /**
      * チェックポイントを登録する。
      *
-     * @param uuid CP登録者のUUID
+     * @param uuid UUID
      * @param cpName チェックポイント名
      * @param loc 位置
      */
@@ -49,7 +49,7 @@ public class CheckpointDao {
     /**
      * チェックポイントを削除する。
      *
-     * @param uuid CP登録者のUUID
+     * @param uuid UUID
      * @param world ワールド
      * @param cpName チェックポイント名
      * @return 削除に成功したか
@@ -70,7 +70,7 @@ public class CheckpointDao {
     /**
      * チェックポイントの位置を検索する。
      *
-     * @param uuid CP登録者のUUID
+     * @param uuid UUID
      * @param world ワールド
      * @param cpName チェックポイント名
      * @return チェックポイントの位置
@@ -101,7 +101,7 @@ public class CheckpointDao {
     /**
      * 指定されたプレイヤーが指定されたワールドで登録しているチェックポイント名をすべて取得する。
      *
-     * @param uuid CP登録者のUUID
+     * @param uuid UUID
      * @param world ワールド
      * @return チェックポイント名のリスト
      */
