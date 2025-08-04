@@ -100,8 +100,9 @@ public class TimerManager {
 
         //この条件はゴール連発防止のため。またスタートとは違い、別のゴールを連続して踏んでも重複表示は行わない。
         if (!state.isOnEnd()) {
-            Map.Entry<Integer, Integer> bestRecord = recordDao.getRankAndRecordNoDup(uuid, courseName, false);
+            Map.Entry<Integer, Integer> bestRecord = recordDao.getRankAndRecordNoDup(uuid, courseName);
             CourseMessage.endMessage(player, courseName, recordValue, rank, bestRecord);
+            CourseMessage.showRanks(player, courseName, recordValue, rank, bestRecord);
         }
 
         state.setOnEnd(true);

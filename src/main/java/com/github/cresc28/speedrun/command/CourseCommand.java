@@ -144,7 +144,7 @@ public class CourseCommand implements CommandExecutor, TabCompleter {
                 if (args.length == 3)
                     sender.sendMessage(String.format("コース名:%s タイプ:%s 座標:%d %d %d", args[2], typeDisplay, loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                 else
-                    sender.sendMessage(String.format("コース名: %s 中継地点名: %s 座標: %d %d %d", args[2], args[3], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+                    sender.sendMessage(String.format("コース名:%s 中継地点名:%s 座標:%d %d %d", args[2], args[3], loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
                 return true;
 
             default: return false;
