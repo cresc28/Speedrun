@@ -60,6 +60,11 @@ public class ConfigManager {
             config.set("maxRecordStored", 10);
             saveConfig();
         }
+
+        if (!config.contains("broadcastViapointPassMessage")) {
+            config.set("broadcastViapointPassMessage", false);
+            saveConfig();
+        }
     }
 
     /**
@@ -95,5 +100,9 @@ public class ConfigManager {
 
     public static int getMaxRecordStored(){
         return config.getInt("maxRecordStored", 10);
+    }
+
+    public static boolean isBroadcastViapointPassMessage(){
+        return config.getBoolean("broadcastViapointPassMessage", false);
     }
 }

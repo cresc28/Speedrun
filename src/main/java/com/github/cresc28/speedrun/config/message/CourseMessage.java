@@ -1,5 +1,6 @@
 package com.github.cresc28.speedrun.config.message;
 
+import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.utils.GameUtils;
 import com.github.cresc28.speedrun.utils.TextUtils;
 import org.bukkit.Bukkit;
@@ -75,10 +76,13 @@ public class CourseMessage {
                         + "start: \"計測開始！\"\n\n"
 
                         + "# ゴールメッセージ（表示可能:プレイヤー名、コース名、タイム、順位、ベスト順位、ベスト記録）\n"
-                        + "complete1: \"%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！%n%順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位&r)\"\n\n"
+                        + "complete1: \"%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！\"\n\n"
 
                         + "# ゴールメッセージ（タイム計測なし）（表示可能:プレイヤー名、コース名）\n"
                         + "complete2: \"%player%さんが%course%をクリア！\"\n\n"
+
+                        + "# ゴールメッセージ（ユニキャスト）（表示可能:プレイヤー名、コース名）\n"
+                        + "complete3: \"順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位&r)\"\n\n"
 
                         + "# 中継地点通過メッセージ（表示可能:プレイヤー名、コース名、中継地点名、タイム）\n"
                         + "pass1: \"%player%さんが%viapoint%を&a%time%(%tick%ticks)&rで通過！\"\n\n"
@@ -124,28 +128,52 @@ public class CourseMessage {
      * @param tick タイム(tick)
      */
     public static void endMessage(Player player, String courseName, Integer tick, int rank, Map.Entry<Integer, Integer> rankAndTime) {
-        String message;
+        String messageBroadcast;
 
         if (tick != null) {
-            message = config.getString("complete1", "%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！%n%順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位)&r");
-            message = message.replace("%time%", GameUtils.tickToTime(tick));
-            message = message.replace("%tick%", String.valueOf(tick));
-            message = message.replace("%rank%", String.valueOf(rank));
-            message = message.replace("%bestRank%", String.valueOf(rankAndTime.getKey()));
-            message = message.replace("%bestTick%", String.valueOf(rankAndTime.getValue()));
-            message = message.replace("%bestTime%", GameUtils.tickToTime(rankAndTime.getValue()));
+            messageBroadcast = config.getString("complete1", "%player%さんが%course%を&a%time%(%tick%ticks)&rでクリア！");
+            messageBroadcast = messageBroadcast.replace("%time%", GameUtils.tickToTime(tick))
+                    .replace("%tick%", String.valueOf(tick))
+                    .replace("%rank%", String.valueOf(rank))
+                    .replace("%bestRank%", String.valueOf(rankAndTime.getKey()))
+                    .replace("%bestTick%", String.valueOf(rankAndTime.getValue()))
+                    .replace("%bestTime%", GameUtils.tickToTime(rankAndTime.getValue()));
         }
 
         else {
-            message = config.getString("complete2", "%player%さんが%course%をクリア！");
+            messageBroadcast = config.getString("complete2", "%player%さんが%course%をクリア！");
         }
 
-        message = message.replace("%player%", player.getName());
-        message = message.replace("%course%", courseName);
-        message = ChatColor.translateAlternateColorCodes('&', message);
+        messageBroadcast = messageBroadcast.replace("%player%", player.getName());
+        messageBroadcast = messageBroadcast.replace("%course%", courseName);
+        messageBroadcast = ChatColor.translateAlternateColorCodes('&', messageBroadcast);
 
-        for (String line : message.split("%n%")) {
+        for (String line : messageBroadcast.split("%n%")) {
             Bukkit.broadcastMessage(line);
+        }
+    }
+
+    public static void showRanks(Player player, String courseName, Integer tick, int rank, Map.Entry<Integer, Integer> rankAndTime){
+        String messageUnicast;
+
+        if (tick != null) {
+            messageUnicast = config.getString("complete3", "順位は&6%rank%位&rです。(ベスト記録:&a%bestTime%&r, ベスト順位:&6%bestRank%位&r)");
+            messageUnicast = messageUnicast.replace("%time%", GameUtils.tickToTime(tick))
+                    .replace("%tick%", String.valueOf(tick))
+                    .replace("%rank%", String.valueOf(rank))
+                    .replace("%bestRank%", String.valueOf(rankAndTime.getKey()))
+                    .replace("%bestTick%", String.valueOf(rankAndTime.getValue()))
+                    .replace("%bestTime%", GameUtils.tickToTime(rankAndTime.getValue()));
+        }
+
+        else return;
+
+        messageUnicast = messageUnicast.replace("%player%", player.getName());
+        messageUnicast = messageUnicast.replace("%course%", courseName);
+        messageUnicast = ChatColor.translateAlternateColorCodes('&', messageUnicast);
+
+        for (String line : messageUnicast.split("%n%")) {
+            player.sendMessage(line);
         }
     }
 
@@ -189,7 +217,8 @@ public class CourseMessage {
         message = ChatColor.translateAlternateColorCodes('&', message);
 
         for (String line : message.split("%n%")) {
-            Bukkit.broadcastMessage(line);
+            if(ConfigManager.isBroadcastViapointPassMessage()) Bukkit.broadcastMessage(line);
+            else player.sendMessage(line);
         }
     }
 }

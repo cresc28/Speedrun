@@ -182,6 +182,8 @@ public class PlayerInteractListener implements Listener {
         String thirdLine = ChatColor.stripColor(sign.getLine(2));
         int displayCount = Integer.parseInt(thirdLine); //thirdLineが数字であるかのチェックはsignChangeListenerにて行っている。
         int rank = 1;
+        int displayRank = rank;
+        int previousTick = -1;
 
         List<Map.Entry<String, String>> recordList = allowDup ?
                 recordDao.getTopRecordDup(courseName, 1, displayCount) : recordDao.getTopRecordNoDup(courseName, 1, displayCount);
@@ -190,9 +192,13 @@ public class PlayerInteractListener implements Listener {
         player.sendMessage(ChatColor.LIGHT_PURPLE + "----------ランキング----------");
         for (Map.Entry<String, String> entry : recordList) {
             int tick = Integer.parseInt(entry.getValue());
+            if(tick != previousTick) displayRank = rank;
+
             String time = GameUtils.tickToTime(tick);
-            String line = String.format(ChatColor.GREEN + "%2d. %-16s %10s %6d" + "ticks", rank, entry.getKey(), time, tick);
+            String line = String.format(ChatColor.GREEN + "%2d. %-16s %10s %6d" + "ticks", displayRank, entry.getKey(), time, tick);
             player.sendMessage(line);
+
+            previousTick = tick;
             rank++;
         }
     }

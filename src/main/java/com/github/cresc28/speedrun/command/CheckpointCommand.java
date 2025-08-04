@@ -30,7 +30,8 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
         Player player = (Player) sender;
 
         if (args.length == 1) {
-            List<String> options = Arrays.asList("tp", "remove", "list", "allowCrossWorldTp", "deleteCpOnStart");
+            List<String> options = new ArrayList<>(Arrays.asList("tp", "remove", "list"));
+            if(player.isOp()) options.addAll(Arrays.asList("allowCrossWorldTp", "deleteCpOnStart"));
             for (String option : options) {
                 if (option.startsWith(args[0].toLowerCase())) completions.add(option);
             }
@@ -73,11 +74,6 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
         Player player = (Player) sender;
 
-        if(player.getGameMode() != GameMode.CREATIVE && !player.isOp()){
-            sender.sendMessage("OP権限不所持の場合、このコマンドはクリエイティブモードでのみ実行可能です。");
-            return true;
-        }
-
         UUID uuid = player.getUniqueId();
         Location loc = player.getLocation();
 
@@ -111,6 +107,12 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
             case "allowcrossworldtp":
                 if(args.length != 2) return false;
+
+                if(!player.isOp()) {
+                    sender.sendMessage("そのコマンドの実行権限がありません。");
+                    return true;
+                }
+
                 if(args[1].equalsIgnoreCase("true")){
                     ConfigManager.setCrossWorldTpAllowed(Boolean.parseBoolean(args[1]));
                     sender.sendMessage("他ワールドへのCPでの移動を許可しました。");
@@ -126,6 +128,12 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
 
             case "deletecponstart":
                 if(args.length != 2) return false;
+
+                if(!player.isOp()) {
+                    sender.sendMessage("そのコマンドの実行権限がありません。");
+                    return true;
+                }
+
                 if(args[1].equalsIgnoreCase("true")){
                     ConfigManager.setDeleteCpOnStart(Boolean.parseBoolean(args[1]));
                     sender.sendMessage("計測開始時にそのコースのCPが削除されるように変更しました。");
@@ -140,6 +148,9 @@ public class CheckpointCommand implements CommandExecutor, TabCompleter {
                 return true;
 
             default:
+                if(!player.isOp() && player.getGameMode() != GameMode.CREATIVE) {
+                    player.sendMessage(ChatColor.RED + "OP権限不保持の場合、このコマンドはクリエイティブモードでのみ実行可能です。");
+                }
                 cpManager.registerCheckpoint(uuid, loc, args[0]);
                 sender.sendMessage("チェックポイントを設定しました。");
                 return true;
