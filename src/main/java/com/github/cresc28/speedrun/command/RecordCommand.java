@@ -3,7 +3,7 @@ package com.github.cresc28.speedrun.command;
 import com.github.cresc28.speedrun.data.RecordInfo;
 import com.github.cresc28.speedrun.data.RecordSession;
 import com.github.cresc28.speedrun.data.SpeedrunParameters;
-import com.github.cresc28.speedrun.db.course.RecordDao;
+import com.github.cresc28.speedrun.db.record.RecordDao;
 import com.github.cresc28.speedrun.gui.RecordMenuForDelete;
 import com.github.cresc28.speedrun.manager.CourseManager;
 import com.github.cresc28.speedrun.utils.GameUtils;

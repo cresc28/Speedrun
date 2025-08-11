@@ -1,6 +1,6 @@
 package com.github.cresc28.speedrun.data;
 
-import com.github.cresc28.speedrun.db.course.RecordDao;
+import com.github.cresc28.speedrun.db.record.RecordDao;
 import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.manager.CourseManager;
 

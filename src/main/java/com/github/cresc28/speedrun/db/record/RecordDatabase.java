@@ -1,4 +1,4 @@
-package com.github.cresc28.speedrun.db.course;
+package com.github.cresc28.speedrun.db.record;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
