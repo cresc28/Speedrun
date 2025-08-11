@@ -5,7 +5,7 @@ import com.github.cresc28.speedrun.data.CourseEntry;
 import com.github.cresc28.speedrun.data.PointType;
 import com.github.cresc28.speedrun.data.RunState;
 import com.github.cresc28.speedrun.config.message.CourseMessage;
-import com.github.cresc28.speedrun.db.course.RecordDao;
+import com.github.cresc28.speedrun.db.record.RecordDao;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

@@ -3,7 +3,7 @@ package com.github.cresc28.speedrun.event;
 
 import com.github.cresc28.speedrun.config.ConfigManager;
 import com.github.cresc28.speedrun.data.SpeedrunParameters;
-import com.github.cresc28.speedrun.db.course.RecordDao;
+import com.github.cresc28.speedrun.db.record.RecordDao;
 import com.github.cresc28.speedrun.manager.CheckpointManager;
 import com.github.cresc28.speedrun.gui.CheckpointMenu;
 import com.github.cresc28.speedrun.utils.GameUtils;
