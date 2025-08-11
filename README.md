@@ -45,7 +45,7 @@
 ### `/course add via_point <コース名>　[中継地点名]`
 名前付きで中継地点を登録します。<br>
 内部的には`コース名.中継地点名`という形式で保存されます。<br>
-中継地点通過時にメッセージをブロードキャストするかについては、config.ymlのbroadcastViapointPassMessageの項目で設定可能です。
+中継地点通過時にメッセージをブロードキャストするかについては、`config.yml`の`broadcastViapointPassMessage`の項目で設定可能です。
 
 ---
 
@@ -184,6 +184,6 @@ topコマンドでプレイヤー名がUUID表示されている場合は、UUID
 
 ### その他
 各コースの各プレイヤーの記録はデフォルトで最大10件まで保存され、それを超えた場合は悪い記録から順に削除されます。<br>
-保存上限を変更したい場合は、`config`ディレクトリ内の`maxRecordStored`を編集してください。
+保存上限を変更したい場合は、`config.yml`の`maxRecordStored`の項目を編集してください。
 
 </details>
